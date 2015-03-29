@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2015, Mazen Kotb <email@mazenmc.io>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+package io.minecloud.db;
+
+import io.minecloud.annotation.Immutable;
+
+@Immutable
+public final class Credentials {
+    private final String[] hosts;
+    private final String username;
+    private final char[] password;
+    private final String database;
+
+    public Credentials(String[] hosts, String username, char[] password) {
+        this(hosts, username, password, null);
+    }
+
+    public Credentials(String[] hosts, String username, char[] password, String database) {
+        this.hosts = hosts;
+        this.username = username;
+        this.password = password;
+        this.database = database;
+    }
+
+    public String[] hosts() {
+        return hosts;
+    }
+
+    public String username() {
+        return username;
+    }
+
+    public char[] password() {
+        return password;
+    }
+
+    public String database() {
+        return database;
+    }
+}
