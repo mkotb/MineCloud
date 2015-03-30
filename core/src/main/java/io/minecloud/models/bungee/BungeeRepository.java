@@ -13,50 +13,24 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.player;
+package io.minecloud.models.bungee;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
-import lombok.Setter;
+import com.mongodb.DBObject;
+import io.minecloud.db.mongo.AbstractMongoRepository;
+import io.minecloud.db.mongo.MongoDatabase;
 
-import java.util.List;
+public class BungeeRepository extends AbstractMongoRepository<Bungee> {
 
-public class PlayerData implements MongoModel {
-    @DataField(name = "uuid")
-    @Setter
-    private String id;
-    @DataField
-    @Setter
-    private String name;
-
-    @DataField
-    @Setter
-    private double health;
-
-    @DataField
-    @Setter
-    private double maxHealth;
-
-    @DataField
-    private List<PlayerMetadata> metadata;
-
-    public String id() {
-        return id;
+    private BungeeRepository(MongoDatabase database) {
+        super("bungees", database);
     }
 
-    public String name() {
-        return name;
+    public BungeeRepository create(MongoDatabase database) {
+        return new BungeeRepository(database);
     }
 
-    public double health() {
-        return health;
-    }
-
-    public double maxHealth() {
-        return maxHealth;
-    }
-
-    public List<PlayerMetadata> metadata() {
-        return metadata;
+    @Override
+    public boolean update(DBObject query, Bungee model) {
+        throw new UnsupportedOperationException();
     }
 }

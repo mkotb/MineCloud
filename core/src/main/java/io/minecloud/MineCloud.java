@@ -15,12 +15,31 @@
  */
 package io.minecloud;
 
+import io.minecloud.db.Credentials;
+import io.minecloud.db.mongo.MongoDatabase;
+import io.minecloud.db.redis.RedisDatabase;
+import io.minecloud.models.network.Network;
+import io.minecloud.models.network.NetworkRepository;
+import io.minecloud.models.nodes.Node;
+import io.minecloud.models.nodes.NodeRepository;
+import io.minecloud.models.nodes.type.NodeType;
+import io.minecloud.models.nodes.type.NodeTypeRepository;
+import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerRepository;
+import io.minecloud.models.server.type.ServerType;
+import io.minecloud.models.server.type.ServerTypeRepository;
+import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public final class MineCloud {
     private static final MineCloud INSTANCE = new MineCloud();
     private static final Logger LOGGER = LogManager.getLogger();
+
+    @Setter
+    private MongoDatabase mongo;
+    @Setter
+    private RedisDatabase redis;
 
     private MineCloud() {}
 
@@ -30,5 +49,27 @@ public final class MineCloud {
 
     public static Logger logger() {
         return LOGGER;
+    }
+
+    public MongoDatabase mongo() {
+        return mongo;
+    }
+
+    public RedisDatabase redis() {
+        return redis;
+    }
+
+    public void initiateMongo(Credentials credentials) {
+        mongo = MongoDatabase.createDatabase(credentials);
+
+        mongo.loadRepository(NetworkRepository.create(mongo), Network.class);
+        mongo.loadRepository(NodeTypeRepository.create(mongo), NodeType.class);
+        mongo.loadRepository(NodeRepository.create(mongo), Node.class);
+        mongo.loadRepository(ServerTypeRepository.create(mongo), ServerType.class);
+        mongo.loadRepository(ServerRepository.create(mongo), Server.class);
+    }
+
+    public void initiateRedis(Credentials credentials) {
+        redis = RedisDatabase.create(credentials);
     }
 }

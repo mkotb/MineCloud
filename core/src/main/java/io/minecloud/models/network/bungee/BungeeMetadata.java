@@ -13,28 +13,33 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.nodes.spec;
+package io.minecloud.models.network.bungee;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.models.bungee.type.BungeeType;
+import lombok.Setter;
 
-public class NodeSpecification implements MongoModel {
+public class BungeeMetadata implements MongoModel {
+    @DataField(reference = true)
+    @Setter
+    private BungeeType type;
     @DataField
-    private String name;
+    @Setter
+    private int minimumAmount;
     @DataField
-    private int ram;
-    @DataField
-    private CPU cpu;
+    @Setter
+    private int maximumAmount;
 
-    public int ram() {
-        return ram;
+    public BungeeType type() {
+        return type;
+    }
+    
+    public int minimumAmount() {
+        return minimumAmount;
     }
 
-    public CPU cpu() {
-        return cpu;
-    }
-
-    public String name() {
-        return name;
+    public int maximumAmount() {
+        return maximumAmount;
     }
 }

@@ -1,7 +1,23 @@
+/*
+ * Copyright (c) 2015, Mazen Kotb <email@mazenmc.io>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 package io.minecloud.models.server.type;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.models.nodes.Node;
 import lombok.Setter;
 
 public class ServerType implements MongoModel {
@@ -10,34 +26,34 @@ public class ServerType implements MongoModel {
     private String name;
     @DataField
     @Setter
-    private int minimumAmount;
-    @DataField
-    @Setter
-    private int maximumAmount;
+    private int dedicatedRam;
     @DataField
     @Setter
     private int maxPlayers;
+    @DataField(reference = true)
+    @Setter
+    private Node preferredNode;
     @DataField
     @Setter
-    private String preferredNode;
+    private String mod;
 
     public String name() {
         return name;
-    }
-
-    public int minimumAmount() {
-        return minimumAmount;
-    }
-
-    public int maximumAmount() {
-        return maximumAmount;
     }
 
     public int maxPlayers() {
         return maxPlayers;
     }
 
-    public String preferredNode() {
+    public Node preferredNode() {
         return preferredNode;
+    }
+
+    public String mod() {
+        return mod;
+    }
+
+    public int dedicatedRam() {
+        return dedicatedRam;
     }
 }

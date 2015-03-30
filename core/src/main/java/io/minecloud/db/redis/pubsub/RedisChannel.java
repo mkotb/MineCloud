@@ -28,17 +28,16 @@ public abstract class RedisChannel {
     protected RedisChannel(RedisDatabase database, String channel) {
         this.database = database;
         this.channel = channel;
-        Jedis resource = database.grabResource();
 
-        resource.subscribe(ChannelPubSub.create(this), channel.getBytes(Charset.forName("UTF-8")));
-        database.returnResource(resource);
+        try (Jedis resource = database.grabResource()) {
+            resource.subscribe(ChannelPubSub.create(this), channel.getBytes(Charset.forName("UTF-8")));
+        }
     }
 
     public void publish(Message message) {
-        Jedis resource = database.grabResource();
-
-        resource.publish(channel.getBytes(Charset.forName("UTF-8")), message.raw());
-        database.returnResource(resource);
+        try (Jedis resource = database.grabResource()) {
+            resource.publish(channel.getBytes(Charset.forName("UTF-8")), message.raw());
+        }
     }
 
     public abstract void handle(Message message);

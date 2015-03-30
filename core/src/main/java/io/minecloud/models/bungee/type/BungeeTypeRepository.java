@@ -13,50 +13,22 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.player;
+package io.minecloud.models.bungee.type;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
-import lombok.Setter;
+import io.minecloud.db.mongo.AbstractMongoRepository;
+import io.minecloud.db.mongo.MongoDatabase;
 
-import java.util.List;
+public class BungeeTypeRepository extends AbstractMongoRepository<BungeeType> {
 
-public class PlayerData implements MongoModel {
-    @DataField(name = "uuid")
-    @Setter
-    private String id;
-    @DataField
-    @Setter
-    private String name;
-
-    @DataField
-    @Setter
-    private double health;
-
-    @DataField
-    @Setter
-    private double maxHealth;
-
-    @DataField
-    private List<PlayerMetadata> metadata;
-
-    public String id() {
-        return id;
+    private BungeeTypeRepository(MongoDatabase database) {
+        super("bungee-types", database);
     }
 
-    public String name() {
-        return name;
+    public static BungeeTypeRepository create(MongoDatabase database) {
+        return new BungeeTypeRepository(database);
     }
 
-    public double health() {
-        return health;
-    }
-
-    public double maxHealth() {
-        return maxHealth;
-    }
-
-    public List<PlayerMetadata> metadata() {
-        return metadata;
+    public BungeeType typeBy(String name) {
+        return findFirst((model) -> model.name().equalsIgnoreCase(name));
     }
 }

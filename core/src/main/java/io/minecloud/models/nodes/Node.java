@@ -17,19 +17,27 @@ package io.minecloud.models.nodes;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.models.nodes.type.NodeType;
+import lombok.Setter;
 
 public class Node implements MongoModel {
     @DataField
+    @Setter
     private String name;
     @DataField
+    @Setter
     private String privateIp;
     @DataField
+    @Setter
     private int ramDedicated;
+    @DataField(reference = true)
+    @Setter
+    private NodeType type;
     @DataField
-    private String specification;
-    @DataField
+    @Setter
     private double currentFrequency;
     @DataField
+    @Setter
     private double availableRam;
 
     public String name() {
@@ -44,7 +52,7 @@ public class Node implements MongoModel {
         return ramDedicated;
     }
 
-    public String specification() {
-        return specification;
+    public NodeType type() {
+        return type;
     }
 }

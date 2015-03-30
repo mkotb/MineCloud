@@ -15,6 +15,7 @@
  */
 package io.minecloud.db.mongo;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import io.minecloud.db.mongo.model.MongoModel;
@@ -52,6 +53,10 @@ public interface MongoRepository<T extends MongoModel> {
                 .filter(predicate)
                 .collect(Collectors.toList());
     }
+
+    public T findFirst(BasicDBObject query);
+
+    public T findFirst(ObjectId id);
 
     /**
      * Retrieves all models or entries in the repository

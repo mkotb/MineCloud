@@ -52,7 +52,12 @@ public abstract class AbstractMongoRepository<T extends MongoModel> implements M
         return result.getN() == 1;
     }
 
-    public T get(ObjectId id) {
+    @Override
+    public T findFirst(BasicDBObject query) {
+        return findFirst((ObjectId) collection.findOne(query).get("_id"));
+    }
+
+    public T findFirst(ObjectId id) {
         return findFirst((model) ->
                 ModelWrapper.wrapperFrom(model).objectId().equals(id));
     }

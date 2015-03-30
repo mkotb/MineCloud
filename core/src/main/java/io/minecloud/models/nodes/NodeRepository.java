@@ -15,6 +15,7 @@
  */
 package io.minecloud.models.nodes;
 
+import com.mongodb.DBObject;
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
 
@@ -30,5 +31,10 @@ public class NodeRepository extends AbstractMongoRepository<Node> {
 
     public Node nodeBy(String name) {
         return findFirst((node) -> node.name().equalsIgnoreCase(name));
+    }
+
+    @Override
+    public boolean update(DBObject query, Node model) {
+        throw new UnsupportedOperationException();
     }
 }

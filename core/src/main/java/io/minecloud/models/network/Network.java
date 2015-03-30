@@ -13,50 +13,43 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.player;
+package io.minecloud.models.network;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.models.network.bungee.BungeeMetadata;
+import io.minecloud.models.network.server.ServerMetadata;
 import lombok.Setter;
 
 import java.util.List;
 
-public class PlayerData implements MongoModel {
-    @DataField(name = "uuid")
-    @Setter
-    private String id;
+public class Network implements MongoModel {
     @DataField
     @Setter
     private String name;
-
     @DataField
     @Setter
-    private double health;
-
+    private List<ServerMetadata> serverMetadata;
     @DataField
     @Setter
-    private double maxHealth;
-
+    private List<BungeeMetadata> bungeeMetadata;
     @DataField
-    private List<PlayerMetadata> metadata;
-
-    public String id() {
-        return id;
-    }
+    @Setter
+    private List<String> nodes;
 
     public String name() {
         return name;
     }
 
-    public double health() {
-        return health;
+    public List<ServerMetadata> serverMetadata() {
+        return serverMetadata;
     }
 
-    public double maxHealth() {
-        return maxHealth;
+    public List<BungeeMetadata> bungeeMetadata() {
+        return bungeeMetadata;
     }
 
-    public List<PlayerMetadata> metadata() {
-        return metadata;
+    public List<String> nodes() {
+        return nodes;
     }
 }

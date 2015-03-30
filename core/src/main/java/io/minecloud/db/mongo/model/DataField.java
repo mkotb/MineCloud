@@ -26,4 +26,6 @@ public @interface DataField {
     public String name() default "filler_In";
 
     public boolean optional() default false;
+
+    public boolean reference() default false;
 }

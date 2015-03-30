@@ -17,9 +17,12 @@ package io.minecloud.db.mongo.model;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import io.minecloud.MineCloud;
 import io.minecloud.MineCloudException;
+import io.minecloud.db.mongo.MongoRepository;
 import org.apache.logging.log4j.Level;
+import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -66,11 +69,20 @@ public final class ModelTranslator {
 
     public static <T extends MongoModel> ModelWrapper translate(BasicDBObject object, Class<T> cls) {
         if (!object.containsField("timeCreated") || object.containsField("lastUpdated")) {
-            return null; // don't translate
+            return null; // don't translate, invalid object
         }
 
-        if (!cls.getName().equals(cls.getName()) || !MongoModel.class.isAssignableFrom(cls)) {
-            return null;
+        String className = object.getString("modelClass");
+
+        if (!className.equals(cls.getName())) {
+            try {
+                cls = classBy(className);
+            } catch (MineCloudException ignored) {
+            }
+        }
+
+        if (!MongoModel.class.isAssignableFrom(cls)) {
+            throw new MineCloudException("Class provided is not assignable from MongoModel"); // in some world
         }
 
         T model;
@@ -90,7 +102,7 @@ public final class ModelTranslator {
         }
 
         for (Field field : cls.getDeclaredFields()) {
-            if (!field.isAnnotationPresent(DataField.class)) {
+            if (!field.isAnnotationPresent(DataField.class)) { // ignore fields which are not data fields
                 continue;
             }
 
@@ -99,13 +111,36 @@ public final class ModelTranslator {
             String name = data.name();
 
             if ("filler_In".equals(name)) {
-                name = field.getName();
+                name = field.getName(); // replace name with field name if not overridden
             }
 
             if (!data.optional() && !object.containsField(data.name())) {
                 return null; // invalid object C:
             } else if (data.optional() && !object.containsField(data.name())) {
-                continue;
+                continue; // field is optional and object provided doesn't contain the field, so proceed without it
+            }
+
+            if (data.reference() && MongoModel.class.isAssignableFrom(field.getType())) {
+                /*
+                 * Find the according repository, and use the object id or name to find the referenced object
+                 */
+                MongoRepository repository = MineCloud.instance().mongo()
+                        .repositoryBy(field.getType().asSubclass(MongoModel.class));
+                MongoModel reference;
+                Object identifier = object.get(data.name());
+
+                if (identifier instanceof ObjectId) {
+                    reference = repository.findFirst((ObjectId) identifier);
+                } else if (identifier instanceof String) {
+                    reference = repository.findFirst(new BasicDBObject("name", identifier));
+                } else {
+                    return null; // invalid identifier
+                }
+
+                converter = (obj) -> (T) reference;
+            } else if (data.reference() && !MongoModel.class.isAssignableFrom(field.getType())) {
+                throw new MineCloudException("Cannot get reference to non-model object" +
+                        field.getType().getName() + " !");
             }
 
             if (converter == null && data.optional()) {
@@ -116,11 +151,15 @@ public final class ModelTranslator {
                         field.getName() + " in " + cls.getSimpleName());
             }
 
+            if (converter == null) {
+                continue; // not possible, but to remove warnings
+            }
+
             if (Modifier.isFinal(field.getModifiers()) && !data.optional()) {
                 throw new MineCloudException("Cannot set a final field on non-optional field " +
                         field.getName() + " in " + cls.getSimpleName());
             } else if (data.optional() && Modifier.isFinal(field.getModifiers())) {
-                continue;
+                continue; // field is optional and final at the same time, proceed anyways
             }
 
             if (Modifier.isStatic(field.getModifiers())) {
@@ -130,7 +169,7 @@ public final class ModelTranslator {
 
             try {
                 if (Modifier.isPrivate(field.getModifiers()) || Modifier.isProtected(field.getModifiers())) {
-                    field.setAccessible(true);
+                    field.setAccessible(true); // set accessible if needed
                 }
 
                 field.set(model, converter.convert(object.get(name)));
@@ -148,6 +187,7 @@ public final class ModelTranslator {
 
         object.append("timeCreated", wrapper.timeSerialized());
         object.append("lastUpdated", Date.from(Instant.now()));
+        object.append("modelClass", wrapper.model().getClass().getName());
 
         for (Field field : model.getClass().getDeclaredFields()) {
             if(!field.isAnnotationPresent(DataField.class)) {
@@ -179,8 +219,22 @@ public final class ModelTranslator {
                 continue;
             }
 
+            if (value == null) {
+                continue; // not possible, but to remove warnings
+            }
+
             if (MongoModel.class.isAssignableFrom(value.getClass())) {
                 value = translate(ModelWrapper.wrapperFrom((MongoModel) value));
+
+                if (data.reference()) {
+                    BasicDBObject obj = (BasicDBObject) value;
+
+                    if (obj.getString("name") != null) {
+                        value = obj.getString("name");
+                    } else {
+                        value = obj.getObjectId("_id");
+                    }
+                }
             }
 
             if (List.class.isAssignableFrom(value.getClass())) {

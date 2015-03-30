@@ -62,16 +62,4 @@ public final class RedisDatabase implements Database {
     public Jedis grabResource() {
         return pool.getResource();
     }
-
-    public void returnResource(Jedis jedis) {
-        returnResource(jedis, false);
-    }
-
-    public void returnResource(Jedis jedis, boolean broken) {
-        if (broken) {
-            pool.returnBrokenResource(jedis);
-        } else {
-            pool.returnResource(jedis);
-        }
-    }
 }

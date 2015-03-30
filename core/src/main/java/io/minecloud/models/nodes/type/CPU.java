@@ -13,50 +13,42 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.player;
+package io.minecloud.models.nodes.type;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 import lombok.Setter;
 
-import java.util.List;
-
-public class PlayerData implements MongoModel {
-    @DataField(name = "uuid")
-    @Setter
-    private String id;
+/*
+ * It is not recommended to change the values of this class
+ */
+public class CPU implements MongoModel {
     @DataField
     @Setter
-    private String name;
-
+    private double baseFrequency;
     @DataField
     @Setter
-    private double health;
-
+    private double maxFrequency;
     @DataField
     @Setter
-    private double maxHealth;
-
+    private int cores;
     @DataField
-    private List<PlayerMetadata> metadata;
+    @Setter
+    private int threads;
 
-    public String id() {
-        return id;
+    public double baseFrequency() {
+        return baseFrequency;
     }
 
-    public String name() {
-        return name;
+    public double maxFrequency() {
+        return maxFrequency;
     }
 
-    public double health() {
-        return health;
+    public int cores() {
+        return cores;
     }
 
-    public double maxHealth() {
-        return maxHealth;
-    }
-
-    public List<PlayerMetadata> metadata() {
-        return metadata;
+    public int threads() {
+        return threads;
     }
 }

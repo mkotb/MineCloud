@@ -13,42 +13,22 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.nodes.spec;
+package io.minecloud.models.nodes.type;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
-import lombok.Setter;
+import io.minecloud.db.mongo.AbstractMongoRepository;
+import io.minecloud.db.mongo.MongoDatabase;
 
-/*
- * It is not recommended to change the values of this class
- */
-public class CPU implements MongoModel {
-    @DataField
-    @Setter
-    private double baseFrequency;
-    @DataField
-    @Setter
-    private double maxFrequency;
-    @DataField
-    @Setter
-    private int cores;
-    @DataField
-    @Setter
-    private int threads;
+public class NodeTypeRepository extends AbstractMongoRepository<NodeType> {
 
-    public double baseFrequency() {
-        return baseFrequency;
+    private NodeTypeRepository(MongoDatabase database) {
+        super("node-types", database);
     }
 
-    public double maxFrequency() {
-        return maxFrequency;
+    public static NodeTypeRepository create(MongoDatabase database) {
+        return new NodeTypeRepository(database);
     }
 
-    public int cores() {
-        return cores;
-    }
-
-    public int threads() {
-        return threads;
+    public NodeType specificationBy(String name) {
+        return findFirst((spec) -> spec.name().equalsIgnoreCase(name));
     }
 }
