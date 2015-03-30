@@ -40,8 +40,8 @@ public class MongoDatabase implements Database {
         return new MongoDatabase(credentials);
     }
 
-    public <T extends MongoModel> MongoRepository<T> repositoryBy(Class<T> model) {
-        return (MongoRepository<T>) repositories.get(model);
+    public <T extends MongoModel, E extends MongoRepository<T>> E repositoryBy(Class<T> model) {
+        return (E) repositories.get(model);
     }
 
     public <T extends MongoModel> void loadRepository(MongoRepository<T> repository, Class<T> cls) {
