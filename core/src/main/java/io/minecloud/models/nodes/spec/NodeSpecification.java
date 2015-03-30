@@ -13,32 +13,28 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.nodes;
+package io.minecloud.models.nodes.spec;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 
-public class NodeModel implements MongoModel {
+public class NodeSpecification implements MongoModel {
     @DataField
-    private String privateIp;
+    private String name;
     @DataField
-    private int ramDedicated;
+    private int ram;
     @DataField
-    private NodeSpecification specification;
-    @DataField
-    private double currentFrequency;
-    @DataField
-    private double availableRam;
+    private CPU cpu;
 
-    public String privateIp() {
-        return privateIp;
+    public int ram() {
+        return ram;
     }
 
-    public int ramDedicated() {
-        return ramDedicated;
+    public CPU cpu() {
+        return cpu;
     }
 
-    public NodeSpecification specification() {
-        return specification;
+    public String name() {
+        return name;
     }
 }

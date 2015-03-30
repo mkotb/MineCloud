@@ -18,7 +18,7 @@ package io.minecloud.models.nodes;
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
 
-public class NodeRepository extends AbstractMongoRepository<NodeModel> {
+public class NodeRepository extends AbstractMongoRepository<Node> {
 
     private NodeRepository(MongoDatabase database) {
         super("nodes", database);
@@ -26,5 +26,9 @@ public class NodeRepository extends AbstractMongoRepository<NodeModel> {
 
     public static NodeRepository create(MongoDatabase database) {
         return new NodeRepository(database);
+    }
+
+    public Node nodeBy(String name) {
+        return findFirst((node) -> node.name().equalsIgnoreCase(name));
     }
 }

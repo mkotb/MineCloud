@@ -15,6 +15,7 @@
  */
 package io.minecloud.db.mongo.model;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import io.minecloud.MineCloud;
 import io.minecloud.MineCloudException;
@@ -23,9 +24,7 @@ import org.apache.logging.log4j.Level;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -43,6 +42,16 @@ public final class ModelTranslator {
         addConverter(int.class, (obj) -> (int) obj);
         addConverter(double.class, (obj) -> (double) obj);
         addConverter(Date.class, (obj) -> (Date) obj);
+        addConverter(List.class, (obj) -> {
+            BasicDBList raw = (BasicDBList) obj;
+            List list = new ArrayList();
+
+            for (Object o : raw) {
+                list.add(getConverter(o.getClass()).convert(o));
+            }
+
+            return list;
+        });
     }
 
     private static Class classBy(String name) {
@@ -85,6 +94,7 @@ public final class ModelTranslator {
                 continue;
             }
 
+            DataFieldConverter<T> converter = (DataFieldConverter<T>) getConverter(field.getType());
             DataField data = field.getAnnotation(DataField.class);
             String name = data.name();
 
@@ -98,9 +108,9 @@ public final class ModelTranslator {
                 continue;
             }
 
-            if (!CONVERTERS.containsKey(field.getType()) && data.optional()) {
+            if (converter == null && data.optional()) {
                 continue;
-            } else if (!CONVERTERS.containsKey(field.getType()) && !data.optional()) {
+            } else if (converter == null && !data.optional()) {
                 throw new MineCloudException("There is no data converter for type " +
                         field.getType().getSimpleName() + " for non-optional field " +
                         field.getName() + " in " + cls.getSimpleName());
@@ -123,11 +133,11 @@ public final class ModelTranslator {
                     field.setAccessible(true);
                 }
 
-                field.set(model, CONVERTERS.get(field.getClass()).convert(object.get(name)));
+                field.set(model, converter.convert(object.get(name)));
             } catch (IllegalAccessException ignored) {}
         }
 
-        model.initialize();
+        model.initialize(object);
         return ModelWrapper.create(object.getDate("timeCreated"), object.getDate("lastUpdated"), model,
                 object.getObjectId("_id"));
     }
@@ -169,6 +179,14 @@ public final class ModelTranslator {
                 continue;
             }
 
+            if (MongoModel.class.isAssignableFrom(value.getClass())) {
+                value = translate(ModelWrapper.wrapperFrom((MongoModel) value));
+            }
+
+            if (List.class.isAssignableFrom(value.getClass())) {
+                value = resolveList((List) value);
+            }
+
             if (Modifier.isStatic(field.getModifiers())) {
                 MineCloud.logger().warn("Found static data field for an instance-based model: " +
                         field.toString() + ". Encoding anyways...");
@@ -179,6 +197,40 @@ public final class ModelTranslator {
 
         model.translate(object);
         return object;
+    }
+
+    private static BasicDBList resolveList(List list) {
+        BasicDBList value = new BasicDBList();
+
+        for (Object o : list) {
+            if (MongoModel.class.isAssignableFrom(o.getClass())) {
+                o = translate(ModelWrapper.wrapperFrom((MongoModel) o));
+            }
+
+            if (List.class.isAssignableFrom(o.getClass())) {
+                o = resolveList((List) o);
+            }
+
+            value.add(o);
+        }
+
+        return value;
+    }
+
+    public static <T> DataFieldConverter<T> getConverter(Class<T> cls) {
+        DataFieldConverter<T> converter = null;
+
+        for (Class<?> clazz : CONVERTERS.keySet()) {
+            if (clazz.equals(cls)) {
+                return (DataFieldConverter<T>) CONVERTERS.get(clazz);
+            }
+
+            if (clazz.isAssignableFrom(cls)) {
+                converter = (DataFieldConverter<T>) CONVERTERS.get(clazz);
+            }
+        }
+
+        return converter;
     }
 
     public static <T> void addConverter(Class<T> cls, DataFieldConverter<T> converter) {

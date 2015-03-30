@@ -22,7 +22,7 @@ public interface MongoModel {
     /**
      * Called after all data fields have been loaded successfully, may or may not have any significant effect.
      */
-    public default void initialize() {}
+    public default void initialize(BasicDBObject object) {}
 
     /**
      * Called after field-encoding for translation of model -> db object.

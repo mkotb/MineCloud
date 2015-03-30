@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * <p>
- * MongoRepository is a means of data structure for MineCloud, this uses type T as form of a schema for the database.
+ * MongoRepository is a means of data structure for MineCloud, this uses type T as form of a schema for the collection.
  * This being so, any invalid inputs or raw entries will immediately be either removed or ignored during load-time.
  * Using such a design keeps invalid data entries to be put into the database to cause destruction across the network,
  * reducing volatility of the software.

@@ -52,6 +52,11 @@ public abstract class AbstractMongoRepository<T extends MongoModel> implements M
         return result.getN() == 1;
     }
 
+    public T get(ObjectId id) {
+        return findFirst((model) ->
+                ModelWrapper.wrapperFrom(model).objectId().equals(id));
+    }
+
     @Override
     public void remove(T model) {
         collection.remove(ModelTranslator.translate(ModelWrapper.wrapperFrom(model)));

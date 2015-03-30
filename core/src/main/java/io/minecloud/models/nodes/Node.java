@@ -18,29 +18,33 @@ package io.minecloud.models.nodes;
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 
-public class CPU implements MongoModel {
+public class Node implements MongoModel {
     @DataField
-    private double baseFrequency;
+    private String name;
     @DataField
-    private double maxFrequency;
+    private String privateIp;
     @DataField
-    private int cores;
+    private int ramDedicated;
     @DataField
-    private int threads;
+    private String specification;
+    @DataField
+    private double currentFrequency;
+    @DataField
+    private double availableRam;
 
-    public double baseFrequency() {
-        return baseFrequency;
+    public String name() {
+        return name;
     }
 
-    public double maxFrequency() {
-        return maxFrequency;
+    public String privateIp() {
+        return privateIp;
     }
 
-    public int cores() {
-        return cores;
+    public int ramDedicated() {
+        return ramDedicated;
     }
 
-    public int threads() {
-        return threads;
+    public String specification() {
+        return specification;
     }
 }
