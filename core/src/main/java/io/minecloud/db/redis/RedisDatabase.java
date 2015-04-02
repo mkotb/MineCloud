@@ -18,11 +18,15 @@ package io.minecloud.db.redis;
 import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.Database;
+import io.minecloud.db.redis.pubsub.RedisChannel;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.util.*;
+
 public final class RedisDatabase implements Database {
+    private final Map<String, RedisChannel> channels = new HashMap<>();
     private final Credentials credentials;
     private JedisPool pool;
 
@@ -57,6 +61,14 @@ public final class RedisDatabase implements Database {
 
         pool = new JedisPool(config, host, port, 1000,
                 new String(credentials.password()));
+    }
+
+    public void addChannel(RedisChannel channel) {
+        channels.put(channel.channel(), channel);
+    }
+
+    public RedisChannel channelBy(String name) {
+        return channels.get(name);
     }
 
     public Jedis grabResource() {

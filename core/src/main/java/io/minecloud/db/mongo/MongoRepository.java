@@ -87,5 +87,7 @@ public interface MongoRepository<T extends MongoModel> {
 
     public boolean update(DBObject query, T model);
 
+    public void update(T model);
+
     public DBCollection collection();
 }

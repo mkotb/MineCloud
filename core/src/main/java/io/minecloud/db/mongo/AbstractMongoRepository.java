@@ -15,22 +15,19 @@
  */
 package io.minecloud.db.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import com.mongodb.*;
 import io.minecloud.db.mongo.model.ModelTranslator;
 import io.minecloud.db.mongo.model.ModelWrapper;
 import io.minecloud.db.mongo.model.MongoModel;
 import org.bson.types.ObjectId;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class AbstractMongoRepository<T extends MongoModel> implements MongoRepository<T> {
     protected final DBCollection collection;
-    protected final Set<T> models = new HashSet<>();
     protected final MongoDatabase database;
     private final String collectionName;
 
@@ -50,6 +47,10 @@ public abstract class AbstractMongoRepository<T extends MongoModel> implements M
         WriteResult result = collection.insert(ModelTranslator.translate(ModelWrapper.wrapperFrom(model)));
 
         return result.getN() == 1;
+    }
+
+    public Class<T> modelClass() {
+        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     @Override
@@ -81,12 +82,28 @@ public abstract class AbstractMongoRepository<T extends MongoModel> implements M
     }
 
     @Override
+    public void update(T model) {
+        ModelWrapper wrapper = ModelWrapper.wrapperFrom(model);
+
+        collection.update(new BasicDBObject("_id", wrapper.objectId()),
+                ModelTranslator.translate(wrapper));
+    }
+
+    @Override
     public DBCollection collection() {
         return collection;
     }
 
     @Override
     public Collection<T> models() {
+        Set<T> models = new HashSet<>();
+        DBCursor cursor = collection.find();
+
+        while (cursor.hasNext()) {
+            models.add((T) ModelTranslator.translate((BasicDBObject) cursor.next(), modelClass())
+                    .model());
+        }
+
         return models;
     }
 }

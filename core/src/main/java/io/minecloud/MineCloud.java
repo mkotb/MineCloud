@@ -62,6 +62,8 @@ public final class MineCloud {
     public void initiateMongo(Credentials credentials) {
         mongo = MongoDatabase.createDatabase(credentials);
 
+        mongo.setup();
+
         mongo.loadRepository(NetworkRepository.create(mongo), Network.class);
         mongo.loadRepository(NodeTypeRepository.create(mongo), NodeType.class);
         mongo.loadRepository(NodeRepository.create(mongo), Node.class);
@@ -71,5 +73,7 @@ public final class MineCloud {
 
     public void initiateRedis(Credentials credentials) {
         redis = RedisDatabase.create(credentials);
+
+        redis.setup();
     }
 }

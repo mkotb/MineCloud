@@ -25,13 +25,17 @@ public abstract class RedisChannel {
     protected final RedisDatabase database;
     protected final String channel;
 
-    protected RedisChannel(RedisDatabase database, String channel) {
+    protected RedisChannel(String channel, RedisDatabase database) {
         this.database = database;
         this.channel = channel;
 
         try (Jedis resource = database.grabResource()) {
             resource.subscribe(ChannelPubSub.create(this), channel.getBytes(Charset.forName("UTF-8")));
         }
+    }
+
+    public String channel() {
+        return channel;
     }
 
     public void publish(Message message) {

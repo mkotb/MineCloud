@@ -18,6 +18,7 @@ package io.minecloud.models.server;
 import com.mongodb.DBObject;
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
+import io.minecloud.models.server.type.ServerType;
 
 public class ServerRepository extends AbstractMongoRepository<Server> {
 
@@ -32,5 +33,21 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
     @Override
     public boolean update(DBObject query, Server model) {
         throw new UnsupportedOperationException();
+    }
+
+    public int highestNumberFor(ServerType type) {
+        int id = 0;
+
+        for (Server server : models()) {
+            if (!server.type().equals(type)) {
+                continue;
+            }
+
+            if (server.number() > id) {
+                id = server.number();
+            }
+        }
+
+        return id;
     }
 }

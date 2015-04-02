@@ -55,4 +55,12 @@ public class Node implements MongoModel {
     public NodeType type() {
         return type;
     }
+
+    public double currentFrequency() {
+        return currentFrequency;
+    }
+
+    public double availableRam() {
+        return availableRam;
+    }
 }
