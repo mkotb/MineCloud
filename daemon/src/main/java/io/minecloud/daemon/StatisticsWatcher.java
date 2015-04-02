@@ -16,6 +16,7 @@
 package io.minecloud.daemon;
 
 import io.minecloud.MineCloud;
+import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.nodes.CoreMetadata;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
@@ -28,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.IntStream;
 
 // I'm sorry for this class, I recommend almost nobody reads this
 
@@ -42,8 +44,9 @@ public class StatisticsWatcher extends Thread {
     public void run() {
         while(!isInterrupted()) {
             Node node = MineCloudDaemon.instance().node();
-            List<Double> frequencies = new ArrayList<>();
-            double[] usages;
+            double[] frequencies = new double[node.type().cpus().size()];
+            double[] usages = new double[frequencies.length];
+            int index = -1;
 
             for (File file : new File("/sys/devices/system/cpu/").listFiles((f, s) -> s.startsWith("cpu"))) {
                 if (!file.isDirectory())
@@ -63,16 +66,15 @@ public class StatisticsWatcher extends Thread {
                     continue;
                 }
 
-                frequencies.add((double) frequency / 1000000);
+                frequencies[++index] = ((double) frequency / 1000000);
             }
-
-            usages = new double[frequencies.size()];
-            List<String> stat;
 
             if (prevTotal == null) {
-                prevTotal = new int[frequencies.size()];
-                prevIdle = new int[frequencies.size()];
+                prevTotal = new int[frequencies.length];
+                prevIdle = new int[frequencies.length];
             }
+
+            List<String> stat;
 
             try {
                 stat = Files.readAllLines(Paths.get("/proc/stat"));
@@ -81,7 +83,7 @@ public class StatisticsWatcher extends Thread {
                 continue;
             }
 
-            for (int i = 0; i < usages.length; i++) {
+            IntStream.range(0, usages.length).forEach((i) -> {
                 String prefix = "cpu" + i;
                 String cpuStat = stat.stream()
                         .filter((s) -> s.startsWith(prefix))
@@ -104,31 +106,39 @@ public class StatisticsWatcher extends Thread {
                 usages[i] = (1000 * (diffTotal - diffIdle) / diffTotal + 5) / 10;
                 prevIdle[i] = idle;
                 prevTotal[i] = totalCpuTime;
-            }
+            });
 
             Collection<Server> servers = MineCloud.instance().mongo()
                     .repositoryBy(Server.class)
                     .findAll((server) -> server.node().equals(node));
+            Collection<Bungee> bungees = MineCloud.instance().mongo()
+                    .repositoryBy(Bungee.class)
+                    .findAll((bungee) -> bungee.node().equals(node));
             int ramUsed = 0;
 
             for (Server server : servers) {
                 ramUsed += server.ramUsage();
             }
 
+            for (Bungee bungee : bungees) {
+                ramUsed += bungee.ramUsage();
+            }
+
             node.setAvailableRam(node.type().ram() - ramUsed);
 
             List<CoreMetadata> cores = new ArrayList<>();
 
-            for (int i = 0; i < usages.length; i++) {
+            IntStream.range(0, usages.length).forEach((i) -> {
                 CoreMetadata metadata = new CoreMetadata();
 
-                metadata.setCurrentFrequency(frequencies.get(i));
+                metadata.setCurrentFrequency(frequencies[i]);
                 metadata.setUsage(usages[i]);
 
                 cores.add(metadata);
-            }
+            });
 
             node.setCoreMetadata(cores);
+            MineCloud.instance().mongo().repositoryBy(Node.class).update(node);
 
             try {
                 Thread.sleep(1000L);

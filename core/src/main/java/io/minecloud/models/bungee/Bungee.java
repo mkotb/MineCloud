@@ -40,6 +40,9 @@ public class Bungee implements MongoModel {
     @DataField
     @Setter
     private String publicIp;
+    @DataField
+    @Setter
+    private int ramUsage;
 
     public Network network() {
         return network;
@@ -59,5 +62,9 @@ public class Bungee implements MongoModel {
 
     public String publicIp() {
         return publicIp;
+    }
+
+    public int ramUsage() {
+        return ramUsage;
     }
 }

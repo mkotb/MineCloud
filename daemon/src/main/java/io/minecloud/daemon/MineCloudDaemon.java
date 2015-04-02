@@ -18,6 +18,7 @@ package io.minecloud.daemon;
 import com.mongodb.BasicDBObject;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.DockerException;
 import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.mongo.MongoDatabase;
@@ -25,10 +26,14 @@ import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.MessageType;
 import io.minecloud.db.redis.msg.binary.MessageInputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
+import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.NodeRepository;
+import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
+import org.apache.logging.log4j.Level;
+import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,6 +77,52 @@ public class MineCloudDaemon {
                             .findFirst(new BasicDBObject("name", stream.readString()));
 
                     Deployer.deployServer(network, type);
+                }));
+
+        redis.addChannel(SimpleRedisChannel.create("server-kill", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY) {
+                        return;
+                    }
+
+                    MessageInputStream stream = message.contents();
+
+                    if (!stream.readString().equalsIgnoreCase(node))
+                        return;
+
+                    Server server = mongo.repositoryBy(Server.class)
+                            .findFirst(new ObjectId(stream.readString()));
+
+                    if (!server.node().name().equals(node)) {
+                        MineCloud.logger().log(Level.ERROR, "Invalid request was sent to kill a server " +
+                                "not on the current node");
+                        return;
+                    }
+
+                    try {
+                        dockerClient.killContainer(server.containerId());
+                    } catch (DockerException | InterruptedException e) {
+                        MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
+                    }
+                }));
+
+        redis.addChannel(SimpleRedisChannel.create("bungee-create", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY) {
+                        return;
+                    }
+
+                    MessageInputStream stream = message.contents();
+
+                    if (!stream.readString().equalsIgnoreCase(node))
+                        return;
+
+                    Network network = mongo.repositoryBy(Network.class)
+                            .findFirst(new BasicDBObject("name", stream.readString()));
+                    BungeeType type = mongo.repositoryBy(BungeeType.class)
+                            .findFirst(new BasicDBObject("name", stream.readString()));
+
+                    Deployer.deployBungee(network, type);
                 }));
 
         new StatisticsWatcher().start();

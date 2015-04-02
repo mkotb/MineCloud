@@ -30,6 +30,9 @@ public class Node implements MongoModel {
     private String name;
     @DataField
     @Setter
+    private String publicIp;
+    @DataField
+    @Setter
     private String privateIp;
     @DataField
     @Setter
@@ -50,6 +53,10 @@ public class Node implements MongoModel {
 
     public String privateIp() {
         return privateIp;
+    }
+
+    public String publicIp() {
+        return publicIp;
     }
 
     public int ramDedicated() {
