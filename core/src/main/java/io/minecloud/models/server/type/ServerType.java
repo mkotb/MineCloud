@@ -18,8 +18,10 @@ package io.minecloud.models.server.type;
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.nodes.Node;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+@EqualsAndHashCode
 public class ServerType implements MongoModel {
     @DataField
     @Setter

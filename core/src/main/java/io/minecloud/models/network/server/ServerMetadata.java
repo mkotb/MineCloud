@@ -18,8 +18,10 @@ package io.minecloud.models.network.server;
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.server.type.ServerType;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+@EqualsAndHashCode
 public class ServerMetadata implements MongoModel {
     @DataField(reference = true)
     @Setter

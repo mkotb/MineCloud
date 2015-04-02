@@ -18,8 +18,12 @@ package io.minecloud.models.nodes;
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.nodes.type.NodeType;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+import java.util.List;
+
+@EqualsAndHashCode
 public class Node implements MongoModel {
     @DataField
     @Setter
@@ -35,10 +39,10 @@ public class Node implements MongoModel {
     private NodeType type;
     @DataField
     @Setter
-    private double currentFrequency;
+    private double availableRam;
     @DataField
     @Setter
-    private double availableRam;
+    private List<CoreMetadata> coreMetadata;
 
     public String name() {
         return name;
@@ -56,8 +60,16 @@ public class Node implements MongoModel {
         return type;
     }
 
-    public double currentFrequency() {
-        return currentFrequency;
+    public List<CoreMetadata> coreMetadata() {
+        return coreMetadata;
+    }
+
+    public double usage(int core) {
+        if (core >= coreMetadata.size()) {
+            return -1;
+        }
+
+        return coreMetadata.get(core).usage();
     }
 
     public double availableRam() {

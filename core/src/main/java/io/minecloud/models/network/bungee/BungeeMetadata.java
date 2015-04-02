@@ -18,8 +18,10 @@ package io.minecloud.models.network.bungee;
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.bungee.type.BungeeType;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+@EqualsAndHashCode
 public class BungeeMetadata implements MongoModel {
     @DataField(reference = true)
     @Setter

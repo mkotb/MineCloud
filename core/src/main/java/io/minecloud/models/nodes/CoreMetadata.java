@@ -13,51 +13,27 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.models.bungee;
+package io.minecloud.models.nodes;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
-import io.minecloud.models.bungee.type.BungeeType;
-import io.minecloud.models.network.Network;
-import io.minecloud.models.nodes.Node;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 @EqualsAndHashCode
-public class Bungee implements MongoModel {
-    @DataField(reference = true)
-    @Setter
-    private Network network;
-    @DataField(reference = true)
-    @Setter
-    private BungeeType type;
+public class CoreMetadata implements MongoModel {
     @DataField
     @Setter
-    private String containerId;
-    @DataField(reference = true)
-    @Setter
-    private Node node;
+    private double currentFrequency;
     @DataField
     @Setter
-    private String publicIp;
+    private double usage;
 
-    public Network network() {
-        return network;
+    public double currentFrequency() {
+        return currentFrequency;
     }
 
-    public BungeeType type() {
-        return type;
-    }
-
-    public String containerId() {
-        return containerId;
-    }
-
-    public Node node() {
-        return node;
-    }
-
-    public String publicIp() {
-        return publicIp;
+    public double usage() {
+        return usage;
     }
 }

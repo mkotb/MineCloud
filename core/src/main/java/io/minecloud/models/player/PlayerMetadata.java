@@ -17,7 +17,9 @@ package io.minecloud.models.player;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class PlayerMetadata implements MongoModel {
     @DataField
     private String value;

@@ -19,10 +19,12 @@ import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.network.bungee.BungeeMetadata;
 import io.minecloud.models.network.server.ServerMetadata;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.util.List;
 
+@EqualsAndHashCode
 public class Network implements MongoModel {
     @DataField
     @Setter

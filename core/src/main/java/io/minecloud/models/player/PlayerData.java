@@ -17,10 +17,12 @@ package io.minecloud.models.player;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.util.List;
 
+@EqualsAndHashCode
 public class PlayerData implements MongoModel {
     @DataField(name = "uuid")
     @Setter

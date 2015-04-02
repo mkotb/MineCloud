@@ -21,6 +21,7 @@ import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.player.PlayerData;
 import io.minecloud.models.server.type.ServerType;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.List;
  *
  * Any inconsistent changes made to this class will be ignored.
  */
+@EqualsAndHashCode
 public class Server implements MongoModel {
     @DataField(reference = true)
     @Setter

@@ -17,8 +17,12 @@ package io.minecloud.models.nodes.type;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+import java.util.List;
+
+@EqualsAndHashCode
 public class NodeType implements MongoModel {
     @DataField
     @Setter
@@ -28,14 +32,14 @@ public class NodeType implements MongoModel {
     private int ram;
     @DataField
     @Setter
-    private CPU cpu;
+    private List<CPU> cpus;
 
     public int ram() {
         return ram;
     }
 
-    public CPU cpu() {
-        return cpu;
+    public List<CPU> cpus() {
+        return cpus;
     }
 
     public String name() {

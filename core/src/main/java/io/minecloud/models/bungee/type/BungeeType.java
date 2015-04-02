@@ -17,8 +17,10 @@ package io.minecloud.models.bungee.type;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+@EqualsAndHashCode
 public class BungeeType implements MongoModel {
     @DataField
     @Setter

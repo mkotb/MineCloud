@@ -74,9 +74,7 @@ public class MineCloudDaemon {
                     Deployer.deployServer(network, type);
                 }));
 
-        while (!Thread.currentThread().isInterrupted()) {
-            // TODO statistics watcher
-        }
+        new StatisticsWatcher().start();
     }
 
     public Node node() {
