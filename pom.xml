@@ -12,6 +12,7 @@
     <modules>
         <module>core</module>
         <module>daemon</module>
+        <module>controller</module>
     </modules>
 
     <dependencies>

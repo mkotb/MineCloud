@@ -26,6 +26,7 @@ import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.MessageType;
 import io.minecloud.db.redis.msg.binary.MessageInputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
+import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
@@ -37,12 +38,7 @@ import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Properties;
-import java.util.Scanner;
-
-import static io.minecloud.MineCloud.logger;
 
 public class MineCloudDaemon {
     private static MineCloudDaemon instance;
@@ -125,6 +121,33 @@ public class MineCloudDaemon {
                     Deployer.deployBungee(network, type);
                 }));
 
+        redis.addChannel(SimpleRedisChannel.create("bungee-kill", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY) {
+                        return;
+                    }
+
+                    MessageInputStream stream = message.contents();
+
+                    if (!stream.readString().equalsIgnoreCase(node))
+                        return;
+
+                    Bungee bungee = mongo.repositoryBy(Bungee.class)
+                            .findFirst(new ObjectId(stream.readString()));
+
+                    if (!bungee.node().name().equals(node)) {
+                        MineCloud.logger().log(Level.ERROR, "Invalid request was sent to kill a bungee " +
+                                "not on the current node");
+                        return;
+                    }
+
+                    try {
+                        dockerClient.killContainer(bungee.containerId());
+                    } catch (DockerException | InterruptedException e) {
+                        MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
+                    }
+                }));
+
         new StatisticsWatcher().start();
     }
 
@@ -156,7 +179,7 @@ public class MineCloudDaemon {
         properties.load(new FileInputStream(file));
 
         if (!properties.containsKey("mongo-hosts")) {
-            runSetup(properties, file);
+            MineCloud.runSetup(properties, file);
             new MineCloudDaemon(properties);
 
             properties = null;
@@ -175,75 +198,5 @@ public class MineCloudDaemon {
         MineCloud.instance().initiateRedis(redis);
 
         new MineCloudDaemon(properties);
-    }
-
-    private static void runSetup(Properties properties, File file) throws IOException {
-        Scanner scanner = new Scanner(System.in);
-        String[] hosts;
-        String database;
-        String username;
-        String password;
-
-        logger().info("I see you either have your details mis-configured or there is none, " +
-                "we will proceed with performing the initial setup!");
-
-        System.out.print("Please enter the hosts for MongoDB (separated by commas): ");
-        hosts = scanner.nextLine().split(",");
-
-        System.out.println();
-        System.out.print("Please enter the database name: ");
-        database = scanner.nextLine();
-
-        System.out.println();
-        System.out.print("Please enter the username for auth.:");
-        username = scanner.nextLine();
-
-        System.out.println();
-        System.out.print("Please enter the password for " + username + ": ");
-        password = scanner.nextLine();
-
-        StringBuilder formattedHosts = new StringBuilder();
-
-        for (String s : hosts) {
-            formattedHosts.append(s)
-                    .append(";");
-        }
-
-        properties.setProperty("mongo-hosts", formattedHosts.toString());
-        properties.setProperty("mongo-database", database);
-        properties.setProperty("mongo-username", username);
-        properties.setProperty("mongo-password", password);
-
-        Credentials mongo = new Credentials(hosts, username, password.toCharArray(), database);
-        MineCloud.instance().initiateMongo(mongo);
-
-        System.out.println();
-        System.out.print("Great! Please enter the host for the Redis server: ");
-        hosts = new String[] {scanner.nextLine()};
-
-        System.out.println();
-        System.out.print("Please enter the username for the Redis server: ");
-        username = scanner.nextLine();
-
-        System.out.println();
-        System.out.print("Please enter the password for " + username + ":");
-
-        password = scanner.nextLine();
-
-        properties.setProperty("redis-host", hosts[0]);
-        properties.setProperty("redis-username", username);
-        properties.setProperty("redis-password", password);
-
-        Credentials redis = new Credentials(hosts, username, password.toCharArray());
-        MineCloud.instance().initiateRedis(redis);
-
-        System.out.print("Lastly, please enter the name of this node: ");
-        properties.setProperty("node-name", scanner.nextLine());
-
-
-        System.out.println("Finished setup!");
-        System.out.println("You can modify the database details in " + file.getAbsolutePath());
-
-        properties.store(new FileOutputStream(file), "");
     }
 }

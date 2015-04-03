@@ -32,6 +32,12 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.Scanner;
+
 public final class MineCloud {
     private static final MineCloud INSTANCE = new MineCloud();
     private static final Logger LOGGER = LogManager.getLogger();
@@ -49,6 +55,76 @@ public final class MineCloud {
 
     public static Logger logger() {
         return LOGGER;
+    }
+
+    public static void runSetup(Properties properties, File file) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        String[] hosts;
+        String database;
+        String username;
+        String password;
+
+        logger().info("I see you either have your details mis-configured or there is none, " +
+                "we will proceed with performing the initial setup!");
+
+        System.out.print("Please enter the hosts for MongoDB (separated by commas): ");
+        hosts = scanner.nextLine().split(",");
+
+        System.out.println();
+        System.out.print("Please enter the database name: ");
+        database = scanner.nextLine();
+
+        System.out.println();
+        System.out.print("Please enter the username for auth.:");
+        username = scanner.nextLine();
+
+        System.out.println();
+        System.out.print("Please enter the password for " + username + ": ");
+        password = scanner.nextLine();
+
+        StringBuilder formattedHosts = new StringBuilder();
+
+        for (String s : hosts) {
+            formattedHosts.append(s)
+                    .append(";");
+        }
+
+        properties.setProperty("mongo-hosts", formattedHosts.toString());
+        properties.setProperty("mongo-database", database);
+        properties.setProperty("mongo-username", username);
+        properties.setProperty("mongo-password", password);
+
+        Credentials mongo = new Credentials(hosts, username, password.toCharArray(), database);
+        MineCloud.instance().initiateMongo(mongo);
+
+        System.out.println();
+        System.out.print("Great! Please enter the host for the Redis server: ");
+        hosts = new String[] {scanner.nextLine()};
+
+        System.out.println();
+        System.out.print("Please enter the username for the Redis server: ");
+        username = scanner.nextLine();
+
+        System.out.println();
+        System.out.print("Please enter the password for " + username + ":");
+
+        password = scanner.nextLine();
+
+        properties.setProperty("redis-host", hosts[0]);
+        properties.setProperty("redis-username", username);
+        properties.setProperty("redis-password", password);
+
+        Credentials redis = new Credentials(hosts, username, password.toCharArray());
+        MineCloud.instance().initiateRedis(redis);
+
+        System.out.print("Lastly, please enter the name of this node: ");
+        properties.setProperty("node-name", scanner.nextLine());
+
+
+        logger().info("Finished setup!");
+        logger().info("You can modify the database details in " + file.getAbsolutePath());
+
+        properties.store(new FileOutputStream(file), "");
     }
 
     public MongoDatabase mongo() {
