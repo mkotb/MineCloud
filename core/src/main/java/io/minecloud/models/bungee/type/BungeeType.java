@@ -17,6 +17,7 @@ package io.minecloud.models.bungee.type;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.models.nodes.type.NodeType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
@@ -28,6 +29,9 @@ public class BungeeType implements MongoModel {
     @DataField
     @Setter
     private int dedicatedRam;
+    @DataField(reference = true)
+    @Setter
+    private NodeType preferredNode;
 
     public String name() {
         return name;
@@ -35,5 +39,9 @@ public class BungeeType implements MongoModel {
 
     public int dedicatedRam() {
         return dedicatedRam;
+    }
+
+    public NodeType preferredNode() {
+        return preferredNode;
     }
 }

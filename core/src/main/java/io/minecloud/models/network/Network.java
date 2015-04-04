@@ -15,10 +15,15 @@
  */
 package io.minecloud.models.network;
 
+import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.models.bungee.Bungee;
+import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.bungee.BungeeMetadata;
 import io.minecloud.models.network.server.ServerMetadata;
+import io.minecloud.models.server.Server;
+import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
@@ -49,6 +54,34 @@ public class Network implements MongoModel {
 
     public List<BungeeMetadata> bungeeMetadata() {
         return bungeeMetadata;
+    }
+
+    public int serversOnline() {
+        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).models()
+                .stream()
+                .filter((server) -> server.network().equals(this))
+                .count();
+    }
+
+    public int serversOnline(ServerType type) {
+        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).models()
+                .stream()
+                .filter((server) -> server.network().equals(this) && server.type().equals(type))
+                .count();
+    }
+
+    public int bungeesOnline() {
+        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
+                .stream()
+                .filter((bungee) -> bungee.network().equals(this))
+                .count();
+    }
+
+    public int bungeesOnline(BungeeType type) {
+        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
+                .stream()
+                .filter((bungee) -> bungee.network().equals(this) && bungee.type().equals(type))
+                .count();
     }
 
     public List<String> nodes() {

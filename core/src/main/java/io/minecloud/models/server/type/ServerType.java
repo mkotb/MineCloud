@@ -17,7 +17,7 @@ package io.minecloud.models.server.type;
 
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
-import io.minecloud.models.nodes.Node;
+import io.minecloud.models.nodes.type.NodeType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
@@ -34,7 +34,7 @@ public class ServerType implements MongoModel {
     private int maxPlayers;
     @DataField(reference = true)
     @Setter
-    private Node preferredNode;
+    private NodeType preferredNode;
     @DataField
     @Setter
     private String mod;
@@ -47,7 +47,7 @@ public class ServerType implements MongoModel {
         return maxPlayers;
     }
 
-    public Node preferredNode() {
+    public NodeType preferredNode() {
         return preferredNode;
     }
 

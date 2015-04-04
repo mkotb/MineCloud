@@ -15,13 +15,17 @@
  */
 package io.minecloud.models.nodes;
 
+import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.DataField;
 import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.nodes.type.NodeType;
+import io.minecloud.models.server.Server;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @EqualsAndHashCode
 public class Node implements MongoModel {
@@ -71,6 +75,16 @@ public class Node implements MongoModel {
         return coreMetadata;
     }
 
+    public double totalUsage() {
+        double total = 0;
+
+        for (int i = 0; i < coreMetadata.size(); i++) {
+            total += usage(i);
+        }
+
+        return total;
+    }
+
     public double usage(int core) {
         if (core >= coreMetadata.size()) {
             return -1;
@@ -81,5 +95,16 @@ public class Node implements MongoModel {
 
     public double availableRam() {
         return availableRam;
+    }
+
+    public List<Server> servers() {
+        return MineCloud.instance().mongo().repositoryBy(Server.class).models()
+                .stream()
+                .filter((server) -> server.node().equals(this))
+                .collect(Collectors.toList());
+    }
+
+    public int serverCount() {
+        return servers().size();
     }
 }
