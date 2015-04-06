@@ -73,6 +73,8 @@ public final class Deployer {
         server.setRamUsage(-1);
 
         repository.insert(server);
+        MineCloud.logger().info("Started server " + server.name()
+                + " with container id " + server.containerId());
     }
 
     public static void deployBungee(Network network, BungeeType type) {
@@ -113,5 +115,6 @@ public final class Deployer {
         bungee.setRamUsage(-1);
 
         repository.insert(bungee);
+        MineCloud.logger().info("Started bungee " + bungee.name() + " with container id " + bungee.containerId());
     }
 }

@@ -79,6 +79,12 @@ public class Controller {
                                         .forEach((i) -> deployServer(network, metadata.type()));
                         });
                     });
+
+            try {
+                Thread.sleep(2000L);
+            } catch (InterruptedException ignored) {
+                // I don't care
+            }
         }
     }
 
@@ -123,6 +129,7 @@ public class Controller {
         }
 
         redis.channelBy("bungee-create").publish(os.toMessage());
+        MineCloud.logger().info("Sent deploy message to " + node.name() + " for bungee type " + type.name());
     }
 
     public void deployServer(Network network, ServerType type) {
@@ -139,6 +146,7 @@ public class Controller {
         }
 
         redis.channelBy("server-create").publish(os.toMessage());
+        MineCloud.logger().info("Sent deploy message to " + node.name() + " for server type " + type.name());
     }
 
     public Node findNode(Network network, NodeType preferredNode, int requiredRam) {

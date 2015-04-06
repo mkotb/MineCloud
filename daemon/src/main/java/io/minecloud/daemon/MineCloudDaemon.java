@@ -19,6 +19,7 @@ import com.mongodb.BasicDBObject;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
+import com.spotify.docker.client.messages.Container;
 import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.mongo.MongoDatabase;
@@ -97,6 +98,10 @@ public class MineCloudDaemon {
 
                     try {
                         dockerClient.killContainer(server.containerId());
+                        MineCloud.logger().info("Killed server " + server.name()
+                                + " with container id " + server.containerId());
+
+                        mongo.repositoryBy(Server.class).remove(server);
                     } catch (DockerException | InterruptedException e) {
                         MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
                     }
@@ -143,12 +148,57 @@ public class MineCloudDaemon {
 
                     try {
                         dockerClient.killContainer(bungee.containerId());
+                        MineCloud.logger().info("Killed bungee " + bungee.name()
+                                + " with container id " + bungee.containerId());
+
+                        mongo.repositoryBy(Bungee.class).remove(bungee);
                     } catch (DockerException | InterruptedException e) {
                         MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
                     }
                 }));
 
         new StatisticsWatcher().start();
+
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                dockerClient.listContainers().stream()
+                        .filter((container) -> container.status().contains("exited"))
+                        .forEach((container) -> {
+                            try {
+                                dockerClient.killContainer(container.id());
+
+                                if (container.image().contains("minecloud")) {
+                                    String type = container.image().substring(9);
+
+                                    switch (type.toLowerCase()) {
+                                        case "bungee":
+                                            mongo.repositoryBy(Bungee.class)
+                                                    .remove((bungee) -> bungee
+                                                            .containerId().equals(container.id()));
+                                            break;
+
+                                        case "server":
+                                            mongo.repositoryBy(Server.class)
+                                                    .remove((server) -> server
+                                                            .containerId().equals(container.id()));
+                                            break;
+                                    }
+                                }
+
+                               MineCloud.logger().info("Killed dead container " + container.id());
+                            } catch (DockerException | InterruptedException e) {
+                                MineCloud.logger().log(Level.ERROR, "Was unable to kill exited container " + container.id(),
+                                        e);
+                            }
+                        });
+            } catch (DockerException | InterruptedException ignored) {}
+
+            try {
+                Thread.sleep(2000L);
+            } catch (InterruptedException ignored) {
+                // I don't care
+            }
+        }
     }
 
     public Node node() {

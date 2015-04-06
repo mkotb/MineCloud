@@ -67,4 +67,8 @@ public class Bungee implements MongoModel {
     public int ramUsage() {
         return ramUsage;
     }
+
+    public String name() {
+        return "bungee." + publicIp();
+    }
 }

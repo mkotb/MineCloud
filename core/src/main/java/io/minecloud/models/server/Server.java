@@ -89,4 +89,8 @@ public class Server implements MongoModel {
     public String containerId() {
         return containerId;
     }
+
+    public String name() {
+        return type.name() + ":" + number();
+    }
 }
