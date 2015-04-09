@@ -17,10 +17,7 @@ package io.minecloud.daemon;
 
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
-import com.spotify.docker.client.messages.ContainerConfig;
-import com.spotify.docker.client.messages.ContainerCreation;
-import com.spotify.docker.client.messages.HostConfig;
-import com.spotify.docker.client.messages.PortBinding;
+import com.spotify.docker.client.messages.*;
 import io.minecloud.MineCloud;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.BungeeRepository;
@@ -46,7 +43,6 @@ public final class Deployer {
         Server server = new Server();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/server")
-                .exposedPorts("25565")
                 .openStdin(true)
                 .env("") // TODO ENVs
                 .cmd("sh initialize.sh") // TODO
@@ -71,6 +67,7 @@ public final class Deployer {
         server.setOnlinePlayers(new ArrayList<>());
         server.setNumber(repository.highestNumberFor(type) + 1);
         server.setRamUsage(-1);
+        server.setPort(0);
 
         repository.insert(server);
         MineCloud.logger().info("Started server " + server.name()
@@ -90,7 +87,7 @@ public final class Deployer {
                 .build();
         HostConfig hostConfig = HostConfig.builder()
                 .portBindings(new HashMap<String, List<PortBinding>>() {{
-                    put("25565", Arrays.asList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
+                    put(node.privateIp(), Arrays.asList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
                 }})
                 .build();
 

@@ -26,6 +26,7 @@ import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.MessageType;
 import io.minecloud.db.redis.msg.binary.MessageInputStream;
+import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
@@ -39,6 +40,7 @@ import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class MineCloudDaemon {
@@ -157,6 +159,8 @@ public class MineCloudDaemon {
                     }
                 }));
 
+        redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis));
+
         new StatisticsWatcher().start();
 
         while (!Thread.currentThread().isInterrupted()) {
@@ -178,15 +182,23 @@ public class MineCloudDaemon {
                                             break;
 
                                         case "server":
-                                            mongo.repositoryBy(Server.class)
-                                                    .remove((server) -> server
+                                            Server server = mongo.repositoryBy(Server.class)
+                                                    .findFirst((s) -> s
                                                             .containerId().equals(container.id()));
+                                            mongo.repositoryBy(Server.class).remove(server);
+
+                                            MessageOutputStream os = new MessageOutputStream();
+
+                                            os.writeString(server.name());
+
+                                            redis.channelBy("server-shutdown-notif")
+                                                    .publish(os.toMessage());
                                             break;
                                     }
                                 }
 
                                MineCloud.logger().info("Killed dead container " + container.id());
-                            } catch (DockerException | InterruptedException e) {
+                            } catch (DockerException | InterruptedException | IOException e) {
                                 MineCloud.logger().log(Level.ERROR, "Was unable to kill exited container " + container.id(),
                                         e);
                             }

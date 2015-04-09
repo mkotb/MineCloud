@@ -38,6 +38,9 @@ public class ServerType implements MongoModel {
     @DataField
     @Setter
     private String mod;
+    @DataField
+    @Setter
+    private boolean defaultServer;
 
     public String name() {
         return name;
@@ -57,5 +60,9 @@ public class ServerType implements MongoModel {
 
     public int dedicatedRam() {
         return dedicatedRam;
+    }
+
+    public boolean defaultServer() {
+        return defaultServer;
     }
 }

@@ -13,6 +13,7 @@
         <module>core</module>
         <module>daemon</module>
         <module>controller</module>
+        <module>bungee</module>
     </modules>
 
     <dependencies>
@@ -36,6 +37,7 @@
                     <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
+
 
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
