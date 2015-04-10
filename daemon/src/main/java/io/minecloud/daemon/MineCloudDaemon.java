@@ -20,6 +20,7 @@ import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
 import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.ContainerInfo;
 import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.mongo.MongoDatabase;
@@ -156,6 +157,38 @@ public class MineCloudDaemon {
                         mongo.repositoryBy(Bungee.class).remove(bungee);
                     } catch (DockerException | InterruptedException e) {
                         MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
+                    }
+                }));
+
+        redis.addChannel(SimpleRedisChannel.create("server-start-notif", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY)
+                        return;
+
+                    MessageInputStream stream = message.contents();
+
+                    Server server = mongo.repositoryBy(Server.class)
+                            .findFirst(new ObjectId(stream.readString()));
+
+                    if (!server.node().name().equals(node))
+                        return;
+
+                    if (server.port() != -1)
+                        return; // don't even know how this would happen
+
+                    try {
+                        ContainerInfo info = dockerClient.inspectContainer(server.containerId());
+
+                        info.networkSettings().ports().forEach((s, l) -> {
+                            if (!s.contains("25565"))
+                                return;
+
+                            server.setPort(Integer.parseInt(l.get(0).hostPort()));
+                        });
+
+                        mongo.repositoryBy(Server.class).update(server);
+                    } catch (Exception e) {
+                        MineCloud.logger().log(Level.ERROR, "Was unable to set the port of a started server", e);
                     }
                 }));
 
