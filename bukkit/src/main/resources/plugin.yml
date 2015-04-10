@@ -1,0 +1,3 @@
+name: 'MineCloud-Bukkit'
+version: 1.0
+main: io.minecloud.bukkit.MineCloudPlugin

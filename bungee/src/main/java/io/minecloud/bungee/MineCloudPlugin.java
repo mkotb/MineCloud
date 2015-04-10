@@ -71,7 +71,7 @@ public class MineCloudPlugin extends Plugin {
             ServerType def = mongo.repositoryBy(ServerType.class).findFirst(ServerType::defaultServer);
 
             mongo.repositoryBy(Server.class).models().stream()
-                    .filter((server) -> server.type().equals(def) && server.port() != 0)
+                    .filter((server) -> server.type().equals(def) && server.ramUsage() != -1)
                     .forEach(this::addServer);
 
             getProxy().setReconnectHandler(new ReconnectHandler(this));

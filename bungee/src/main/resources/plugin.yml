@@ -1,0 +1,4 @@
+name: 'MineCloud-Bungee'
+main: io.minecloud.bungee.MineCloudPlugin
+version: 1.0
+author: MazenMC

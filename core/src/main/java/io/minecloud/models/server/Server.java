@@ -25,6 +25,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /*
  * It is not recommended to play with the values of this class.
@@ -57,6 +59,9 @@ public class Server implements MongoModel {
     @DataField
     @Setter
     private String containerId;
+    @DataField
+    @Setter
+    private double tps;
 
     public Network network() {
         return network;
@@ -74,6 +79,26 @@ public class Server implements MongoModel {
         return onlinePlayers;
     }
 
+    public PlayerData playerBy(String name) {
+        Optional<PlayerData> optional = onlinePlayers().stream()
+                .filter((pd) -> pd.name().equals(name))
+                .findFirst();
+
+        return optional.isPresent() ? optional.get() : null;
+    }
+
+    public PlayerData playerBy(UUID id) {
+        Optional<PlayerData> optional = onlinePlayers().stream()
+                .filter((pd) -> pd.id().equals(id.toString()))
+                .findFirst();
+
+        return optional.isPresent() ? optional.get() : null;
+    }
+
+    public void removePlayer(UUID id) {
+        onlinePlayers.remove(playerBy(id));
+    }
+
     public int ramUsage() {
         return ramUsage;
     }
@@ -88,6 +113,10 @@ public class Server implements MongoModel {
 
     public String containerId() {
         return containerId;
+    }
+
+    public double tps() {
+        return tps;
     }
 
     public String name() {
