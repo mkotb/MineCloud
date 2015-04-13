@@ -19,6 +19,7 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
 import com.spotify.docker.client.messages.*;
 import io.minecloud.MineCloud;
+import io.minecloud.db.Credentials;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.BungeeRepository;
 import io.minecloud.models.bungee.type.BungeeType;
@@ -41,10 +42,35 @@ public final class Deployer {
     public static void deployServer(Network network, ServerType type) {
         ServerRepository repository = MineCloud.instance().mongo().repositoryBy(Server.class);
         Server server = new Server();
+
+        server.setNumber(repository.highestNumberFor(type) + 1);
+        server.setNetwork(network);
+        server.setNode(MineCloudDaemon.instance().node());
+        server.setOnlinePlayers(new ArrayList<>());
+        server.setRamUsage(-1);
+        server.setPort(0);
+
+        deployServer(server);
+        repository.insert(server);
+    }
+
+    public static void deployServer(Server server) {
+        Credentials mongoCreds = MineCloud.instance().mongo().credentials();
+        Credentials redisCreds = MineCloud.instance().redis().credentials();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/server")
                 .openStdin(true)
-                .env("") // TODO ENVs
+                .env(new EnvironmentBuilder()
+                        .append("mongo_hosts", mongoCreds.formattedHosts())
+                        .append("mongo_username", mongoCreds.username())
+                        .append("mongo_password", new String(mongoCreds.password()))
+                        .append("mongo_database", mongoCreds.database())
+
+                        .append("redis_host", redisCreds.hosts()[0])
+                        .append("redis_username", redisCreds.username())
+                        .append("redis_password", new String(redisCreds.password()))
+                        .append("server_id", server.objectId().toString())
+                        .build())
                 .cmd("sh initialize.sh") // TODO
                 .build();
 
@@ -56,20 +82,11 @@ public final class Deployer {
 
             client.startContainer(creation.id());
         } catch (InterruptedException | DockerException ex) {
-            MineCloud.logger().log(Level.ERROR, "Was unable to create server with type " + type.name(),
+            MineCloud.logger().log(Level.ERROR, "Was unable to create server with type " + server.type().name(),
                     ex);
             return;
         }
 
-        server.setNetwork(network);
-        server.setContainerId(creation.id());
-        server.setNode(MineCloudDaemon.instance().node());
-        server.setOnlinePlayers(new ArrayList<>());
-        server.setNumber(repository.highestNumberFor(type) + 1);
-        server.setRamUsage(-1);
-        server.setPort(0);
-
-        repository.insert(server);
         MineCloud.logger().info("Started server " + server.name()
                 + " with container id " + server.containerId());
     }
@@ -113,5 +130,21 @@ public final class Deployer {
 
         repository.insert(bungee);
         MineCloud.logger().info("Started bungee " + bungee.name() + " with container id " + bungee.containerId());
+    }
+
+    private static class EnvironmentBuilder {
+        private List<String> environmentVars = new ArrayList<>();
+
+        private EnvironmentBuilder() {
+        }
+
+        public EnvironmentBuilder append(String key, String value) {
+            environmentVars.add(key + "=" + value);
+            return this;
+        }
+
+        public String[] build() {
+            return environmentVars.stream().toArray(String[]::new);
+        }
     }
 }

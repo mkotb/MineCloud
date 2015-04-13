@@ -58,6 +58,10 @@ public class MongoDatabase implements Database {
         return database;
     }
 
+    public Credentials credentials() {
+        return credentials;
+    }
+
     @Override
     public void setup() {
         MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(10000)

@@ -74,4 +74,8 @@ public final class RedisDatabase implements Database {
     public Jedis grabResource() {
         return pool.getResource();
     }
+
+    public Credentials credentials() {
+        return credentials;
+    }
 }

@@ -249,6 +249,7 @@ public final class ModelTranslator {
             object.append(name, value); // FIXME: only supports strings, primitives, and Dates
         }
 
+        object.append("_id", model.objectId());
         model.translate(object);
         return object;
     }

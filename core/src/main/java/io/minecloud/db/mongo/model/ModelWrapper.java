@@ -24,7 +24,7 @@ import java.util.Map;
 public class ModelWrapper {
     private static final Map<MongoModel, ModelWrapper> CACHE = new HashMap<>();
 
-    private final ObjectId id;
+    private ObjectId id;
     private final Date created;
     private final Date lastUpdated;
     private final MongoModel model;
@@ -59,6 +59,9 @@ public class ModelWrapper {
     }
 
     public ObjectId objectId() {
+        if (id == null)
+            id = new ObjectId();
+
         return id;
     }
 

@@ -21,6 +21,7 @@ import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import io.minecloud.models.server.Server;
+import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -32,11 +33,13 @@ public class MineCloudPlugin extends JavaPlugin {
     private TPSTracker tracker;
     private MongoDatabase mongo;
     private RedisDatabase redis;
+    private ObjectId serverId;
 
     @Override
     public void onEnable() {
         MineCloud.environmentSetup();
 
+        serverId = new ObjectId(System.getenv("server_id"));
         mongo = MineCloud.instance().mongo();
         redis = MineCloud.instance().redis();
         tracker = new TPSTracker();
@@ -50,11 +53,14 @@ public class MineCloudPlugin extends JavaPlugin {
                 Runtime runtime = Runtime.getRuntime();
 
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
-                server.setTps(tracker.fetchTps());
+
+                synchronized (tracker) {
+                    server.setTps(tracker.fetchTps());
+                }
 
                 mongo.repositoryBy(Server.class).update(server);
             }
-        }.runTaskTimer(this, 0, 600);
+        }.runTaskTimerAsynchronously(this, 0, 600);
 
         redis.addChannel(SimpleRedisChannel.create("server-create-notif", redis));
         redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis));
@@ -80,7 +86,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
     public Server server() {
         return mongo.repositoryBy(Server.class)
-                .findFirst((server) -> server.containerId().equals(System.getenv("server_id")));
+                .findFirst((server) -> server.objectId().equals(serverId));
     }
 
     public MongoDatabase mongo() {

@@ -50,4 +50,15 @@ public final class Credentials {
     public String database() {
         return database;
     }
+
+    public String formattedHosts() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : hosts) {
+            sb.append(s)
+                    .append(';');
+        }
+
+        return sb.toString();
+    }
 }
