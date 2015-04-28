@@ -29,9 +29,11 @@ public abstract class RedisChannel {
         this.database = database;
         this.channel = channel;
 
-        try (Jedis resource = database.grabResource()) {
-            resource.subscribe(ChannelPubSub.create(this), channel.getBytes(Charset.forName("UTF-8")));
-        }
+        new Thread(() -> {
+            try (Jedis resource = database.grabResource()) {
+                resource.subscribe(ChannelPubSub.create(this), channel.getBytes(Charset.forName("UTF-8")));
+            }
+        }, "MineCloud - Channel '" + channel + " Thread");
     }
 
     public String channel() {

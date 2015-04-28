@@ -15,7 +15,7 @@
 ## OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ### BEGIN INIT INFO
-# Provides: minestack-daemon
+# Provides: minecloud-daemon
 # Required-Start: $remote_fs $syslog
 # Required-Stop: $remote_fs $syslog
 # Default-Start: 2 3 4 5
@@ -24,7 +24,7 @@
 # Description: Enable service provided by daemon.
 ### END INIT INFO
 
-dir="/opt/minestack/daemon/bin/"
+dir="/opt/minecloud/daemon/bin/"
 user="root"
 cmd="java -jar daemon.jar"
 
