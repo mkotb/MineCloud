@@ -15,35 +15,30 @@
  */
 package io.minecloud.models.server.type;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.nodes.type.NodeType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Reference;
 
+@Entity(value = "server-types", noClassnameStored = true)
 @EqualsAndHashCode
-public class ServerType implements MongoModel {
-    @DataField
-    @Setter
-    private String name;
-    @DataField
+public class ServerType extends MongoEntity {
     @Setter
     private int dedicatedRam;
-    @DataField
     @Setter
     private int maxPlayers;
-    @DataField(reference = true)
+    @Reference
     @Setter
     private NodeType preferredNode;
-    @DataField
     @Setter
     private String mod;
-    @DataField
     @Setter
     private boolean defaultServer;
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public int maxPlayers() {

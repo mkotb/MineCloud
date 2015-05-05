@@ -15,24 +15,18 @@
  */
 package io.minecloud.models.nodes.type;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
 import lombok.Setter;
 
 /*
  * It is not recommended to change the values of this class
  */
-public class CPU implements MongoModel {
-    @DataField
+public class CPU {
     @Setter
     private double baseFrequency;
-    @DataField
     @Setter
     private double maxFrequency;
-    @DataField
     @Setter
     private int cores;
-    @DataField
     @Setter
     private int threads;
 

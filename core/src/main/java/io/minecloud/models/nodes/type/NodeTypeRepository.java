@@ -17,15 +17,15 @@ package io.minecloud.models.nodes.type;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
+import org.mongodb.morphia.Datastore;
 
 public class NodeTypeRepository extends AbstractMongoRepository<NodeType> {
-
-    private NodeTypeRepository(MongoDatabase database) {
-        super("node-types", database);
+    private NodeTypeRepository(Datastore datastore) {
+        super(NodeType.class, datastore);
     }
 
-    public static NodeTypeRepository create(MongoDatabase database) {
-        return new NodeTypeRepository(database);
+    public static NodeTypeRepository create(Datastore datastore) {
+        return new NodeTypeRepository(datastore);
     }
 
     public NodeType specificationBy(String name) {

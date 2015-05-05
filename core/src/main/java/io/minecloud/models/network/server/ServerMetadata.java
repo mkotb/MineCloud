@@ -15,21 +15,18 @@
  */
 package io.minecloud.models.network.server;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Reference;
 
 @EqualsAndHashCode
-public class ServerMetadata implements MongoModel {
-    @DataField(reference = true)
+public class ServerMetadata {
+    @Reference
     @Setter
     private ServerType type;
-    @DataField
     @Setter
     private int minimumAmount;
-    @DataField
     @Setter
     private int maximumAmount;
 

@@ -15,24 +15,17 @@
  */
 package io.minecloud.models.server;
 
-import com.mongodb.DBObject;
 import io.minecloud.db.mongo.AbstractMongoRepository;
-import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.models.server.type.ServerType;
+import org.mongodb.morphia.Datastore;
 
 public class ServerRepository extends AbstractMongoRepository<Server> {
-
-    private ServerRepository(MongoDatabase database) {
-        super("servers", database);
+    private ServerRepository(Datastore datastore) {
+        super(Server.class, datastore);
     }
 
-    public static ServerRepository create(MongoDatabase database) {
-        return new ServerRepository(database);
-    }
-
-    @Override
-    public boolean update(DBObject query, Server model) {
-        throw new UnsupportedOperationException();
+    public static ServerRepository create(Datastore datastore) {
+        return new ServerRepository(datastore);
     }
 
     public int highestNumberFor(ServerType type) {

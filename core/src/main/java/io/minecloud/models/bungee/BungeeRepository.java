@@ -15,22 +15,15 @@
  */
 package io.minecloud.models.bungee;
 
-import com.mongodb.DBObject;
 import io.minecloud.db.mongo.AbstractMongoRepository;
-import io.minecloud.db.mongo.MongoDatabase;
+import org.mongodb.morphia.Datastore;
 
 public class BungeeRepository extends AbstractMongoRepository<Bungee> {
-
-    private BungeeRepository(MongoDatabase database) {
-        super("bungees", database);
+    private BungeeRepository(Datastore datastore) {
+        super(Bungee.class, datastore);
     }
 
-    public BungeeRepository create(MongoDatabase database) {
-        return new BungeeRepository(database);
-    }
-
-    @Override
-    public boolean update(DBObject query, Bungee model) {
-        throw new UnsupportedOperationException();
+    public static BungeeRepository create(Datastore datastore) {
+        return new BungeeRepository(datastore);
     }
 }

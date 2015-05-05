@@ -17,15 +17,16 @@ package io.minecloud.models.bungee.type;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
+import org.mongodb.morphia.Datastore;
 
 public class BungeeTypeRepository extends AbstractMongoRepository<BungeeType> {
 
-    private BungeeTypeRepository(MongoDatabase database) {
-        super("bungee-types", database);
+    private BungeeTypeRepository(Datastore datastore) {
+        super(BungeeType.class, datastore);
     }
 
-    public static BungeeTypeRepository create(MongoDatabase database) {
-        return new BungeeTypeRepository(database);
+    public static BungeeTypeRepository create(Datastore datastore) {
+        return new BungeeTypeRepository(datastore);
     }
 
     public BungeeType typeBy(String name) {

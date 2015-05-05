@@ -15,26 +15,24 @@
  */
 package io.minecloud.models.bungee.type;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.nodes.type.NodeType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Reference;
 
+@Entity(value = "bungee-types", noClassnameStored = true)
 @EqualsAndHashCode
-public class BungeeType implements MongoModel {
-    @DataField
-    @Setter
-    private String name;
-    @DataField
+public class BungeeType extends MongoEntity {
     @Setter
     private int dedicatedRam;
-    @DataField(reference = true)
+    @Reference
     @Setter
     private NodeType preferredNode;
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public int dedicatedRam() {

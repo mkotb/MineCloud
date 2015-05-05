@@ -15,10 +15,7 @@
  */
 package io.minecloud.db.mongo;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import io.minecloud.db.mongo.model.MongoModel;
 import org.bson.types.ObjectId;
 
 import java.util.Collection;
@@ -36,58 +33,26 @@ import java.util.stream.Collectors;
  *
  * @param <T>
  */
-public interface MongoRepository<T extends MongoModel> {
-
+public interface MongoRepository<T> {
     public String collectionName();
 
+    public T findFirst(String id);
+
     public default T findFirst(Predicate<T> predicate) {
-        Optional<T> optional = models().stream()
-                .filter(predicate)
-                .findFirst();
+        Optional<T> optional = models().stream().filter(predicate).findFirst();
 
         return optional.isPresent() ? optional.get() : null;
     }
 
     public default Collection<T> findAll(Predicate<T> predicate) {
-        return models().stream()
-                .filter(predicate)
-                .collect(Collectors.toList());
+        return models().stream().filter(predicate).collect(Collectors.toList());
     }
-
-    public T findFirst(BasicDBObject query);
-
-    public T findFirst(ObjectId id);
 
     /**
      * Retrieves all models or entries in the repository
      * @return All models in the repository
      */
     public Collection<T> models();
-
-    /**
-     * Inserts a module into the repository
-     * @param model Model you wish to insert
-     * @return If module was able to be inserted successfully, will return false if model has invalid values.
-     */
-    public boolean insert(T model);
-
-    /**
-     * Removes a value from the repository based on predicate provided
-     * @param predicate Predicate wished to be used when performing a search
-     */
-    public default void remove(Predicate<T> predicate) {
-        models().stream()
-                .filter(predicate)
-                .forEach(this::remove);
-    }
-
-    public void remove(T model);
-
-    public boolean update(ObjectId id, T model);
-
-    public boolean update(DBObject query, T model);
-
-    public void update(T model);
 
     public DBCollection collection();
 }

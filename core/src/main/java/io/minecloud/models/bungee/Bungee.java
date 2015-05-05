@@ -15,32 +15,29 @@
  */
 package io.minecloud.models.bungee;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Reference;
 
+@Entity(value = "bungees", noClassnameStored = true)
 @EqualsAndHashCode
-public class Bungee implements MongoModel {
-    @DataField(reference = true)
+public class Bungee extends MongoEntity {
+    @Reference
     @Setter
     private Network network;
-    @DataField(reference = true)
+    @Reference
     @Setter
     private BungeeType type;
-    @DataField
-    @Setter
-    private String containerId;
-    @DataField(reference = true)
+    @Reference
     @Setter
     private Node node;
-    @DataField
     @Setter
     private String publicIp;
-    @DataField
     @Setter
     private int ramUsage;
 
@@ -53,7 +50,7 @@ public class Bungee implements MongoModel {
     }
 
     public String containerId() {
-        return containerId;
+        return entityId();
     }
 
     public Node node() {

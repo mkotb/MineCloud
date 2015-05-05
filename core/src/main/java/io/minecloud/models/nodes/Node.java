@@ -16,43 +16,36 @@
 package io.minecloud.models.nodes;
 
 import io.minecloud.MineCloud;
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.server.Server;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Reference;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+@Entity(value = "nodes", noClassnameStored = true)
 @EqualsAndHashCode
-public class Node implements MongoModel {
-    @DataField
-    @Setter
-    private String name;
-    @DataField
+public class Node extends MongoEntity {
     @Setter
     private String publicIp;
-    @DataField
     @Setter
     private String privateIp;
-    @DataField
     @Setter
     private int ramDedicated;
-    @DataField(reference = true)
+    @Reference
     @Setter
     private NodeType type;
-    @DataField
     @Setter
     private double availableRam;
-    @DataField
     @Setter
     private List<CoreMetadata> coreMetadata;
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public String privateIp() {

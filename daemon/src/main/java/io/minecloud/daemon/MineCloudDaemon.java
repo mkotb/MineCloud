@@ -23,6 +23,7 @@ import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.ContainerInfo;
 import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
+import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.MessageType;
@@ -38,6 +39,7 @@ import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
 import org.apache.logging.log4j.Level;
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.query.Query;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,10 +73,8 @@ public class MineCloudDaemon {
                     if (!stream.readString().equalsIgnoreCase(node))
                         return;
 
-                    Network network = mongo.repositoryBy(Network.class)
-                            .findFirst(new BasicDBObject("name", stream.readString()));
-                    ServerType type = mongo.repositoryBy(ServerType.class)
-                            .findFirst(new BasicDBObject("name", stream.readString()));
+                    Network network = mongo.repositoryBy(Network.class).findFirst(stream.readString());
+                    ServerType type = mongo.repositoryBy(ServerType.class).findFirst(stream.readString());
 
                     Deployer.deployServer(network, type);
                 }));
@@ -90,8 +90,7 @@ public class MineCloudDaemon {
                     if (!stream.readString().equalsIgnoreCase(node))
                         return;
 
-                    Server server = mongo.repositoryBy(Server.class)
-                            .findFirst(new ObjectId(stream.readString()));
+                    Server server = mongo.repositoryBy(Server.class).findFirst(stream.readString());
 
                     if (!server.node().name().equals(node)) {
                         MineCloud.logger().log(Level.ERROR, "Invalid request was sent to kill a server " +
@@ -102,9 +101,9 @@ public class MineCloudDaemon {
                     try {
                         dockerClient.killContainer(server.containerId());
                         MineCloud.logger().info("Killed server " + server.name()
-                                + " with container id " + server.containerId());
+                                + " with container uuid " + server.containerId());
 
-                        mongo.repositoryBy(Server.class).remove(server);
+                        mongo.repositoryBy(Server.class).delete(server);
                     } catch (DockerException | InterruptedException e) {
                         MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
                     }
@@ -121,10 +120,8 @@ public class MineCloudDaemon {
                     if (!stream.readString().equalsIgnoreCase(node))
                         return;
 
-                    Network network = mongo.repositoryBy(Network.class)
-                            .findFirst(new BasicDBObject("name", stream.readString()));
-                    BungeeType type = mongo.repositoryBy(BungeeType.class)
-                            .findFirst(new BasicDBObject("name", stream.readString()));
+                    Network network = mongo.repositoryBy(Network.class).findFirst(stream.readString());
+                    BungeeType type = mongo.repositoryBy(BungeeType.class).findFirst(stream.readString());
 
                     Deployer.deployBungee(network, type);
                 }));
@@ -140,8 +137,7 @@ public class MineCloudDaemon {
                     if (!stream.readString().equalsIgnoreCase(node))
                         return;
 
-                    Bungee bungee = mongo.repositoryBy(Bungee.class)
-                            .findFirst(new ObjectId(stream.readString()));
+                    Bungee bungee = mongo.repositoryBy(Bungee.class).findFirst(stream.readString());
 
                     if (!bungee.node().name().equals(node)) {
                         MineCloud.logger().log(Level.ERROR, "Invalid request was sent to kill a bungee " +
@@ -152,9 +148,9 @@ public class MineCloudDaemon {
                     try {
                         dockerClient.killContainer(bungee.containerId());
                         MineCloud.logger().info("Killed bungee " + bungee.name()
-                                + " with container id " + bungee.containerId());
+                                + " with container uuid " + bungee.containerId());
 
-                        mongo.repositoryBy(Bungee.class).remove(bungee);
+                        mongo.repositoryBy(Bungee.class).delete(bungee);
                     } catch (DockerException | InterruptedException e) {
                         MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
                     }
@@ -167,8 +163,7 @@ public class MineCloudDaemon {
 
                     MessageInputStream stream = message.contents();
 
-                    Server server = mongo.repositoryBy(Server.class)
-                            .findFirst(new ObjectId(stream.readString()));
+                    Server server = mongo.repositoryBy(Server.class).findFirst(stream.readString());
 
                     if (!server.node().name().equals(node))
                         return;
@@ -186,7 +181,7 @@ public class MineCloudDaemon {
                             server.setPort(Integer.parseInt(l.get(0).hostPort()));
                         });
 
-                        mongo.repositoryBy(Server.class).update(server);
+                        mongo.repositoryBy(Server.class).save(server);
                     } catch (Exception e) {
                         MineCloud.logger().log(Level.ERROR, "Was unable to set the port of a started server", e);
                     }
@@ -209,16 +204,16 @@ public class MineCloudDaemon {
 
                                     switch (type.toLowerCase()) {
                                         case "bungee":
-                                            mongo.repositoryBy(Bungee.class)
-                                                    .remove((bungee) -> bungee
-                                                            .containerId().equals(container.id()));
+                                            AbstractMongoRepository<Bungee> repository = mongo.repositoryBy(Bungee.class);
+                                            Query<Bungee> query = repository.createQuery().field("_id").equal(container.id());
+                                            repository.deleteByQuery(query);
                                             break;
 
                                         case "server":
                                             Server server = mongo.repositoryBy(Server.class)
                                                     .findFirst((s) -> s
                                                             .containerId().equals(container.id()));
-                                            mongo.repositoryBy(Server.class).remove(server);
+                                            mongo.repositoryBy(Server.class).delete(server);
 
                                             MessageOutputStream os = new MessageOutputStream();
 

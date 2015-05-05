@@ -18,6 +18,10 @@ package io.minecloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
+import io.minecloud.models.bungee.Bungee;
+import io.minecloud.models.bungee.BungeeRepository;
+import io.minecloud.models.bungee.type.BungeeType;
+import io.minecloud.models.bungee.type.BungeeTypeRepository;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.network.NetworkRepository;
 import io.minecloud.models.nodes.Node;
@@ -151,11 +155,13 @@ public final class MineCloud {
 
         mongo.setup();
 
-        mongo.loadRepository(NetworkRepository.create(mongo), Network.class);
-        mongo.loadRepository(NodeTypeRepository.create(mongo), NodeType.class);
-        mongo.loadRepository(NodeRepository.create(mongo), Node.class);
-        mongo.loadRepository(ServerTypeRepository.create(mongo), ServerType.class);
-        mongo.loadRepository(ServerRepository.create(mongo), Server.class);
+        mongo.loadRepository(NetworkRepository.create(mongo.datastore()), Network.class);
+        mongo.loadRepository(NodeTypeRepository.create(mongo.datastore()), NodeType.class);
+        mongo.loadRepository(NodeRepository.create(mongo.datastore()), Node.class);
+        mongo.loadRepository(BungeeTypeRepository.create(mongo.datastore()), BungeeType.class);
+        mongo.loadRepository(BungeeRepository.create(mongo.datastore()), Bungee.class);
+        mongo.loadRepository(ServerTypeRepository.create(mongo.datastore()), ServerType.class);
+        mongo.loadRepository(ServerRepository.create(mongo.datastore()), Server.class);
     }
 
     public void initiateRedis(Credentials credentials) {

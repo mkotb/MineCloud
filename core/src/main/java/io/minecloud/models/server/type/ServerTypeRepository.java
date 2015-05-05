@@ -17,14 +17,15 @@ package io.minecloud.models.server.type;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
+import org.mongodb.morphia.Datastore;
 
 public class ServerTypeRepository extends AbstractMongoRepository<ServerType> {
-    private ServerTypeRepository(MongoDatabase database) {
-        super("server-types", database);
+    private ServerTypeRepository(Datastore datastore) {
+        super(ServerType.class, datastore);
     }
 
-    public static ServerTypeRepository create(MongoDatabase database) {
-        return new ServerTypeRepository(database);
+    public static ServerTypeRepository create(Datastore datastore) {
+        return new ServerTypeRepository(datastore);
     }
 
     public ServerType serverTypeBy(String name) {

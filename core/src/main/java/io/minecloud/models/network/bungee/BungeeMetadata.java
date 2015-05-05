@@ -15,21 +15,18 @@
  */
 package io.minecloud.models.network.bungee;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
 import io.minecloud.models.bungee.type.BungeeType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Reference;
 
 @EqualsAndHashCode
-public class BungeeMetadata implements MongoModel {
-    @DataField(reference = true)
+public class BungeeMetadata {
+    @Reference
     @Setter
     private BungeeType type;
-    @DataField
     @Setter
     private int minimumAmount;
-    @DataField
     @Setter
     private int maximumAmount;
 
