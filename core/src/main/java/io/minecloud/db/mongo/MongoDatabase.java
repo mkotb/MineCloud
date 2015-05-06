@@ -48,12 +48,6 @@ public class MongoDatabase implements Database {
     }
 
     public <T> void loadRepository(MongoRepository<T> repository, Class<T> cls) {
-        Type type = repository.getClass().getGenericInterfaces()[0];
-
-        if (type instanceof Class && type.equals(cls)) {
-            throw new IllegalArgumentException("Type provided does not match repository type!");
-        }
-
         repositories.put(cls, repository);
     }
 
@@ -98,7 +92,7 @@ public class MongoDatabase implements Database {
 
         MongoClient client;
 
-        if (credentials.username() != null) {
+        if (credentials.username() != null && !credentials.username().equalsIgnoreCase("")) {
             MongoCredential credential = MongoCredential.createMongoCRCredential(credentials.username(),
                     credentials.database(), credentials.password());
 

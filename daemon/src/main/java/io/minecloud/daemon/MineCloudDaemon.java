@@ -15,11 +15,9 @@
  */
 package io.minecloud.daemon;
 
-import com.mongodb.BasicDBObject;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
-import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.ContainerInfo;
 import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
@@ -37,8 +35,8 @@ import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.NodeRepository;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.logging.log4j.Level;
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.query.Query;
 
 import java.io.File;
@@ -255,8 +253,8 @@ public class MineCloudDaemon {
 
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        File configFolder = new File("/etc/minecloud/");
-        File file = new File(configFolder, "daemon/details.properties");
+        File configFolder = new File(SystemUtils.IS_OS_LINUX ? "/etc/minecloud/" : "./config/");
+        File file = new File(configFolder, "details.properties");
 
         if (!configFolder.exists()) {
             configFolder.mkdirs();

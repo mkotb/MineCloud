@@ -17,14 +17,6 @@
         <module>bukkit</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.14.8</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -38,7 +30,6 @@
                     <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
-
 
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
@@ -70,4 +61,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.14.8</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
