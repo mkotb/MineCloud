@@ -51,7 +51,7 @@ public final class Deployer {
         server.setPort(0);
 
         deployServer(server);
-        repository.insert(server);
+        repository.save(server);
     }
 
     public static void deployServer(Server server) {
@@ -69,7 +69,7 @@ public final class Deployer {
                         .append("redis_host", redisCreds.hosts()[0])
                         .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
-                        .append("server_id", server.objectId().toString())
+                        .append("server_id", server.entityId().toString())
                         .build())
                 .cmd("sh initialize.sh") // TODO
                 .build();
@@ -88,7 +88,7 @@ public final class Deployer {
         }
 
         MineCloud.logger().info("Started server " + server.name()
-                + " with container id " + server.containerId());
+                + " with container uuid " + server.containerId());
     }
 
     public static void deployBungee(Network network, BungeeType type) {
@@ -122,14 +122,14 @@ public final class Deployer {
         }
 
         bungee.setNetwork(network);
-        bungee.setContainerId(creation.id());
+        bungee.setId(creation.id());
         bungee.setNode(node);
         bungee.setPublicIp(node.publicIp());
         bungee.setType(type);
         bungee.setRamUsage(-1);
 
-        repository.insert(bungee);
-        MineCloud.logger().info("Started bungee " + bungee.name() + " with container id " + bungee.containerId());
+        repository.save(bungee);
+        MineCloud.logger().info("Started bungee " + bungee.name() + " with container uuid " + bungee.containerId());
     }
 
     private static class EnvironmentBuilder {

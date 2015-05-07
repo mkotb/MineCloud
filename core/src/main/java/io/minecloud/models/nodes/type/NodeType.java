@@ -15,22 +15,18 @@
  */
 package io.minecloud.models.nodes.type;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.db.mongo.model.MongoEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
 
 import java.util.List;
 
+@Entity(value = "node-types", noClassnameStored = true)
 @EqualsAndHashCode
-public class NodeType implements MongoModel {
-    @DataField
-    @Setter
-    private String name;
-    @DataField
+public class NodeType extends MongoEntity {
     @Setter
     private int ram;
-    @DataField
     @Setter
     private List<CPU> cpus;
 
@@ -43,6 +39,6 @@ public class NodeType implements MongoModel {
     }
 
     public String name() {
-        return name;
+        return entityId();
     }
 }

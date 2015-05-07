@@ -16,94 +16,49 @@
 package io.minecloud.db.mongo;
 
 import com.mongodb.*;
-import io.minecloud.db.mongo.model.ModelTranslator;
-import io.minecloud.db.mongo.model.ModelWrapper;
-import io.minecloud.db.mongo.model.MongoModel;
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.dao.BasicDAO;
+import org.mongodb.morphia.query.QueryResults;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractMongoRepository<T extends MongoModel> implements MongoRepository<T> {
-    protected final DBCollection collection;
-    protected final MongoDatabase database;
-    private final String collectionName;
+public abstract class AbstractMongoRepository<T> extends BasicDAO<T, String> implements MongoRepository<T> {
+    protected DBCollection collection;
 
-    protected AbstractMongoRepository(String collectionName, MongoDatabase database) {
-        this.collectionName = collectionName;
-        this.database = database;
-        this.collection = database.db().getCollection(collectionName);
+    protected AbstractMongoRepository(Class<T> entity, Datastore datastore) {
+        super(entity, datastore);
+        collection = getCollection();
     }
 
     @Override
     public String collectionName() {
-        return collectionName;
+        return collection.getName();
     }
 
     @Override
-    public boolean insert(T model) {
-        WriteResult result = collection.insert(ModelTranslator.translate(ModelWrapper.wrapperFrom(model)));
-
-        return result.getN() == 1;
-    }
-
-    public Class<T> modelClass() {
-        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-    }
-
-    @Override
-    public T findFirst(BasicDBObject query) {
-        return findFirst((ObjectId) collection.findOne(query).get("_id"));
-    }
-
-    public T findFirst(ObjectId id) {
-        return findFirst((model) ->
-                ModelWrapper.wrapperFrom(model).objectId().equals(id));
-    }
-
-    @Override
-    public void remove(T model) {
-        collection.remove(ModelTranslator.translate(ModelWrapper.wrapperFrom(model)));
-    }
-
-    @Override
-    public boolean update(ObjectId id, T model) {
-        return update(new BasicDBObject("_id", id), model);
-    }
-
-    @Override
-    public boolean update(DBObject query, T model) {
-        WriteResult result = collection.update(query,
-                ModelTranslator.translate(ModelWrapper.wrapperFrom(model)));
-
-        return result.getN() != 0;
-    }
-
-    @Override
-    public void update(T model) {
-        ModelWrapper wrapper = ModelWrapper.wrapperFrom(model);
-
-        collection.update(new BasicDBObject("_id", wrapper.objectId()),
-                ModelTranslator.translate(wrapper));
+    public T findFirst(String id) {
+        return findOne("_id", id);
     }
 
     @Override
     public DBCollection collection() {
-        return collection;
+        return this.getCollection();
     }
 
     @Override
     public Collection<T> models() {
         Set<T> models = new HashSet<>();
-        DBCursor cursor = collection.find();
-
-        while (cursor.hasNext()) {
-            models.add((T) ModelTranslator.translate((BasicDBObject) cursor.next(), modelClass())
-                    .model());
-        }
+        QueryResults<T> results = find();
+        models.addAll(results.asList());
 
         return models;
+    }
+
+    public Class<T> modelClass() {
+        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 }

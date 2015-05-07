@@ -59,8 +59,7 @@ public final class RedisDatabase implements Database {
             }
         }
 
-        pool = new JedisPool(config, host, port, 1000,
-                new String(credentials.password()));
+        pool = !credentials.username().equals("") ? new JedisPool(config, host, port, 1000, new String(credentials.password())) : new JedisPool(config, host, port, 1000);
     }
 
     public void addChannel(RedisChannel channel) {

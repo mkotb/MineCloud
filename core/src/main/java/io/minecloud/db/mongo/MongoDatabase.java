@@ -20,8 +20,9 @@ import io.minecloud.MineCloud;
 import io.minecloud.MineCloudException;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.Database;
-import io.minecloud.db.mongo.model.MongoModel;
 import org.apache.logging.log4j.Level;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
 
 import java.lang.reflect.Type;
 import java.net.UnknownHostException;
@@ -31,6 +32,8 @@ public class MongoDatabase implements Database {
     private final Map<Class<?>, MongoRepository<?>> repositories = new HashMap<>();
     private final Credentials credentials;
     private DB database;
+    private Morphia morphia;
+    private Datastore datastore;
 
     private MongoDatabase(Credentials credentials) {
         this.credentials = credentials;
@@ -40,22 +43,24 @@ public class MongoDatabase implements Database {
         return new MongoDatabase(credentials);
     }
 
-    public <T extends MongoModel, E extends MongoRepository<T>> E repositoryBy(Class<T> model) {
+    public <T, E extends AbstractMongoRepository<T>> E repositoryBy(Class<T> model) {
         return (E) repositories.get(model);
     }
 
-    public <T extends MongoModel> void loadRepository(MongoRepository<T> repository, Class<T> cls) {
-        Type type = repository.getClass().getGenericInterfaces()[0];
-
-        if (type instanceof Class && type.equals(cls)) {
-            throw new IllegalArgumentException("Type provided does not match repository type!");
-        }
-
+    public <T> void loadRepository(MongoRepository<T> repository, Class<T> cls) {
         repositories.put(cls, repository);
     }
 
     public DB db() {
         return database;
+    }
+
+    public Morphia morphia() {
+        return morphia;
+    }
+
+    public Datastore datastore() {
+        return datastore;
     }
 
     public Credentials credentials() {
@@ -87,7 +92,7 @@ public class MongoDatabase implements Database {
 
         MongoClient client;
 
-        if (credentials.username() != null) {
+        if (credentials.username() != null && !credentials.username().equalsIgnoreCase("")) {
             MongoCredential credential = MongoCredential.createMongoCRCredential(credentials.username(),
                     credentials.database(), credentials.password());
 
@@ -102,5 +107,7 @@ public class MongoDatabase implements Database {
         }
 
         database = client.getDB(credentials.database());
+        morphia = new Morphia();
+        datastore = morphia.createDatastore(client, credentials.database());
     }
 }

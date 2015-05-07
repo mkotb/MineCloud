@@ -138,7 +138,7 @@ public class StatisticsWatcher extends Thread {
             });
 
             node.setCoreMetadata(cores);
-            MineCloud.instance().mongo().repositoryBy(Node.class).update(node);
+            MineCloud.instance().mongo().repositoryBy(Node.class).save(node);
 
             try {
                 Thread.sleep(1000L);

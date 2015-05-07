@@ -16,8 +16,7 @@
 package io.minecloud.models.network;
 
 import io.minecloud.MineCloud;
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.bungee.BungeeMetadata;
@@ -26,26 +25,23 @@ import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 
 import java.util.List;
 
+@Entity(value = "networks", noClassnameStored = true)
 @EqualsAndHashCode
-public class Network implements MongoModel {
-    @DataField
-    @Setter
-    private String name;
-    @DataField
+public class Network extends MongoEntity {
     @Setter
     private List<ServerMetadata> serverMetadata;
-    @DataField
     @Setter
     private List<BungeeMetadata> bungeeMetadata;
-    @DataField
     @Setter
     private List<String> nodes;
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public List<ServerMetadata> serverMetadata() {

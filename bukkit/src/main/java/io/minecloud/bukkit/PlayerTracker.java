@@ -43,7 +43,7 @@ public class PlayerTracker implements Listener {
         onlinePlayers.set(onlinePlayers.lastIndexOf(data), data);
         server.setOnlinePlayers(onlinePlayers);
 
-        plugin.mongo().repositoryBy(Server.class).update(server);
+        plugin.mongo().repositoryBy(Server.class).save(server);
     }
 
     @EventHandler
@@ -61,7 +61,7 @@ public class PlayerTracker implements Listener {
         onlinePlayers.add(data);
 
         server.setOnlinePlayers(onlinePlayers);
-        plugin.mongo().repositoryBy(Server.class).update(server);
+        plugin.mongo().repositoryBy(Server.class).save(server);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -86,6 +86,6 @@ public class PlayerTracker implements Listener {
         Server server = plugin.server();
 
         server.removePlayer(event.getPlayer().getUniqueId());
-        plugin.mongo().repositoryBy(Server.class).update(server);
+        plugin.mongo().repositoryBy(Server.class).save(server);
     }
 }

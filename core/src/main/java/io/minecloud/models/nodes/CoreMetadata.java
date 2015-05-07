@@ -15,17 +15,13 @@
  */
 package io.minecloud.models.nodes;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 @EqualsAndHashCode
-public class CoreMetadata implements MongoModel {
-    @DataField
+public class CoreMetadata {
     @Setter
     private double currentFrequency;
-    @DataField
     @Setter
     private double usage;
 

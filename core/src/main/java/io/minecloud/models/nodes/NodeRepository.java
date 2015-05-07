@@ -15,26 +15,19 @@
  */
 package io.minecloud.models.nodes;
 
-import com.mongodb.DBObject;
 import io.minecloud.db.mongo.AbstractMongoRepository;
-import io.minecloud.db.mongo.MongoDatabase;
+import org.mongodb.morphia.Datastore;
 
 public class NodeRepository extends AbstractMongoRepository<Node> {
-
-    private NodeRepository(MongoDatabase database) {
-        super("nodes", database);
+    private NodeRepository(Datastore datastore) {
+        super(Node.class, datastore);
     }
 
-    public static NodeRepository create(MongoDatabase database) {
-        return new NodeRepository(database);
+    public static NodeRepository create(Datastore datstore) {
+        return new NodeRepository(datstore);
     }
 
     public Node nodeBy(String name) {
         return findFirst((node) -> node.name().equalsIgnoreCase(name));
-    }
-
-    @Override
-    public boolean update(DBObject query, Node model) {
-        throw new UnsupportedOperationException();
     }
 }

@@ -15,14 +15,15 @@
  */
 package io.minecloud.models.server;
 
-import io.minecloud.db.mongo.model.DataField;
-import io.minecloud.db.mongo.model.MongoModel;
+import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.player.PlayerData;
 import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Reference;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,33 +34,28 @@ import java.util.UUID;
  *
  * Any inconsistent changes made to this class will be ignored.
  */
+@Entity(value = "servers", noClassnameStored = true)
 @EqualsAndHashCode
-public class Server implements MongoModel {
-    @DataField(reference = true)
+public class Server extends MongoEntity {
+    @Reference
     @Setter
     private Network network;
-    @DataField(reference = true)
+    @Reference
     @Setter
     private ServerType type;
-    @DataField(reference = true)
+    @Reference
     @Setter
     private Node node;
-    @DataField
     @Setter
     private List<PlayerData> onlinePlayers;
-    @DataField
     @Setter
     private int ramUsage;
-    @DataField
     @Setter
     private int port;
-    @DataField
     @Setter
     private int number;
-    @DataField
     @Setter
     private String containerId;
-    @DataField
     @Setter
     private double tps;
 
@@ -89,7 +85,7 @@ public class Server implements MongoModel {
 
     public PlayerData playerBy(UUID id) {
         Optional<PlayerData> optional = onlinePlayers().stream()
-                .filter((pd) -> pd.id().equals(id.toString()))
+                .filter((pd) -> pd.uuid().equals(id.toString()))
                 .findFirst();
 
         return optional.isPresent() ? optional.get() : null;

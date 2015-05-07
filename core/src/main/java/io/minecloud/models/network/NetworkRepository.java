@@ -17,14 +17,14 @@ package io.minecloud.models.network;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.db.mongo.MongoDatabase;
+import org.mongodb.morphia.Datastore;
 
 public class NetworkRepository extends AbstractMongoRepository<Network> {
-
-    private NetworkRepository(MongoDatabase database) {
-        super("networks", database);
+    private NetworkRepository(Datastore datastore) {
+        super(Network.class, datastore);
     }
 
-    public static NetworkRepository create(MongoDatabase database) {
-        return new NetworkRepository(database);
+    public static NetworkRepository create(Datastore datastore) {
+        return new NetworkRepository(datastore);
     }
 }

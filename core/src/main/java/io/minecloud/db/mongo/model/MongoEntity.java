@@ -15,6 +15,15 @@
  */
 package io.minecloud.db.mongo.model;
 
-public interface DataFieldConverter<T> {
-    public T convert(Object value);
+import lombok.Setter;
+import org.mongodb.morphia.annotations.Id;
+
+public class MongoEntity {
+    @Id
+    @Setter
+    private String id;
+
+    public String entityId() {
+        return id;
+    }
 }

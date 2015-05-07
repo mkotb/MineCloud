@@ -33,13 +33,13 @@ public class MineCloudPlugin extends JavaPlugin {
     private TPSTracker tracker;
     private MongoDatabase mongo;
     private RedisDatabase redis;
-    private ObjectId serverId;
+    private String serverId;
 
     @Override
     public void onEnable() {
         MineCloud.environmentSetup();
 
-        serverId = new ObjectId(System.getenv("server_id"));
+        serverId = System.getenv("server_id");
         mongo = MineCloud.instance().mongo();
         redis = MineCloud.instance().redis();
         tracker = new TPSTracker();
@@ -58,7 +58,7 @@ public class MineCloudPlugin extends JavaPlugin {
                     server.setTps(tracker.fetchTps());
                 }
 
-                mongo.repositoryBy(Server.class).update(server);
+                mongo.repositoryBy(Server.class).save(server);
             }
         }.runTaskTimerAsynchronously(this, 0, 600);
 
@@ -70,7 +70,7 @@ public class MineCloudPlugin extends JavaPlugin {
         try {
             MessageOutputStream os = new MessageOutputStream();
 
-            os.writeString(server().objectId().toString());
+            os.writeString(server().entityId());
 
             redis.channelBy("server-create-notif").publish(os.toMessage());
         } catch (IOException e) {
@@ -81,12 +81,12 @@ public class MineCloudPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        mongo.repositoryBy(Server.class).remove(server());
+        mongo.repositoryBy(Server.class).delete(server());
     }
 
     public Server server() {
         return mongo.repositoryBy(Server.class)
-                .findFirst((server) -> server.objectId().equals(serverId));
+                .findFirst((server) -> server.entityId().equals(serverId));
     }
 
     public MongoDatabase mongo() {
