@@ -23,18 +23,22 @@ import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
+import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.NodeRepository;
 import io.minecloud.models.nodes.type.NodeType;
+import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Controller {
@@ -71,11 +75,27 @@ public class Controller {
                         });
 
                         network.serverMetadata().forEach((metadata) -> {
-                            int serverDifference = metadata.minimumAmount() -
-                                    network.serversOnline(metadata.type());
+                            List<Server> servers = mongo.repositoryBy(Server.class).models()
+                                    .stream()
+                                    .filter((server) -> server.type().equals(metadata.type()))
+                                    .collect(Collectors.toList());
 
-                            if (serverDifference > 0)
-                                IntStream.range(0, serverDifference)
+                            int newServers = metadata.minimumAmount() - servers.size();
+                            int space = metadata.type().maxPlayers() * servers.size();
+                            int onlinePlayers = servers.stream()
+                                    .flatMapToInt((s) -> IntStream.of(s.onlinePlayers().size()))
+                                    .sum();
+
+                            if (onlinePlayers > (space * 0.75)) {
+                                newServers += (int) Math.round(onlinePlayers / (space * 0.75)) + 1;
+                            }
+
+                            if ((newServers + servers.size()) > metadata.maximumAmount()) {
+                                newServers = metadata.maximumAmount() - servers.size();
+                            }
+
+                            if (newServers > 0)
+                                IntStream.range(0, newServers)
                                         .forEach((i) -> deployServer(network, metadata.type()));
                         });
                     });
