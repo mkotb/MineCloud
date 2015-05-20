@@ -27,6 +27,7 @@ import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
+import io.minecloud.models.server.World;
 import io.minecloud.models.server.type.ServerType;
 import org.apache.logging.log4j.Level;
 
@@ -57,6 +58,7 @@ public final class Deployer {
     public static void deployServer(Server server) {
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
+        World defaultWorld = server.type().defaultWorld();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/server")
                 .openStdin(true)
@@ -69,9 +71,11 @@ public final class Deployer {
                         .append("redis_host", redisCreds.hosts()[0])
                         .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
+
                         .append("server_id", server.entityId().toString())
+                        .append("DEFAULT_WORLD", defaultWorld.name())
+                        .append("DEFAULT_WORLD_VERSION", defaultWorld.version())
                         .build())
-                .cmd("sh initialize.sh") // TODO
                 .build();
 
         ContainerCreation creation;

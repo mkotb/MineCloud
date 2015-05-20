@@ -13,21 +13,23 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud;
+package io.minecloud.models.plugins;
 
-public final class MineCloudException extends RuntimeException {
+import lombok.Setter;
+import org.mongodb.morphia.annotations.Reference;
 
-    public MineCloudException() {}
+public class Plugin {
+    @Reference
+    @Setter
+    private PluginType type;
+    @Setter
+    private String version;
 
-    public MineCloudException(String message) {
-        super(message);
+    public PluginType type() {
+        return type;
     }
 
-    public MineCloudException(Exception exception) {
-        super(exception);
-    }
-
-    public MineCloudException(String message, Exception ex) {
-        super(message, ex);
+    public String version() {
+        return version;
     }
 }

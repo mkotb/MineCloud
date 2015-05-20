@@ -13,21 +13,23 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud;
+package io.minecloud.models.server;
 
-public final class MineCloudException extends RuntimeException {
+import lombok.EqualsAndHashCode;
+import lombok.Setter;
 
-    public MineCloudException() {}
+@EqualsAndHashCode
+public class World {
+    @Setter
+    private String name;
+    @Setter
+    private String version;
 
-    public MineCloudException(String message) {
-        super(message);
+    public String name() {
+        return name;
     }
 
-    public MineCloudException(Exception exception) {
-        super(exception);
-    }
-
-    public MineCloudException(String message, Exception ex) {
-        super(message, ex);
+    public String version() {
+        return version;
     }
 }

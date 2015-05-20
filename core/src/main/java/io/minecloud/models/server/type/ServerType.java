@@ -17,10 +17,15 @@ package io.minecloud.models.server.type;
 
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.nodes.type.NodeType;
+import io.minecloud.models.plugins.Plugin;
+import io.minecloud.models.plugins.PluginType;
+import io.minecloud.models.server.World;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Reference;
+
+import java.util.List;
 
 @Entity(value = "server-types", noClassnameStored = true)
 @EqualsAndHashCode
@@ -36,6 +41,12 @@ public class ServerType extends MongoEntity {
     private String mod;
     @Setter
     private boolean defaultServer;
+    @Setter
+    private List<Plugin> plugins;
+    @Setter
+    private World defaultWorld;
+    @Setter
+    private List<World> worlds;
 
     public String name() {
         return entityId();
@@ -59,5 +70,17 @@ public class ServerType extends MongoEntity {
 
     public boolean defaultServer() {
         return defaultServer;
+    }
+
+    public List<Plugin> plugins() {
+        return plugins;
+    }
+
+    public World defaultWorld() {
+        return defaultWorld;
+    }
+
+    public List<World> worlds() {
+        return worlds;
     }
 }

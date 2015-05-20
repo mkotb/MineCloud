@@ -13,21 +13,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud;
+package io.minecloud.models.plugins;
 
-public final class MineCloudException extends RuntimeException {
-
-    public MineCloudException() {}
-
-    public MineCloudException(String message) {
-        super(message);
-    }
-
-    public MineCloudException(Exception exception) {
-        super(exception);
-    }
-
-    public MineCloudException(String message, Exception ex) {
-        super(message, ex);
-    }
+public enum PluginServerType {
+    BUNGEE,
+    SERVER
 }
