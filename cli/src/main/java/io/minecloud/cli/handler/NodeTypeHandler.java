@@ -20,6 +20,8 @@ import io.minecloud.MineCloud;
 import io.minecloud.models.nodes.type.CPU;
 import io.minecloud.models.nodes.type.NodeType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class NodeTypeHandler extends AbstractHandler {
@@ -85,5 +87,22 @@ public class NodeTypeHandler extends AbstractHandler {
                 .repositoryBy(NodeType.class)
                 .save(type);
         return "Successfully pushed modifications to database!";
+    }
+
+    @Command(name = "!show")
+    public List<String> show() {
+        List<String> list = new ArrayList<>();
+        list.add("Currently Modeling [Node Type] (" + type.name() + ")");
+        list.add("===========================================");
+        list.add("Listing Specifications...");
+        list.add("- Ram: " + type.ram() + "MB");
+        list.add("- CPU Specifications:");
+        list.add("  Base Frequency: " + type.processor().baseFrequency());
+        list.add("  Max Frequency: " + type.processor().maxFrequency());
+        list.add("  Cores: " + type.processor().cores());
+        list.add("  Threads: " + type.processor().threads());
+        list.add("===========================================");
+        list.add("If you're ready to go, type 'push'.");
+        return list;
     }
 }

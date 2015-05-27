@@ -92,4 +92,18 @@ public class PluginTypeHandler extends AbstractHandler {
                 .save(type);
         return "Successfully pushed modifications to database!";
     }
+
+    @Command(name = "!show")
+    public List<String> show() {
+        List<String> list = new ArrayList<>();
+        list.add("Currently Modeling [Plugin Type] (" + type.name() + ")");
+        list.add("===========================================");
+        list.add("Listing Specifications...");
+        list.add("- Server Type: " + type.type().name());
+        list.add("- Versions: " + formatStringList(type.versions()));
+        list.add("- Configs: " + formatStringList(type.configs()));
+        list.add("===========================================");
+        list.add("If you're ready to go, type 'push'.");
+        return list;
+    }
 }
