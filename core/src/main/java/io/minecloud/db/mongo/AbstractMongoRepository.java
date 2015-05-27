@@ -16,9 +16,11 @@
 package io.minecloud.db.mongo;
 
 import com.mongodb.*;
+import io.minecloud.db.mongo.model.MongoEntity;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.dao.BasicDAO;
+import org.mongodb.morphia.query.QueryImpl;
 import org.mongodb.morphia.query.QueryResults;
 
 import java.lang.reflect.ParameterizedType;
@@ -26,7 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractMongoRepository<T> extends BasicDAO<T, String> implements MongoRepository<T> {
+public abstract class AbstractMongoRepository<T extends MongoEntity> extends BasicDAO<T, String> implements MongoRepository<T> {
     protected DBCollection collection;
 
     protected AbstractMongoRepository(Class<T> entity, Datastore datastore) {

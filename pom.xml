@@ -15,6 +15,7 @@
         <module>controller</module>
         <module>bungee</module>
         <module>bukkit</module>
+        <module>cli</module>
     </modules>
 
     <build>

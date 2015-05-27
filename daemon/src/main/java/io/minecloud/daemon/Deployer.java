@@ -72,7 +72,7 @@ public final class Deployer {
                         .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
 
-                        .append("server_id", server.entityId().toString())
+                        .append("server_id", server.entityId())
                         .append("DEFAULT_WORLD", defaultWorld.name())
                         .append("DEFAULT_WORLD_VERSION", defaultWorld.version())
                         .build())
@@ -92,19 +92,31 @@ public final class Deployer {
         }
 
         MineCloud.logger().info("Started server " + server.name()
-                + " with container uuid " + server.containerId());
+                + " with container id " + server.containerId());
     }
 
     public static void deployBungee(Network network, BungeeType type) {
         BungeeRepository repository = MineCloud.instance().mongo().repositoryBy(Bungee.class);
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
+        Credentials mongoCreds = MineCloud.instance().mongo().credentials();
+        Credentials redisCreds = MineCloud.instance().redis().credentials();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/bungee")
                 .exposedPorts("25565")
                 .openStdin(true)
-                .env("") // TODO ENVs
-                .cmd("sh initialize.sh")
+                .env(new EnvironmentBuilder()
+                        .append("mongo_hosts", mongoCreds.formattedHosts())
+                        .append("mongo_username", mongoCreds.username())
+                        .append("mongo_password", new String(mongoCreds.password()))
+                        .append("mongo_database", mongoCreds.database())
+
+                        .append("redis_host", redisCreds.hosts()[0])
+                        .append("redis_username", redisCreds.username())
+                        .append("redis_password", new String(redisCreds.password()))
+
+                        .append("bungee_id", bungee.entityId())
+                        .build())
                 .build();
         HostConfig hostConfig = HostConfig.builder()
                 .portBindings(new HashMap<String, List<PortBinding>>() {{
@@ -133,7 +145,7 @@ public final class Deployer {
         bungee.setRamUsage(-1);
 
         repository.save(bungee);
-        MineCloud.logger().info("Started bungee " + bungee.name() + " with container uuid " + bungee.containerId());
+        MineCloud.logger().info("Started bungee " + bungee.name() + " with container id " + bungee.containerId());
     }
 
     private static class EnvironmentBuilder {

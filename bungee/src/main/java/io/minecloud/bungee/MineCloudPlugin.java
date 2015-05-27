@@ -15,21 +15,30 @@
  */
 package io.minecloud.bungee;
 
+import com.google.common.io.Files;
 import io.minecloud.MineCloud;
+import io.minecloud.MineCloudException;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.MessageType;
 import io.minecloud.db.redis.msg.binary.MessageInputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import io.minecloud.models.bungee.Bungee;
+import io.minecloud.models.bungee.type.BungeeType;
+import io.minecloud.models.plugins.PluginType;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bson.types.ObjectId;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class MineCloudPlugin extends Plugin {
     MongoDatabase mongo;
@@ -76,7 +85,86 @@ public class MineCloudPlugin extends Plugin {
             getProxy().setReconnectHandler(new ReconnectHandler(this));
             getProxy().getPluginManager().registerListener(this, new MineCloudListener(this));
         }, 0, TimeUnit.SECONDS);
+
+        BungeeType type = bungee().type();
+
+        type.plugins().forEach((plugin) -> {
+            String version = plugin.version();
+            PluginType pluginType = plugin.type();
+            File pluginsContainer = new File("/mnt/minecloud/plugins/",
+                    pluginType.name() + "/" + version);
+            List<File> plugins = new ArrayList<>();
+
+            getLogger().info("Loading " + pluginType.name() + "...");
+
+            if (validateFolder(pluginsContainer, pluginType, version))
+                return;
+
+            for (File f : pluginsContainer.listFiles()) {
+                if (f.isDirectory())
+                    continue; // ignore directories
+                File pl = new File("plugins/" + f.getName());
+
+                try {
+                    Files.copy(f, pl);
+                } catch (IOException ex) {
+                    getLogger().log(Level.SEVERE, "Could not load " + pluginType.name() +
+                            ", printing stacktrace...");
+                    ex.printStackTrace();
+                    return;
+                }
+
+                plugins.add(pl);
+            }
+
+            File configs = new File("/mnt/minecloud/configs/",
+                    pluginType.name() + "/" + version);
+            File configContainer = new File("plugins/" + pluginType.name());
+
+            if (validateFolder(configs, pluginType, version))
+                return;
+
+            copyFolder(configs, configContainer);
+        });
+
+        getProxy().getPluginManager().detectPlugins(getProxy().getPluginsFolder());
+        getProxy().getPluginManager().loadPlugins();
+        getProxy().getPluginManager().enablePlugins();
     }
+
+    private boolean validateFolder(File file, PluginType pluginType, String version) {
+        if (!file.exists()) {
+            getLogger().info(file.getPath() + " does not exist! Cannot load " + pluginType.name());
+            return true;
+        }
+
+        if (!(file.isDirectory()) || file.listFiles() == null
+                || file.listFiles().length < 1) {
+            getLogger().info(pluginType.name() + " " + version +
+                    " has either no files or has an invalid setup");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void copyFolder(File folder, File folderContainer) {
+        folderContainer.mkdirs();
+
+        for (File f : folder.listFiles()) {
+            if (f.isDirectory()) {
+                File newContainer = new File(folderContainer, f.getName());
+                copyFolder(f, newContainer);
+            }
+
+            try {
+                Files.copy(f, new File(folderContainer, f.getName()));
+            } catch (IOException ex) {
+                throw new MineCloudException(ex);
+            }
+        }
+    }
+
 
     public void addServer(Server server) {
         ServerInfo info = getProxy().constructServerInfo(server.name(),

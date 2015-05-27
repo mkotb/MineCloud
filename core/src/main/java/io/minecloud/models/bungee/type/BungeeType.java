@@ -17,10 +17,13 @@ package io.minecloud.models.bungee.type;
 
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.nodes.type.NodeType;
+import io.minecloud.models.plugins.Plugin;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Reference;
+
+import java.util.List;
 
 @Entity(value = "bungee-types", noClassnameStored = true)
 @EqualsAndHashCode
@@ -30,6 +33,12 @@ public class BungeeType extends MongoEntity {
     @Reference
     @Setter
     private NodeType preferredNode;
+    @Setter
+    private List<Plugin> plugins;
+
+    public List<Plugin> plugins() {
+        return plugins;
+    }
 
     public String name() {
         return entityId();

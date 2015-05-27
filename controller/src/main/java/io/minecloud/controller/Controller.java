@@ -19,6 +19,7 @@ import io.minecloud.MineCloud;
 import io.minecloud.controller.plugin.PluginManager;
 import io.minecloud.controller.plugin.js.JavaScriptManager;
 import io.minecloud.controller.plugin.js.JavaScriptPlugin;
+import io.minecloud.db.Credentials;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.binary.MessageOutputStream;
@@ -127,6 +128,17 @@ public class Controller {
             MineCloud.runSetup(properties, file);
             new Controller();
         }
+
+        Credentials mongo = new Credentials(properties.getProperty("mongo-hosts").split(";"),
+                properties.getProperty("mongo-username"),
+                properties.getProperty("mongo-password").toCharArray(),
+                properties.getProperty("mongo-database"));
+        Credentials redis = new Credentials(new String[] {properties.getProperty("redis-host")},
+                properties.getProperty("redis-username"),
+                properties.getProperty("redis-password").toCharArray());
+
+        MineCloud.instance().initiateMongo(mongo);
+        MineCloud.instance().initiateRedis(redis);
 
         new Controller();
     }
