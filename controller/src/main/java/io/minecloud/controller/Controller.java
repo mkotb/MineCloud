@@ -66,14 +66,14 @@ public class Controller {
         while (!Thread.currentThread().isInterrupted()) {
             mongo.repositoryBy(Network.class).models()
                     .forEach((network) -> {
-                        network.bungeeMetadata().forEach((metadata) -> {
+                        /*network.bungeeMetadata().forEach((metadata) -> {
                             int bungeeDifference = metadata.minimumAmount() -
                                     network.bungeesOnline(metadata.type());
 
                             if (bungeeDifference > 0)
                                 IntStream.range(0, bungeeDifference)
                                         .forEach((i) -> deployBungee(network, metadata.type()));
-                        });
+                        });*/ // FIXME
 
                         network.serverMetadata().forEach((metadata) -> {
                             List<Server> servers = mongo.repositoryBy(Server.class).models()
@@ -182,12 +182,9 @@ public class Controller {
     }
 
     public Node findNode(Network network, NodeType preferredNode, int requiredRam) {
-        NodeRepository repository = mongo.repositoryBy(Node.class);
         Node selectedNode = null;
 
-        for (String nodeName : network.nodes()) {
-            Node node = repository.nodeBy(nodeName);
-
+        for (Node node : network.nodes()) {
             if (selectedNode == null && node.availableRam() >= requiredRam) {
                 selectedNode = node;
                 continue;

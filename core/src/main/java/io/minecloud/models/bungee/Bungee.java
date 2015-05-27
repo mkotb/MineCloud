@@ -25,7 +25,7 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Reference;
 
 @Entity(value = "bungees", noClassnameStored = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Bungee extends MongoEntity {
     @Reference
     @Setter

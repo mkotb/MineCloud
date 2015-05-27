@@ -16,10 +16,12 @@
 package io.minecloud.models.plugins;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Reference;
 
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Plugin {
     @Reference
     @Setter
@@ -36,5 +38,9 @@ public class Plugin {
 
     public String version() {
         return version;
+    }
+
+    public String name() {
+        return type.name();
     }
 }

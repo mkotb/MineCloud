@@ -31,4 +31,14 @@ public class MainHandler extends AbstractHandler {
     public void serverType(String name) {
         enterShell(new ServerTypeHandler(name), "server-type");
     }
+
+    @Command(name = "node-type")
+    public void nodeType(String name) {
+        enterShell(new NodeTypeHandler(name), "node-type");
+    }
+
+    @Command(name = "bungee-type")
+    public void bungeeType(String name) {
+        enterShell(new BungeeTypeHandler(name), "bungee-type");
+    }
 }

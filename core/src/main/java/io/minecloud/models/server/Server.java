@@ -35,7 +35,7 @@ import java.util.UUID;
  * Any inconsistent changes made to this class will be ignored.
  */
 @Entity(value = "servers", noClassnameStored = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Server extends MongoEntity {
     @Reference
     @Setter

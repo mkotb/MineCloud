@@ -17,29 +17,26 @@ package io.minecloud.cli.handler;
 
 import asg.cliche.Command;
 import io.minecloud.MineCloud;
+import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.plugins.Plugin;
 import io.minecloud.models.plugins.PluginType;
-import io.minecloud.models.server.World;
-import io.minecloud.models.server.type.ServerType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ServerTypeHandler extends AbstractHandler {
-    ServerType type;
+public class BungeeTypeHandler extends AbstractHandler {
+    BungeeType type;
 
-    ServerTypeHandler(String name) {
-        super();
-
+    BungeeTypeHandler(String name) {
         type = MineCloud.instance().mongo()
-                .repositoryBy(ServerType.class)
+                .repositoryBy(BungeeType.class)
                 .findFirst(name);
 
         if (type == null) {
             System.out.println("Could not find type in database; creating new one...");
-            type = new ServerType();
+            type = new BungeeType();
 
             type.setName(name);
         }
@@ -56,16 +53,6 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String maxPlayers(int max) {
-        if (max < 0) {
-            return "Invalid max players!";
-        }
-
-        type.setMaxPlayers(max);
-        return "Set maximum amount of players to " + max + " successfully";
-    }
-
-    @Command
     public String preferredNode(String nodeType) {
         NodeType type = MineCloud.instance().mongo()
                 .repositoryBy(NodeType.class)
@@ -77,18 +64,6 @@ public class ServerTypeHandler extends AbstractHandler {
 
         this.type.setPreferredNode(type);
         return "Set preferred node type to " + nodeType;
-    }
-
-    @Command
-    public String mod(String mod) {
-        type.setMod(mod);
-        return "Set mod to " + mod;
-    }
-
-    @Command
-    public String defaultServer(boolean def) {
-        type.setDefaultServer(def);
-        return "Set default server value to " + def;
     }
 
     @Command
@@ -133,42 +108,15 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String defaultWorld(String world, String version) {
-        type.setDefaultWorld(new World(world, version));
-        return "Set default world to " + world + " version " + version;
-    }
-
-    @Command(name = "add-world", abbrev = "aw")
-    public String addWorld(String world, String version) {
-        if (type.worlds() == null) {
-            type.setWorlds(new ArrayList<>());
-        }
-
-        World wrld = new World(world, version);
-        List<World> worlds = type.worlds();
-
-        if (worlds.contains(wrld)) {
-            return "World by the name of " + world + " already exists"; // don't worry, also considers versions
-        }
-
-        worlds.add(wrld);
-        type.setWorlds(worlds);
-
-        return "Added world " + world + " version " + version + " to the extra worlds";
-    }
-
-    @Command
     public String push() {
         if (type.dedicatedRam() == 0 ||
-                type.maxPlayers() == 0 ||
-                type.preferredNode() == null ||
-                type.defaultWorld() == null) {
-            return "Required fields (dedicatedRam, maxPlayers, preferredNode, defaultWorld) have not been set by the user! " +
+                type.preferredNode() == null) {
+            return "Required fields (dedicatedRam, preferredNode) have not been set by the user! " +
                     "Unable to push modifications";
         }
 
         MineCloud.instance().mongo()
-                .repositoryBy(ServerType.class)
+                .repositoryBy(BungeeType.class)
                 .save(type);
         return "Successfully pushed modifications to database!";
     }

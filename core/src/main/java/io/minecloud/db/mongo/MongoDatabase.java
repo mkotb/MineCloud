@@ -20,6 +20,7 @@ import io.minecloud.MineCloud;
 import io.minecloud.MineCloudException;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.Database;
+import io.minecloud.db.mongo.model.MongoEntity;
 import org.apache.logging.log4j.Level;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -43,7 +44,7 @@ public class MongoDatabase implements Database {
         return new MongoDatabase(credentials);
     }
 
-    public <T, E extends AbstractMongoRepository<T>> E repositoryBy(Class<T> model) {
+    public <T extends MongoEntity, E extends AbstractMongoRepository<T>> E repositoryBy(Class<T> model) {
         return (E) repositories.get(model);
     }
 

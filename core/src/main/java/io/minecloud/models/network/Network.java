@@ -19,37 +19,42 @@ import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
-import io.minecloud.models.network.bungee.BungeeMetadata;
 import io.minecloud.models.network.server.ServerMetadata;
+import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Reference;
 
 import java.util.List;
 
 @Entity(value = "networks", noClassnameStored = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class Network extends MongoEntity {
+    @Id
+    @Setter
+    private String name;
     @Setter
     private List<ServerMetadata> serverMetadata;
     @Setter
-    private List<BungeeMetadata> bungeeMetadata;
+    private List<BungeeType> bungees;
     @Setter
-    private List<String> nodes;
+    @Reference
+    private List<Node> nodes;
 
     public String name() {
-        return entityId();
+        return name;
     }
 
     public List<ServerMetadata> serverMetadata() {
         return serverMetadata;
     }
 
-    public List<BungeeMetadata> bungeeMetadata() {
-        return bungeeMetadata;
+    public List<BungeeType> bungeeMetadata() {
+        return bungees;
     }
 
     public int serversOnline() {
@@ -80,7 +85,7 @@ public class Network extends MongoEntity {
                 .count();
     }
 
-    public List<String> nodes() {
+    public List<Node> nodes() {
         return nodes;
     }
 }

@@ -21,13 +21,17 @@ import io.minecloud.models.plugins.Plugin;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 import java.util.List;
 
 @Entity(value = "bungee-types", noClassnameStored = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class BungeeType extends MongoEntity {
+    @Setter
+    @Id
+    private String name;
     @Setter
     private int dedicatedRam;
     @Reference
@@ -41,7 +45,7 @@ public class BungeeType extends MongoEntity {
     }
 
     public String name() {
-        return entityId();
+        return name;
     }
 
     public int dedicatedRam() {

@@ -24,7 +24,7 @@ import org.mongodb.morphia.annotations.Id;
 import java.util.List;
 
 @Entity(value = "node-types", noClassnameStored = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class NodeType extends MongoEntity {
     @Setter
     @Id
@@ -32,14 +32,14 @@ public class NodeType extends MongoEntity {
     @Setter
     private int ram;
     @Setter
-    private List<CPU> cpus;
+    private CPU cpu;
 
     public int ram() {
         return ram;
     }
 
-    public List<CPU> cpus() {
-        return cpus;
+    public CPU processor() {
+        return cpu;
     }
 
     public String name() {

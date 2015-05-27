@@ -29,7 +29,7 @@ import org.mongodb.morphia.annotations.Reference;
 import java.util.List;
 
 @Entity(value = "server-types", noClassnameStored = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class ServerType extends MongoEntity {
     @Setter
     @Id

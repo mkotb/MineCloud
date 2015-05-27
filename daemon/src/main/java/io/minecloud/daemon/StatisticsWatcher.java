@@ -44,7 +44,7 @@ public class StatisticsWatcher extends Thread {
     public void run() {
         while(!isInterrupted()) {
             Node node = MineCloudDaemon.instance().node();
-            double[] frequencies = new double[node.type().cpus().size()];
+            double[] frequencies = new double[node.type().processor().cores()];
             double[] usages = new double[frequencies.length];
             int index = -1;
 
