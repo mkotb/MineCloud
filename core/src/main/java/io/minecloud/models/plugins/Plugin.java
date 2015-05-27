@@ -15,15 +15,20 @@
  */
 package io.minecloud.models.plugins;
 
+import lombok.AllArgsConstructor;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Reference;
 
+@AllArgsConstructor
 public class Plugin {
     @Reference
     @Setter
     private PluginType type;
     @Setter
     private String version;
+
+    public Plugin() {
+    }
 
     public PluginType type() {
         return type;

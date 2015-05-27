@@ -24,6 +24,11 @@ public class MainHandler extends AbstractHandler {
 
     @Command(name = "plugin-type")
     public void pluginType(String name) {
-        enterShell(new PluginTypeHandler(currentShell(), name), "plugin-type");
+        enterShell(new PluginTypeHandler(name), "plugin-type");
+    }
+
+    @Command(name = "server-type")
+    public void serverType(String name) {
+        enterShell(new ServerTypeHandler(name), "server-type");
     }
 }

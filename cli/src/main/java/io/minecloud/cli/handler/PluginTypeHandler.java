@@ -16,29 +16,80 @@
 package io.minecloud.cli.handler;
 
 import asg.cliche.Command;
-import asg.cliche.Shell;
+import asg.cliche.Param;
 import io.minecloud.MineCloud;
+import io.minecloud.models.plugins.PluginServerType;
 import io.minecloud.models.plugins.PluginType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PluginTypeHandler extends AbstractHandler {
     PluginType type;
-    boolean isNew;
 
-    PluginTypeHandler(Shell parent, String name) {
-        super(parent, false);
-
+    PluginTypeHandler(String name) {
         type = MineCloud.instance().mongo()
                 .repositoryBy(PluginType.class)
                 .findFirst(name);
-        isNew = type == null;
 
-        if (isNew) {
+        if (type == null) {
+            System.out.println("Could not find type in database; creating new one...");
             type = new PluginType();
+
+            type.setName(name);
         }
     }
 
-    @Command
-    public void create() {
+    @Command(name = "plugin-server-type", abbrev = "pst")
+    public String pluginServerType(@Param(name = "Server Type") String name) {
+        PluginServerType type = PluginServerType.valueOf(name.toUpperCase());
 
+        if (type == null) {
+            return "No server type of name " + name + " was found. " +
+                    "Available server types: bungee, server";
+        }
+
+        this.type.setType(type); // typee asf
+        return "Set plugin server type to " + name + " successfully";
+    }
+
+    @Command(name = "add-version", abbrev = "av")
+    public String addVersion(String version) {
+        if (type.versions() == null) {
+            type.setVersions(new ArrayList<>());
+        }
+
+        List<String> versions = type.versions();
+
+        versions.add(version);
+        type.setVersions(versions);
+
+        return "Successfully added " + version + " as a plugin version";
+    }
+
+    @Command(name = "add-config", abbrev = "ac")
+    public String addConfig(String configName) {
+        if (type.configs() == null) {
+            type.setConfigs(new ArrayList<>());
+        }
+
+        List<String> configs = type.configs();
+
+        configs.add(configName);
+        type.setConfigs(configs);
+
+        return "Successfully added " + configName + " as a config name";
+    }
+
+    @Command
+    public String push() {
+        if (type.type() == null) {
+            return "Required fields (type) have not been set by the user! Unable to push modifications";
+        }
+
+        MineCloud.instance().mongo()
+                .repositoryBy(PluginType.class)
+                .save(type);
+        return "Successfully pushed modifications to database!";
     }
 }

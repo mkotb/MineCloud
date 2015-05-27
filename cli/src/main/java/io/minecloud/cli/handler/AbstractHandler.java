@@ -20,17 +20,17 @@ import asg.cliche.ShellFactory;
 import io.minecloud.MineCloudException;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public abstract class AbstractHandler {
-    protected final Shell parent;
     private Shell current;
 
-    protected AbstractHandler(Shell parent, boolean bleh) {
-        this.parent = parent;
+    protected AbstractHandler() {
     }
 
     public AbstractHandler(Shell shell) {
-        this.parent = null;
         this.current = shell;
     }
 
@@ -41,6 +41,26 @@ public abstract class AbstractHandler {
         } catch (IOException ex) {
             throw new MineCloudException("Error encountered when in sub-command loop!", ex);
         }
+    }
+
+    public String optionPrompt(String... optins) {
+        List<String> options = Arrays.asList(optins);
+
+        System.out.println("Available options: (enter number)");
+
+        for (int i = 0; i < options.size(); i++) {
+            System.out.println(i + ": " + options.get(i));
+        }
+
+        int option = new Scanner(System.in).nextInt();
+
+        if (option < 0 || option >= options.size()) {
+            System.out.println("\nInvalid option! Trying again...\n\n");
+
+            optionPrompt(optins);
+        }
+
+        return options.get(option);
     }
 
     public Shell currentShell() {

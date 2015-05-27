@@ -15,15 +15,20 @@
  */
 package io.minecloud.models.server;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+@AllArgsConstructor
 @EqualsAndHashCode
 public class World {
     @Setter
     private String name;
     @Setter
     private String version;
+
+    public World() {
+    }
 
     public String name() {
         return name;

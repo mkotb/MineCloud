@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) 2015, Mazen Kotb <email@mazenmc.io>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+package io.minecloud.cli.handler;
+
+import asg.cliche.Command;
+import io.minecloud.MineCloud;
+import io.minecloud.models.nodes.type.NodeType;
+import io.minecloud.models.plugins.Plugin;
+import io.minecloud.models.plugins.PluginType;
+import io.minecloud.models.server.World;
+import io.minecloud.models.server.type.ServerType;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ServerTypeHandler extends AbstractHandler {
+    ServerType type;
+
+    ServerTypeHandler(String name) {
+        super();
+
+        type = MineCloud.instance().mongo()
+                .repositoryBy(ServerType.class)
+                .findFirst(name);
+
+        if (type == null) {
+            System.out.println("Could not find type in database; creating new one...");
+            type = new ServerType();
+
+            type.setName(name);
+        }
+    }
+
+    @Command
+    public String dedicatedRam(int amount) {
+        if (amount < 0 || amount < 500) {
+            return "Invalid ram amount!";
+        }
+
+        type.setDedicatedRam(amount);
+        return "Set dedicated ram to " + amount + " MB successfully";
+    }
+
+    @Command
+    public String maxPlayers(int max) {
+        if (max < 0) {
+            return "Invalid max players!";
+        }
+
+        type.setMaxPlayers(max);
+        return "Set maximum amount of players to " + max + " successfully";
+    }
+
+    @Command
+    public String preferredNode(String nodeType) {
+        NodeType type = MineCloud.instance().mongo()
+                .repositoryBy(NodeType.class)
+                .findFirst(nodeType);
+
+        if (type == null) {
+            return "No found node types by the name of " + nodeType;
+        }
+
+        this.type.setPreferredNode(type);
+        return "Set preferred node type to " + nodeType;
+    }
+
+    @Command
+    public String mod(String mod) {
+        type.setMod(mod);
+        return "Set mod to " + mod;
+    }
+
+    @Command
+    public String defaultServer(boolean def) {
+        type.setDefaultServer(def);
+        return "Set default server value to " + def;
+    }
+
+    @Command
+    public String addPlugin(String pluginName, String version) {
+        PluginType pluginType = MineCloud.instance().mongo()
+                .repositoryBy(PluginType.class)
+                .findFirst(pluginName);
+
+        if (pluginType == null) {
+            return "No found plugin by the name of " + pluginName;
+        }
+
+        if (!pluginType.versions().contains(version)) {
+            return "No version by the name of " + version + " was found for " + pluginName;
+        }
+
+        if (type.plugins() == null) {
+            type.setPlugins(new ArrayList<>());
+        }
+
+        List<Plugin> plugins = type.plugins();
+
+        plugins.add(new Plugin(pluginType, version));
+        type.setPlugins(plugins);
+
+        return "Successfully added " + pluginName + "v" + version;
+    }
+
+    @Command
+    public String defaultWorld(String world, String version) {
+        type.setDefaultWorld(new World(world, version));
+        return "Set default world to " + world + " version " + version;
+    }
+
+    @Command(name = "add-world", abbrev = "aw")
+    public String addWorld(String world, String version) {
+        if (type.worlds() == null) {
+            type.setWorlds(new ArrayList<>());
+        }
+
+        World wrld = new World(world, version);
+        List<World> worlds = type.worlds();
+
+        if (worlds.contains(wrld)) {
+            return "World by the name of " + world + " already exists"; // don't worry, also considers versions
+        }
+
+        worlds.add(wrld);
+        type.setWorlds(worlds);
+
+        return "Added world " + world + " version " + version + " to the extra worlds";
+    }
+
+    @Command
+    public String push() {
+        if (type.dedicatedRam() == 0 ||
+                type.maxPlayers() == 0 ||
+                type.defaultWorld() == null) {
+            return "Required fields (dedicatedRam, maxPlayers, defaultWorld) have not been set by the user! " +
+                    "Unable to push modifications";
+        }
+
+        MineCloud.instance().mongo()
+                .repositoryBy(ServerType.class)
+                .save(type);
+        return "Successfully pushed modifications to database!";
+    }
+}

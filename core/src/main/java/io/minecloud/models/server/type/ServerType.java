@@ -23,6 +23,7 @@ import io.minecloud.models.server.World;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 import java.util.List;
@@ -30,6 +31,9 @@ import java.util.List;
 @Entity(value = "server-types", noClassnameStored = true)
 @EqualsAndHashCode
 public class ServerType extends MongoEntity {
+    @Setter
+    @Id
+    private String name;
     @Setter
     private int dedicatedRam;
     @Setter
@@ -49,7 +53,7 @@ public class ServerType extends MongoEntity {
     private List<World> worlds;
 
     public String name() {
-        return entityId();
+        return name;
     }
 
     public int maxPlayers() {

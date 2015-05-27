@@ -19,6 +19,7 @@ import io.minecloud.db.mongo.model.MongoEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class PluginType extends MongoEntity {
     @Setter
+    @Id
     private String name;
     @Setter
     private PluginServerType type;

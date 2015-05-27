@@ -19,12 +19,16 @@ import io.minecloud.db.mongo.model.MongoEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 
 import java.util.List;
 
 @Entity(value = "node-types", noClassnameStored = true)
 @EqualsAndHashCode
 public class NodeType extends MongoEntity {
+    @Setter
+    @Id
+    private String name;
     @Setter
     private int ram;
     @Setter
@@ -39,6 +43,6 @@ public class NodeType extends MongoEntity {
     }
 
     public String name() {
-        return entityId();
+        return name;
     }
 }
