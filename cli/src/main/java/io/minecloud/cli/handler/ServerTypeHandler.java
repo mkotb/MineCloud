@@ -172,4 +172,23 @@ public class ServerTypeHandler extends AbstractHandler {
                 .save(type);
         return "Successfully pushed modifications to database!";
     }
+
+    @Command(name = "!show")
+    public List<String> show() {
+        List<String> list = new ArrayList<>();
+        list.add("Currently Modeling [Server Type] (" + type.name() + ")");
+        list.add("===========================================");
+        list.add("Listing Specifications...");
+        list.add("- Maximum Amount of Players: " + type.maxPlayers());
+        list.add("- Preferred Node: " + type.preferredNode().name());
+        list.add("- Mod: " + type.mod());
+        list.add("- Dedicated Ram (Per Server): " + type.dedicatedRam() + "MB");
+        list.add("- Plugins: " + formatPlugins(type.plugins()));
+        list.add("- IS Default: " + (type.defaultServer() ? "Yes" : "No"));
+        list.add("- Default World: " + type.defaultWorld().name() + "(" + type.defaultWorld().version() + ")");
+        list.add("- Worlds: " + formatWorlds(type.worlds()));
+        list.add("===========================================");
+        list.add("If you're ready to go, type 'push'.");
+        return list;
+    }
 }

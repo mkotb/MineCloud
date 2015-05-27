@@ -18,6 +18,8 @@ package io.minecloud.cli.handler;
 import asg.cliche.Shell;
 import asg.cliche.ShellFactory;
 import io.minecloud.MineCloudException;
+import io.minecloud.models.plugins.Plugin;
+import io.minecloud.models.server.World;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -65,5 +67,41 @@ public abstract class AbstractHandler {
 
     public Shell currentShell() {
         return current;
+    }
+
+    public String formatPlugins(List<Plugin> plugins) {
+        StringBuilder builder = new StringBuilder();
+
+        for (Plugin plugin : plugins) {
+            builder.append(plugin.name()).append("(v").append(plugin.version()).append("), ");
+        }
+
+        String toReturn = builder.toString().trim();
+        toReturn = (toReturn.endsWith(",") ? toReturn.substring(0, toReturn.length() - 1) : toReturn);
+        return toReturn;
+    }
+
+    public String formatStringList(List<String> versions) {
+        StringBuilder builder = new StringBuilder();
+
+        for (String version : versions) {
+            builder.append(version).append(", ");
+        }
+
+        String toReturn = builder.toString().trim();
+        toReturn = (toReturn.endsWith(",") ? toReturn.substring(0, toReturn.length() - 1) : toReturn);
+        return toReturn;
+    }
+
+    public String formatWorlds(List<World> worlds) {
+        StringBuilder builder = new StringBuilder();
+
+        for (World world : worlds) {
+            builder.append(world.name()).append("(v").append(world.version()).append("), ");
+        }
+
+        String toReturn = builder.toString().trim();
+        toReturn = (toReturn.endsWith(",") ? toReturn.substring(0, toReturn.length() - 1) : toReturn);
+        return toReturn;
     }
 }

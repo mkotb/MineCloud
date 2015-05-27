@@ -120,4 +120,18 @@ public class BungeeTypeHandler extends AbstractHandler {
                 .save(type);
         return "Successfully pushed modifications to database!";
     }
+
+    @Command(name = "!show")
+    public List<String> show() {
+        List<String> list = new ArrayList<>();
+        list.add("Currently Modeling [Bungee Type] (" + type.name() + ")");
+        list.add("===========================================");
+        list.add("Listing Specifications...");
+        list.add("- Dedicated Ram: " + type.dedicatedRam() + "MB");
+        list.add("- Preferred Node: " + type.preferredNode().name());
+        list.add("- Plugins: " + formatPlugins(type.plugins()));
+        list.add("===========================================");
+        list.add("If you're ready to go, type 'push'.");
+        return list;
+    }
 }
