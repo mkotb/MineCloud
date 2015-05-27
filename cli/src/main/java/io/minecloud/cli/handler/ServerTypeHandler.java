@@ -184,7 +184,7 @@ public class ServerTypeHandler extends AbstractHandler {
         list.add("- Mod: " + type.mod());
         list.add("- Dedicated Ram (Per Server): " + type.dedicatedRam() + "MB");
         list.add("- Plugins: " + formatPlugins(type.plugins()));
-        list.add("- IS Default: " + (type.defaultServer() ? "Yes" : "No"));
+        list.add("- Is Default: " + (type.defaultServer() ? "Yes" : "No"));
         list.add("- Default World: " + type.defaultWorld().name() + "(" + type.defaultWorld().version() + ")");
         list.add("- Worlds: " + formatWorlds(type.worlds()));
         list.add("===========================================");
