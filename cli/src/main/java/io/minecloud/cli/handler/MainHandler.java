@@ -41,4 +41,9 @@ public class MainHandler extends AbstractHandler {
     public void bungeeType(String name) {
         enterShell(new BungeeTypeHandler(name), "bungee-type");
     }
+
+    @Command(name = "network-type")
+    public void networkType(String name) {
+        enterShell(new NetworkTypeHandler(name), "network-type");
+    }
 }
