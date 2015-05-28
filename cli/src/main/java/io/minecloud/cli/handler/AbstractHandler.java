@@ -18,6 +18,8 @@ package io.minecloud.cli.handler;
 import asg.cliche.Shell;
 import asg.cliche.ShellFactory;
 import io.minecloud.MineCloudException;
+import io.minecloud.models.bungee.type.BungeeType;
+import io.minecloud.models.nodes.Node;
 import io.minecloud.models.plugins.Plugin;
 import io.minecloud.models.server.World;
 
@@ -104,6 +106,34 @@ public abstract class AbstractHandler {
 
         for (World world : worlds) {
             builder.append(world.name()).append("(v").append(world.version()).append("), ");
+        }
+
+        String toReturn = builder.toString().trim();
+        toReturn = (toReturn.endsWith(",") ? toReturn.substring(0, toReturn.length() - 1) : toReturn);
+        return toReturn;
+    }
+
+    public String formatBungees(List<BungeeType> bungeeTypes) {
+        if (bungeeTypes == null || bungeeTypes.isEmpty())
+            return "N/A";
+        StringBuilder builder = new StringBuilder();
+
+        for (BungeeType type : bungeeTypes) {
+            builder.append(type.name()).append(", ");
+        }
+
+        String toReturn = builder.toString().trim();
+        toReturn = (toReturn.endsWith(",") ? toReturn.substring(0, toReturn.length() - 1) : toReturn);
+        return toReturn;
+    }
+
+    public String formatNodes(List<Node> nodes) {
+        if (nodes == null || nodes.isEmpty())
+            return "N/A";
+        StringBuilder builder = new StringBuilder();
+
+        for (Node node : nodes) {
+            builder.append(node.name()).append("(").append(node.publicIp()).append(")").append(", ");
         }
 
         String toReturn = builder.toString().trim();
