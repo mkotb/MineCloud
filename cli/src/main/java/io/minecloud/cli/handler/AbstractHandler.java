@@ -70,6 +70,8 @@ public abstract class AbstractHandler {
     }
 
     public String formatPlugins(List<Plugin> plugins) {
+        if (plugins == null || plugins.isEmpty())
+            return "N/A";
         StringBuilder builder = new StringBuilder();
 
         for (Plugin plugin : plugins) {
@@ -82,6 +84,8 @@ public abstract class AbstractHandler {
     }
 
     public String formatStringList(List<String> versions) {
+        if (versions == null || versions.isEmpty())
+            return "N/A";
         StringBuilder builder = new StringBuilder();
 
         for (String version : versions) {
@@ -94,6 +98,8 @@ public abstract class AbstractHandler {
     }
 
     public String formatWorlds(List<World> worlds) {
+        if (worlds == null || worlds.isEmpty())
+            return "N/A";
         StringBuilder builder = new StringBuilder();
 
         for (World world : worlds) {
