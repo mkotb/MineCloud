@@ -18,11 +18,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.asg</groupId>
+            <groupId>com.googlecode.clichemaven</groupId>
             <artifactId>cliche</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/asg.cliche-110413.jar</systemPath>
+            <version>110413</version>
         </dependency>
     </dependencies>
 </project>
