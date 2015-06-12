@@ -16,7 +16,6 @@
 package io.minecloud.db.mongo;
 
 import com.mongodb.DBCollection;
-import org.bson.types.ObjectId;
 
 import java.util.Collection;
 import java.util.Optional;

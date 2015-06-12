@@ -21,8 +21,6 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
-import java.util.List;
-
 @Entity(value = "node-types", noClassnameStored = true)
 @EqualsAndHashCode(callSuper = true)
 public class NodeType extends MongoEntity {

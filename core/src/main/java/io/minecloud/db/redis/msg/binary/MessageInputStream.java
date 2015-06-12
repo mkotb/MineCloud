@@ -41,7 +41,7 @@ public class MessageInputStream extends ByteArrayInputStream {
                 return Message.messageFrom(data);
 
             case JSON:
-                return Message.messageFrom(new JSONObject(new String(data, Charset.forName("UTF-8"))));
+                return Message.messageFrom(new JSONObject((new String(data, Charset.forName("UTF-8")))));
 
             case STRING:
                 return Message.messageFrom(new String(data, Charset.forName("UTF-8")));

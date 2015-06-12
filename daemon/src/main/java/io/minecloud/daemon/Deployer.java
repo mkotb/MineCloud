@@ -17,7 +17,10 @@ package io.minecloud.daemon;
 
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
-import com.spotify.docker.client.messages.*;
+import com.spotify.docker.client.messages.ContainerConfig;
+import com.spotify.docker.client.messages.ContainerCreation;
+import com.spotify.docker.client.messages.HostConfig;
+import com.spotify.docker.client.messages.PortBinding;
 import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.models.bungee.Bungee;

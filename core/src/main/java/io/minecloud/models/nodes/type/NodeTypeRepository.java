@@ -16,7 +16,6 @@
 package io.minecloud.models.nodes.type;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
-import io.minecloud.db.mongo.MongoDatabase;
 import org.mongodb.morphia.Datastore;
 
 public class NodeTypeRepository extends AbstractMongoRepository<NodeType> {
