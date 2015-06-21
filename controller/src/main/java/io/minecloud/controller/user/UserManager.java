@@ -15,10 +15,12 @@
  */
 package io.minecloud.controller.user;
 
+import io.minecloud.controller.web.SessionToken;
 import io.minecloud.http.User;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 // TODO saving and loading of users
 public class UserManager {
@@ -34,6 +36,12 @@ public class UserManager {
 
     public User userBy(String name) {
         return users.get(name);
+    }
+
+    public Optional<User> userBy(SessionToken token) {
+        return users.values().stream()
+                .filter((u) -> u.token().equals(token.token()))
+                .findFirst();
     }
 
     public void registerUser(User user) {

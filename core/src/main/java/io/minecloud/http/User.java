@@ -56,4 +56,8 @@ public class User {
     public long lastLogin() {
         return lastLogin;
     }
+
+    public String token() {
+        return token;
+    }
 }

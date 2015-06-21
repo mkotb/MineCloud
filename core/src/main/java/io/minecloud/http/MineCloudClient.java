@@ -46,7 +46,7 @@ public class MineCloudClient {
         return hostname;
     }
 
-    public void initiate(String username, String password) {
+    public void initiate(String username, String password) { // fixme: wrong place for this
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             password = new String(digest.digest(password.getBytes("UTF-8")));
@@ -62,6 +62,8 @@ public class MineCloudClient {
     }
 
     public void sendMessage(Message message, ResponseCallback callback) {
+        message.setToken(user.token() == null ? "" : user.token());
+
         Unirest.post(hostname + ":2572" + message.path())
                 .body(MineCloud.fetchGson().toJson(message))
                 .asStringAsync(new Callback<String>() {

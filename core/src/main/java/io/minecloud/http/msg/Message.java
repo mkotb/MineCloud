@@ -15,9 +15,15 @@
  */
 package io.minecloud.http.msg;
 
+import com.google.gson.annotations.Expose;
+
 public abstract class Message {
+    @Expose(serialize = false, deserialize = false)
     protected final String className;
+    @Expose(serialize = false, deserialize = false)
     protected final String path;
+
+    protected String token;
 
     protected Message(String path) {
         this.className = getClass().getName();
@@ -30,5 +36,13 @@ public abstract class Message {
 
     public String path() {
         return path;
+    }
+
+    public String token() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

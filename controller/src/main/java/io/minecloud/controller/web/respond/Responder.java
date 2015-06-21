@@ -16,8 +16,9 @@
 package io.minecloud.controller.web.respond;
 
 import io.minecloud.controller.web.MessageContext;
+import io.minecloud.http.msg.Message;
 import io.minecloud.http.msg.Response;
 
-public interface Responder<T> {
+public interface Responder<T extends Message> {
     Response respond(MessageContext context, T message);
 }

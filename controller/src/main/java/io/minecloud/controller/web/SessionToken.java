@@ -30,7 +30,7 @@ public final class SessionToken {
 
     SessionToken(User user) {
         this.user = user;
-        this.token = UUID.randomUUID().toString();
+        this.token = UUID.randomUUID().toString().replace("-", "");
         this.timeStamp = System.currentTimeMillis();
 
         user.setToken(token);
