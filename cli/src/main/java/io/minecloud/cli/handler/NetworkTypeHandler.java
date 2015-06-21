@@ -22,7 +22,9 @@ import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NetworkTypeHandler extends AbstractHandler {
     Network type;
@@ -41,7 +43,7 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String addBungee(String bungeeName) {
+    public String addBungee(String bungeeName, int amount) {
         BungeeType bungeeType = MineCloud.instance().mongo()
                 .repositoryBy(BungeeType.class)
                 .findFirst(bungeeName);
@@ -51,12 +53,12 @@ public class NetworkTypeHandler extends AbstractHandler {
         }
 
         if (type.bungeeMetadata() == null) {
-            type.setBungees(new ArrayList<>());
+            type.setBungees(new HashMap<>());
         }
 
-        List<BungeeType> bungeeTypes = type.bungeeMetadata();
+        Map<BungeeType, Integer> bungeeTypes = type.bungeeMetadata();
 
-        bungeeTypes.add(bungeeType);
+        bungeeTypes.put(bungeeType, amount);
         type.setBungees(bungeeTypes);
 
         return "Successfully added " + bungeeName + " to Network";

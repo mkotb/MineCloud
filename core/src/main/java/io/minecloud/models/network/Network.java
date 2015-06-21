@@ -30,6 +30,7 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 import java.util.List;
+import java.util.Map;
 
 @Entity(value = "networks", noClassnameStored = true)
 @EqualsAndHashCode(callSuper = true)
@@ -40,7 +41,7 @@ public class Network extends MongoEntity {
     @Setter
     private List<ServerMetadata> serverMetadata;
     @Setter
-    private List<BungeeType> bungees;
+    private Map<BungeeType, Integer> bungees;
     @Setter
     @Reference
     private List<Node> nodes;
@@ -53,7 +54,7 @@ public class Network extends MongoEntity {
         return serverMetadata;
     }
 
-    public List<BungeeType> bungeeMetadata() {
+    public Map<BungeeType, Integer> bungeeMetadata() {
         return bungees;
     }
 
