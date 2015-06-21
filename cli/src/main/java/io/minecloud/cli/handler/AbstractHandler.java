@@ -26,7 +26,6 @@ import io.minecloud.models.server.World;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public abstract class AbstractHandler {
@@ -114,16 +113,13 @@ public abstract class AbstractHandler {
         return toReturn;
     }
 
-    public String formatBungees(Map<BungeeType, Integer> bungeeTypes) {
+    public String formatBungees(List<BungeeType> bungeeTypes) {
         if (bungeeTypes == null || bungeeTypes.isEmpty())
             return "N/A";
         StringBuilder builder = new StringBuilder();
 
-        for (Map.Entry<BungeeType, Integer> entry : bungeeTypes.entrySet()) {
-            builder.append(entry.getKey().name())
-                    .append(": ")
-                    .append(entry.getValue())
-                    .append(", ");
+        for (BungeeType type : bungeeTypes) {
+            builder.append(type.name()).append(", ");
         }
 
         String toReturn = builder.toString().trim();

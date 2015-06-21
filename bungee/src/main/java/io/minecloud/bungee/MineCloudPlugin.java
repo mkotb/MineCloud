@@ -30,6 +30,7 @@ import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.IOException;

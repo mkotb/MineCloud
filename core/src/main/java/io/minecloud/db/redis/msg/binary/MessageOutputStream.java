@@ -15,8 +15,8 @@
  */
 package io.minecloud.db.redis.msg.binary;
 
-import com.google.gson.JsonObject;
 import io.minecloud.db.redis.msg.Message;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class MessageOutputStream extends ByteArrayOutputStream {
         write(raw);
     }
 
-    public void writeJson(JsonObject object) throws IOException {
+    public void writeJson(JSONObject object) throws IOException {
         writeString(object.toString());
     }
 

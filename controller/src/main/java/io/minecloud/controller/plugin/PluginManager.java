@@ -13,19 +13,22 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.controller.web.respond;
+package io.minecloud.controller.plugin;
 
-import com.google.gson.JsonObject;
-import io.minecloud.http.msg.Response;
-import io.minecloud.http.msg.ResponseStatus;
+import java.io.File;
+import java.util.Collection;
+import java.util.Optional;
 
-public final class ResponseUtils {
-    private ResponseUtils() {
+public interface PluginManager<T extends Plugin> {
+    public Collection<T> plugins();
+
+    public default T pluginBy(String name) {
+        Optional<T> optional = plugins().stream()
+                .filter((plugin) -> plugin.name().equals(name))
+                .findFirst();
+
+        return optional.isPresent() ? optional.get() : null;
     }
 
-    public static Response errorResponse(String reason) {
-        JsonObject payload = new JsonObject();
-        payload.addProperty("reason", reason);
-        return new Response(ResponseStatus.ERROR, payload);
-    }
+    public T loadPlugin(File file);
 }

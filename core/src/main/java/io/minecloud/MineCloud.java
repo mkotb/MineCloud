@@ -15,7 +15,6 @@
  */
 package io.minecloud;
 
-import com.google.gson.Gson;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
@@ -46,7 +45,6 @@ import java.util.Scanner;
 public final class MineCloud {
     private static final MineCloud INSTANCE = new MineCloud();
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Gson GSON = new Gson();
 
     @Setter
     private MongoDatabase mongo;
@@ -72,10 +70,6 @@ public final class MineCloud {
 
         instance().initiateMongo(mongoCredentials);
         instance().initiateRedis(redisCredentials);
-    }
-
-    public static Gson fetchGson() {
-        return GSON;
     }
 
     public static void runSetup(Properties properties, File file) throws IOException {

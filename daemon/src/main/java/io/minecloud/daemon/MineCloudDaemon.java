@@ -35,6 +35,7 @@ import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.NodeRepository;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.logging.log4j.Level;
 import org.mongodb.morphia.query.Query;
 
@@ -252,7 +253,7 @@ public class MineCloudDaemon {
 
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        File configFolder = new File("/etc/minecloud/");
+        File configFolder = new File(SystemUtils.IS_OS_LINUX ? "/etc/minecloud/" : "./config/");
         File file = new File(configFolder, "details.properties");
 
         if (!configFolder.exists()) {

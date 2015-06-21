@@ -18,6 +18,7 @@ package io.minecloud.models.server.type;
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.plugins.Plugin;
+import io.minecloud.models.plugins.PluginType;
 import io.minecloud.models.server.World;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;

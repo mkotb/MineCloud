@@ -13,12 +13,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.http.msg;
+package io.minecloud.controller.plugin;
 
-// could've used the http status codes for this, but whatever
-public enum ResponseStatus {
-    SUCCESS,
-    UNAUTHORIZED,
-    ERROR,
-    FATAL
+public interface Plugin {
+    public String name();
+
+    public String version();
 }

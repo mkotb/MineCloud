@@ -16,6 +16,7 @@
 package io.minecloud.models.network;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
+import io.minecloud.db.mongo.MongoDatabase;
 import org.mongodb.morphia.Datastore;
 
 public class NetworkRepository extends AbstractMongoRepository<Network> {

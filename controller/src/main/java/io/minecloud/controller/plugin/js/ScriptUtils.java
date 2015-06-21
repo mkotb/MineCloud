@@ -13,8 +13,20 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-package io.minecloud.http.msg;
+package io.minecloud.controller.plugin.js;
 
-public interface ResponseCallback {
-    void callback(Response response);
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import org.json.JSONObject;
+
+public final class ScriptUtils {
+    private ScriptUtils() {
+    }
+
+    public static JSONObject toJson(Object response) {
+        if (!(response instanceof ScriptObjectMirror)) {
+            throw new IllegalArgumentException("Response type is not json!");
+        }
+
+        return new JSONObject(response.toString());
+    }
 }
