@@ -30,9 +30,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class BungeeType extends MongoEntity {
     @Setter
-    @Id
-    private String name;
-    @Setter
     private int dedicatedRam;
     @Reference
     @Setter
@@ -45,7 +42,7 @@ public class BungeeType extends MongoEntity {
     }
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public int dedicatedRam() {
@@ -54,5 +51,9 @@ public class BungeeType extends MongoEntity {
 
     public NodeType preferredNode() {
         return preferredNode;
+    }
+
+    public void setName(String name) {
+        setId(name);
     }
 }

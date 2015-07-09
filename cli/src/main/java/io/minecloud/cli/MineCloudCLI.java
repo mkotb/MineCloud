@@ -33,8 +33,8 @@ public final class MineCloudCLI {
 
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        File configFolder = new File("/etc/minecloud/");
-        File file = new File(configFolder, "controller/details.properties");
+        File configFolder = new File("/etc/minecloud/controller/");
+        File file = new File(configFolder, "details.properties");
 
         if (!configFolder.exists()) {
             configFolder.mkdirs();

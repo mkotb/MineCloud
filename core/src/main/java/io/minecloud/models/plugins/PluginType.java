@@ -27,9 +27,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class PluginType extends MongoEntity {
     @Setter
-    @Id
-    private String name;
-    @Setter
     private PluginServerType type;
     @Setter
     private List<String> versions;
@@ -37,7 +34,7 @@ public class PluginType extends MongoEntity {
     private List<String> configs;
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public PluginServerType type() {
@@ -50,5 +47,9 @@ public class PluginType extends MongoEntity {
 
     public List<String> configs() {
         return configs;
+    }
+
+    public void setName(String name) {
+        setId(name);
     }
 }

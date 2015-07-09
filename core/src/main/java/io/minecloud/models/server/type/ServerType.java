@@ -32,9 +32,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ServerType extends MongoEntity {
     @Setter
-    @Id
-    private String name;
-    @Setter
     private int dedicatedRam;
     @Setter
     private int maxPlayers;
@@ -53,7 +50,7 @@ public class ServerType extends MongoEntity {
     private List<World> worlds;
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public int maxPlayers() {
@@ -86,5 +83,9 @@ public class ServerType extends MongoEntity {
 
     public List<World> worlds() {
         return worlds;
+    }
+
+    public void setName(String name) {
+        setId(name);
     }
 }

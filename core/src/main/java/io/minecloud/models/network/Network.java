@@ -19,6 +19,7 @@ import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
+import io.minecloud.models.bungee.type.BungeeTypeRepository;
 import io.minecloud.models.network.server.ServerMetadata;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
@@ -29,25 +30,23 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Entity(value = "networks", noClassnameStored = true)
 @EqualsAndHashCode(callSuper = true)
 public class Network extends MongoEntity {
-    @Id
-    @Setter
-    private String name;
     @Setter
     private List<ServerMetadata> serverMetadata;
     @Setter
-    private Map<BungeeType, Integer> bungees;
+    private Map<String, Integer> bungees;
     @Setter
     @Reference
     private List<Node> nodes;
 
     public String name() {
-        return name;
+        return entityId();
     }
 
     public List<ServerMetadata> serverMetadata() {
@@ -55,7 +54,15 @@ public class Network extends MongoEntity {
     }
 
     public Map<BungeeType, Integer> bungeeMetadata() {
-        return bungees;
+        Map<BungeeType, Integer> metadata = new HashMap<>();
+
+        for (Map.Entry<String, Integer> entry : bungees.entrySet()) {
+            BungeeTypeRepository repository = MineCloud.instance().mongo().repositoryBy(BungeeType.class);
+
+            metadata.put(repository.findFirst(entry.getKey()), entry.getValue());
+        }
+
+        return metadata;
     }
 
     public int serversOnline() {
@@ -88,5 +95,17 @@ public class Network extends MongoEntity {
 
     public List<Node> nodes() {
         return nodes;
+    }
+
+    public void setName(String name) {
+        setId(name);
+    }
+
+    public void setBungees(Map<BungeeType, Integer> map) {
+        bungees = new HashMap<>();
+
+        for (Map.Entry<BungeeType, Integer> entry : map.entrySet()) {
+            bungees.put(entry.getKey().name(), entry.getValue());
+        }
     }
 }

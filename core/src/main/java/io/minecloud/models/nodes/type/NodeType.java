@@ -27,9 +27,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class NodeType extends MongoEntity {
     @Setter
-    @Id
-    private String name;
-    @Setter
     private int ram;
     @Setter
     private CPU cpu;
@@ -43,6 +40,10 @@ public class NodeType extends MongoEntity {
     }
 
     public String name() {
-        return name;
+        return entityId();
+    }
+
+    public void setName(String name) {
+        setId(name);
     }
 }
