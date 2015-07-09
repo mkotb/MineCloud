@@ -80,6 +80,7 @@ public class NetworkTypeHandler extends AbstractHandler {
         List<ServerMetadata> metadata = type.serverMetadata();
         ServerMetadata md = new ServerMetadata();
 
+        md.setType(serverType);
         md.setMaximumAmount(max);
         md.setMaximumAmount(min);
 
