@@ -44,7 +44,7 @@ public class StatisticsWatcher extends Thread {
     public void run() {
         while(!isInterrupted()) {
             Node node = MineCloudDaemon.instance().node();
-            double[] frequencies = new double[node.type().processor().cores()];
+            double[] frequencies = new double[node.type().processor().threads()];
             double[] usages = new double[frequencies.length];
             int index = -1;
 
@@ -90,13 +90,16 @@ public class StatisticsWatcher extends Thread {
                         .findFirst()
                         .get();
 
-                cpuStat = cpuStat.substring(4); // retract prefix "cpun "
+                cpuStat = cpuStat.substring(4); // redact prefix "cpun "
                 String[] statistics = cpuStat.split(" ");
 
                 int idle = Integer.parseInt(statistics[3]);
                 int totalCpuTime = 0;
 
                 for (String s : statistics) {
+                    if ("".equals(s) || s == null)
+                        continue;
+
                     totalCpuTime += Integer.parseInt(s);
                 }
 
