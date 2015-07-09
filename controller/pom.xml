@@ -30,7 +30,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>io.minecloud.daemon.MineCloudDaemon</mainClass>
+                            <mainClass>io.minecloud.controller.Controller</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
