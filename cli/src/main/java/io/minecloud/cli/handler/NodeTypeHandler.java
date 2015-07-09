@@ -62,16 +62,16 @@ public class NodeTypeHandler extends AbstractHandler {
         System.out.print("What is the base frequency on this processor? ");
         cpu.setBaseFrequency(scanner.nextDouble());
 
-        System.out.print("\nWhat is the max frequency on this processor? ");
+        System.out.print("What is the max frequency on this processor? ");
         cpu.setMaxFrequency(scanner.nextDouble());
 
-        System.out.print("\nHow many cores are on this processor? ");
+        System.out.print("How many cores are on this processor? ");
         cpu.setCores(scanner.nextInt());
 
-        System.out.print("\nHow many threads are on this processor? ");
+        System.out.print("How many threads are on this processor? ");
         cpu.setThreads(scanner.nextInt());
 
-        System.out.println("\nThank you!");
+        System.out.println("Thank you!");
 
         type.setCpu(cpu);
         return "Successfully set CPU to entered values";

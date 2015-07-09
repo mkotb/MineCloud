@@ -46,4 +46,9 @@ public class MainHandler extends AbstractHandler {
     public void networkType(String name) {
         enterShell(new NetworkTypeHandler(name), "network-type");
     }
+
+    @Command(name = "node")
+    public void node(String name) {
+        enterShell(new NodeHandler(name), "node");
+    }
 }

@@ -34,8 +34,6 @@ public class Node extends MongoEntity {
     private String publicIp;
     @Setter
     private String privateIp;
-    @Setter
-    private int ramDedicated;
     @Reference
     @Setter
     private NodeType type;
@@ -54,10 +52,6 @@ public class Node extends MongoEntity {
 
     public String publicIp() {
         return publicIp;
-    }
-
-    public int ramDedicated() {
-        return ramDedicated;
     }
 
     public NodeType type() {
@@ -99,5 +93,9 @@ public class Node extends MongoEntity {
 
     public int serverCount() {
         return servers().size();
+    }
+
+    public void setName(String name) {
+        setId(name);
     }
 }
