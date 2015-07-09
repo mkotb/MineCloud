@@ -27,8 +27,10 @@ import java.util.Properties;
 public final class MineCloudCLI {
 
     private MineCloudCLI() throws Exception {
-        ShellFactory.createConsoleShell("minecloud", "MineCloud CLI", new MainHandler())
-                .commandLoop();
+        MainHandler main = new MainHandler();
+
+        main.setCurrent(ShellFactory.createConsoleShell("minecloud", "MineCloud CLI", main));
+        main.currentShell().commandLoop();
     }
 
     public static void main(String[] args) throws Exception {

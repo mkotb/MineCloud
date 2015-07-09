@@ -22,6 +22,7 @@ import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.plugins.Plugin;
 import io.minecloud.models.server.World;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public abstract class AbstractHandler {
+    @Setter
     private Shell current;
 
     protected AbstractHandler() {

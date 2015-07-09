@@ -19,7 +19,7 @@ import asg.cliche.Command;
 
 public class MainHandler extends AbstractHandler {
     public MainHandler() {
-        super(null);
+        super();
     }
 
     @Command(name = "plugin-type")
