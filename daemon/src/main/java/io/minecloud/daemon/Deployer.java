@@ -106,7 +106,7 @@ public final class Deployer {
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/bungee")
                 .volumes("/mnt/minecloud")
-                .hostname(bungee.type().name() + "." + bungee.publicIp())
+                .hostname(type.name() + "." + bungee.publicIp())
                 .exposedPorts("25565")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()
