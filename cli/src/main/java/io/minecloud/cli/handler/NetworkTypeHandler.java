@@ -19,12 +19,11 @@ import asg.cliche.Command;
 import io.minecloud.MineCloud;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
+import io.minecloud.models.network.server.ServerMetadata;
 import io.minecloud.models.nodes.Node;
+import io.minecloud.models.server.type.ServerType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NetworkTypeHandler extends AbstractHandler {
     Network type;
@@ -65,6 +64,31 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
+    public String addServer(String name, int min, int max) {
+        ServerType serverType = MineCloud.instance().mongo()
+                .repositoryBy(ServerType.class)
+                .findFirst(name);
+
+        if (serverType == null) {
+            return "No server types found by the name of " + name;
+        }
+
+        if (type.serverMetadata() == null) {
+            type.setServerMetadata(new ArrayList<>());
+        }
+
+        List<ServerMetadata> metadata = type.serverMetadata();
+        ServerMetadata md = new ServerMetadata();
+
+        md.setMaximumAmount(max);
+        md.setMaximumAmount(min);
+
+        metadata.add(md);
+
+        return "Successfully added " + name + " to Network!";
+    }
+
+    @Command
     public String addNode(String nodeName) {
         Node node = MineCloud.instance().mongo()
                 .repositoryBy(Node.class)
@@ -84,6 +108,81 @@ public class NetworkTypeHandler extends AbstractHandler {
         type.setNodes(nodes);
 
         return "Successfully added " + nodeName + " to Network";
+    }
+
+    @Command
+    public String removeBungee(String bungee) {
+        BungeeType bungeeType = MineCloud.instance().mongo()
+                .repositoryBy(BungeeType.class)
+                .findFirst(bungee);
+
+        if (bungeeType == null) {
+            return "No bungees found by the name of " + bungee;
+        }
+
+        if (type.bungeeMetadata() == null) {
+            type.setBungees(new HashMap<>());
+        }
+
+        Map<BungeeType, Integer> bungeeTypes = type.bungeeMetadata();
+
+        if (!bungeeTypes.containsKey(bungeeType)) {
+            return bungee + " is not on the network";
+        }
+
+        bungeeTypes.remove(bungeeType);
+        return bungee + " has been removed from the network!";
+    }
+
+    @Command
+    public String removeServer(String name) {
+        ServerType serverType = MineCloud.instance().mongo()
+                .repositoryBy(ServerType.class)
+                .findFirst(name);
+
+        if (serverType == null) {
+            return "No server types found by the name of " + name;
+        }
+
+        if (type.serverMetadata() == null) {
+            type.setServerMetadata(new ArrayList<>());
+        }
+
+        List<ServerMetadata> metadata = type.serverMetadata();
+        Optional<ServerMetadata> optional = metadata.stream()
+                .filter((sm) -> sm.type().equals(serverType))
+                .findFirst();
+
+        if (!optional.isPresent()) {
+            return name + " is not on the network!";
+        }
+
+        metadata.remove(optional.get());
+        return name + " has been removed from the network!";
+    }
+
+    @Command
+    public String removeNode(String nodeName) {
+        Node node = MineCloud.instance().mongo()
+                .repositoryBy(Node.class)
+                .findFirst(nodeName);
+
+        if (node == null) {
+            return "No nodes found by the name of " + nodeName;
+        }
+
+        if (type.nodes() == null) {
+            type.setNodes(new ArrayList<>());
+        }
+
+        List<Node> nodes = type.nodes();
+
+        if (!nodes.contains(node)) {
+            return nodeName + " is not on the network!";
+        }
+
+        nodes.remove(node);
+        return nodeName + " has been removed from the network!";
     }
 
     @Command

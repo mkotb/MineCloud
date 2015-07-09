@@ -56,6 +56,10 @@ public class Network extends MongoEntity {
     public Map<BungeeType, Integer> bungeeMetadata() {
         Map<BungeeType, Integer> metadata = new HashMap<>();
 
+        if (bungees == null) {
+            return metadata;
+        }
+
         for (Map.Entry<String, Integer> entry : bungees.entrySet()) {
             BungeeTypeRepository repository = MineCloud.instance().mongo().repositoryBy(BungeeType.class);
 
