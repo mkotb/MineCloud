@@ -160,6 +160,14 @@ public class MineCloudPlugin extends Plugin {
                 .forEach(Plugin::onEnable);
     }
 
+    @Override
+    public void onDisable() {
+        Bungee bungee = bungee();
+
+        if (bungee != null)
+            mongo.repositoryBy(Bungee.class).delete(bungee);
+    }
+
     private boolean validateFolder(File file, PluginType pluginType, String version) {
         if (!file.exists()) {
             getLogger().info(file.getPath() + " does not exist! Cannot load " + pluginType.name());

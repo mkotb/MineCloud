@@ -210,7 +210,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
             os.writeString(serverId);
 
-            redis.channelBy("server-create-notif").publish(os.toMessage());
+            redis.channelBy("server-stop-notif").publish(os.toMessage());
         } catch (IOException ex) {
             ex.printStackTrace(); // almost impossible to happen
         }
