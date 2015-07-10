@@ -192,7 +192,7 @@ public class MineCloudDaemon {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 dockerClient.listContainers().stream()
-                        .filter((container) -> container.status().contains("exited"))
+                        .filter((container) -> container.status().toLowerCase().contains("exited"))
                         .forEach((container) -> {
                             try {
                                 dockerClient.killContainer(container.id());
