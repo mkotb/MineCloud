@@ -56,17 +56,21 @@ public class MineCloudPlugin extends Plugin {
         redis = MineCloud.instance().redis();
 
         redis.addChannel(SimpleRedisChannel.create("server-start-notif", redis)
-                .addCallback((message) -> {
-                    if (message.type() != MessageType.BINARY) {
-                        return;
-                    }
+                .addCallback((message) ->
+                    getProxy().getScheduler().schedule(this, () -> {
+                        if (message.type() != MessageType.BINARY) {
+                            return;
+                        }
 
-                    MessageInputStream stream = message.contents();
+                        try {
+                            MessageInputStream stream = message.contents();
 
-                    Server server = mongo.repositoryBy(Server.class).findFirst(stream.readString());
+                            Server server = mongo.repositoryBy(Server.class).findFirst(stream.readString());
 
-                    addServer(server);
-                }));
+                            addServer(server);
+                        } catch (IOException ignored) {
+                        }
+                    }, 1, TimeUnit.SECONDS)));
 
         redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis)
                 .addCallback((message) -> {
