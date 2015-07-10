@@ -44,7 +44,6 @@ public class Controller {
     private final MongoDatabase mongo;
 
     private Controller() {
-
         instance = this;
 
         this.redis = MineCloud.instance().redis();
@@ -56,12 +55,20 @@ public class Controller {
         while (!Thread.currentThread().isInterrupted()) {
             mongo.repositoryBy(Network.class).models()
                     .forEach((network) -> {
+                        System.out.println("Scanning " + network.name() + " (" + network.bungeesOnline() +
+                                "," + network.serversOnline() + ")");
+
                         network.bungeeMetadata().forEach((type, amount) -> {
+                            System.out.println("Going through " + type.name() + " (" + network.bungeesOnline(type) + ")");
                             int difference = amount - network.bungeesOnline(type);
 
-                            if (difference > 0)
+                            System.out.println(difference + " difference");
+
+                            if (difference > 0) {
+                                System.out.println("deploying " + difference + " bungees");
                                 IntStream.range(0, difference)
                                         .forEach((i) -> deployBungee(network, type));
+                            }
                         });
 
                         network.serverMetadata().forEach((metadata) -> {
@@ -70,23 +77,31 @@ public class Controller {
                                     .filter((server) -> server.type().equals(metadata.type()))
                                     .collect(Collectors.toList());
 
+                            System.out.println("going through " + metadata.type().name() + " (" + servers.size() + ")");
+
                             int newServers = metadata.minimumAmount() - servers.size();
                             int space = metadata.type().maxPlayers() * servers.size();
                             int onlinePlayers = servers.stream()
                                     .flatMapToInt((s) -> IntStream.of(s.onlinePlayers().size()))
                                     .sum();
 
+                            System.out.println(newServers + "," + space + "," + onlinePlayers);
+
                             if (onlinePlayers > (space * 0.75)) {
                                 newServers += (int) Math.round(onlinePlayers / (space * 0.75)) + 1;
+                                System.out.println("adding more servers than min due to players " + newServers);
                             }
 
                             if ((newServers + servers.size()) > metadata.maximumAmount()) {
                                 newServers = metadata.maximumAmount() - servers.size();
+                                System.out.println("was over max, must go stay at max " + newServers);
                             }
 
-                            if (newServers > 0)
+                            if (newServers > 0) {
+                                System.out.println("Deploying " + newServers + " servers");
                                 IntStream.range(0, newServers)
                                         .forEach((i) -> deployServer(network, metadata.type()));
+                            }
                         });
                     });
 

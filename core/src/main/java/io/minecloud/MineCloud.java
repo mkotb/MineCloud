@@ -44,7 +44,7 @@ import java.util.Scanner;
 
 public final class MineCloud {
     private static final MineCloud INSTANCE = new MineCloud();
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MineCloud.class);
 
     @Setter
     private MongoDatabase mongo;
