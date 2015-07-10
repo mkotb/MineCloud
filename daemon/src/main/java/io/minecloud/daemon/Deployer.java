@@ -135,7 +135,7 @@ public final class Deployer {
 
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
-            creation = client.createContainer(config, type.name() + node.publicIp());
+            creation = client.createContainer(config, type.name());
 
             client.startContainer(creation.id(), hostConfig);
         } catch (InterruptedException | DockerException ex) {
