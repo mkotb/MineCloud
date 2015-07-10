@@ -148,7 +148,7 @@ public final class Deployer {
         HostConfig hostConfig = HostConfig.builder()
                 .binds("/mnt/minecloud:/mnt/minecloud")
                 .portBindings(new HashMap<String, List<PortBinding>>() {{
-                    put(node.privateIp(), Arrays.asList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
+                    put("25565", Arrays.asList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
                 }})
                 .publishAllPorts(true)
                 .build();
