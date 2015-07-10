@@ -191,15 +191,8 @@ public class MineCloudDaemon {
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                dockerClient.listContainers().stream()
-                        .filter((container) -> {
-                            System.out.println("going through " + container.id());
-                            System.out.println(container.status());
-                            System.out.println(container.status().toLowerCase().contains("exited"));
-                            System.out.println("...");
-
-                            return container.status().toLowerCase().contains("exited");
-                        })
+                dockerClient.listContainers(DockerClient.ListContainersParam.allContainers()).stream()
+                        .filter((container) -> container.status().toLowerCase().contains("exited"))
                         .forEach((container) -> {
                             try {
                                 dockerClient.killContainer(container.id());
@@ -217,7 +210,7 @@ public class MineCloudDaemon {
 
                                         case "server":
                                             Server server = mongo.repositoryBy(Server.class)
-                                                    .findOne("containerId", container.id());
+                                                    .findOne("containerId", container.names().get(0));
 
                                             if (server != null) {
                                                 mongo.repositoryBy(Server.class).delete(server);
