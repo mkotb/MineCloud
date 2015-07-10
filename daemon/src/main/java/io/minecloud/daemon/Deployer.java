@@ -52,7 +52,8 @@ public final class Deployer {
         server.setOnlinePlayers(new ArrayList<>());
         server.setRamUsage(-1);
         server.setPort(-1);
-        server.setId(server.name());
+        server.setContainerId(server.type().name() + server.number());
+        server.setId(server.containerId());
 
         deployServer(server);
         repository.save(server);
@@ -109,8 +110,6 @@ public final class Deployer {
             return;
         }
 
-        server.setContainerId(server.type().name() + server.number());
-        server.setId(server.containerId());
         MineCloud.logger().info("Started server " + server.name()
                 + " with container id " + server.containerId());
     }
