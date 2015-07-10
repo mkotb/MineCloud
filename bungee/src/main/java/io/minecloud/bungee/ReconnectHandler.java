@@ -16,12 +16,12 @@
 package io.minecloud.bungee;
 
 import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerRepository;
 import net.md_5.bungee.api.AbstractReconnectHandler;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,9 +37,11 @@ public class ReconnectHandler extends AbstractReconnectHandler {
         ServerInfo info = ReconnectHandler.getForcedHost(proxiedPlayer.getPendingConnection());
 
         if (info == null) {
-            List<Server> servers = new ArrayList<>(plugin.mongo.repositoryBy(Server.class)
-                    .findAll((server) -> server.type().defaultServer() &&
-                            server.network().equals(plugin.bungee().network())));
+            ServerRepository repository = plugin.mongo.repositoryBy(Server.class);
+            List<Server> servers = repository.find(repository.createQuery()
+                    .field("defaultServer").equal(true)
+                    .field("network").equal(plugin.bungee().network()))
+                    .asList();
 
             Collections.sort(servers, (a, b) -> b.onlinePlayers().size() - a.onlinePlayers().size());
 
