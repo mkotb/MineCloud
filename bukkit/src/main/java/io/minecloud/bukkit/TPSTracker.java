@@ -39,7 +39,7 @@ public class TPSTracker extends BukkitRunnable {
 
     public double fetchTps(int time) {
         int target = (tickCount - 1 - time) % ticks.length;
-        long elapsed = System.currentTimeMillis() - ticks[target];
+        long elapsed = System.currentTimeMillis() - Math.abs(ticks[target]);
 
         return time / (elapsed / 1000.0D);
     }
