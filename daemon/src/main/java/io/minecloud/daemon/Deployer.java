@@ -83,7 +83,7 @@ public final class Deployer {
 
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
-            creation = client.createContainer(config, server.type().name() + "." + server.number());
+            creation = client.createContainer(config, server.type().name() + "-" + server.number());
 
             client.startContainer(creation.id(), HostConfig.builder()
                     .binds("/mnt/minecloud:/mnt/minecloud")
@@ -135,7 +135,7 @@ public final class Deployer {
 
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
-            creation = client.createContainer(config, type.name() + "." + node.publicIp());
+            creation = client.createContainer(config, type.name() + "-" + node.publicIp());
 
             client.startContainer(creation.id(), hostConfig);
         } catch (InterruptedException | DockerException ex) {
