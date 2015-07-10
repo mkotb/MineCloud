@@ -88,6 +88,9 @@ public class MineCloudPlugin extends Plugin {
 
         BungeeType type = bungee().type();
 
+        File nContainer = new File("nplugins/");
+        nContainer.mkdirs();
+
         type.plugins().forEach((plugin) -> {
             String version = plugin.version();
             PluginType pluginType = plugin.type();
@@ -103,7 +106,7 @@ public class MineCloudPlugin extends Plugin {
             for (File f : pluginsContainer.listFiles()) {
                 if (f.isDirectory())
                     continue; // ignore directories
-                File pl = new File("plugins/" + f.getName());
+                File pl = new File(nContainer, f.getName());
 
                 try {
                     Files.copy(f, pl);
@@ -119,7 +122,7 @@ public class MineCloudPlugin extends Plugin {
 
             File configs = new File("/mnt/minecloud/configs/",
                     pluginType.name() + "/" + version);
-            File configContainer = new File("plugins/" + pluginType.name());
+            File configContainer = new File(nContainer, pluginType.name());
 
             if (validateFolder(configs, pluginType, version))
                 return;
@@ -127,7 +130,7 @@ public class MineCloudPlugin extends Plugin {
             copyFolder(configs, configContainer);
         });
 
-        getProxy().getPluginManager().detectPlugins(getProxy().getPluginsFolder());
+        getProxy().getPluginManager().detectPlugins(nContainer);
         getProxy().getPluginManager().loadPlugins();
         getProxy().getPluginManager().enablePlugins();
     }
