@@ -149,8 +149,8 @@ public class Controller {
             return;
         }
 
-        redis.channelBy("bungee-create").publish(os.toMessage());
         MineCloud.logger().info("Sent deploy message to " + node.name() + " for bungee type " + type.name());
+        redis.channelBy("bungee-create").publish(os.toMessage());
     }
 
     public void deployServer(Network network, ServerType type) {
@@ -166,8 +166,8 @@ public class Controller {
             return;
         }
 
-        redis.channelBy("server-create").publish(os.toMessage());
         MineCloud.logger().info("Sent deploy message to " + node.name() + " for server type " + type.name());
+        redis.channelBy("server-create").publish(os.toMessage());
     }
 
     public Node findNode(Network network, NodeType preferredNode, int requiredRam) {
