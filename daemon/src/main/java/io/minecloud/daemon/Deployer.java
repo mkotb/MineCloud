@@ -103,7 +103,7 @@ public final class Deployer {
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
 
-        bungee.setId(new ObjectId().toString().substring(0, 24));
+        bungee.setId(node.publicIp());
 
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
@@ -121,7 +121,7 @@ public final class Deployer {
                         .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
 
-                        .append("bungee_id", bungee.entityId())
+                        .append("bungee_id", bungee.publicIp())
                         .build())
                 .build();
         HostConfig hostConfig = HostConfig.builder()
@@ -162,7 +162,7 @@ public final class Deployer {
         }
 
         public EnvironmentBuilder append(String key, String value) {
-            environmentVars.add(key + "=" + value);
+            environmentVars.add(key + "='" + value + "'");
             return this;
         }
 
