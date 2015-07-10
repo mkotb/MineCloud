@@ -61,7 +61,7 @@ public final class Deployer {
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         World defaultWorld = server.type().defaultWorld();
         ContainerConfig config = ContainerConfig.builder()
-                .volumes("/mnt/minecloud")
+                .volumes("/mnt/minecloud:/mnt/minecloud")
                 .image("minecloud/server")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()
@@ -108,7 +108,7 @@ public final class Deployer {
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/bungee")
-                .volumes("/mnt/minecloud")
+                .volumes("/mnt/minecloud:/mnt/minecloud")
                 .exposedPorts("25565")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()
