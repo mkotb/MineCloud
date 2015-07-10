@@ -121,7 +121,7 @@ public final class Deployer {
                         .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
 
-                        .append("bungee_id", bungee.publicIp())
+                        .append("bungee_id", node.publicIp())
                         .build())
                 .build();
         HostConfig hostConfig = HostConfig.builder()
