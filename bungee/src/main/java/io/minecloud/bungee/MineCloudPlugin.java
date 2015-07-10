@@ -144,7 +144,9 @@ public class MineCloudPlugin extends Plugin {
 
         getProxy().getPluginManager().detectPlugins(nContainer);
         getProxy().getPluginManager().loadPlugins();
-        getProxy().getPluginManager().enablePlugins();
+        getProxy().getPluginManager().getPlugins().stream()
+                .filter((p) -> !p.getDescription().getName().equals("MineCloud-Bungee"))
+                .forEach(Plugin::onEnable);
     }
 
     private boolean validateFolder(File file, PluginType pluginType, String version) {
