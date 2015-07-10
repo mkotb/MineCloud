@@ -94,7 +94,15 @@ public class Network extends MongoEntity {
     public int bungeesOnline() {
         return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
                 .stream()
-                .filter((bungee) -> bungee.network().name().equalsIgnoreCase(name()))
+                .filter((bungee) -> {
+                    boolean b = bungee.network().name().equalsIgnoreCase(name());
+
+                    System.out.println("Scanning through " + bungee.name());
+                    System.out.println(bungee.network().name() + ":" + name());
+                    System.out.println(b);
+
+                    return b;
+                })
                 .count();
     }
 
