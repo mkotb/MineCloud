@@ -89,6 +89,17 @@ public class MineCloudPlugin extends Plugin {
             getProxy().getPluginManager().registerListener(this, new MineCloudListener(this));
         }, 0, TimeUnit.SECONDS);
 
+        getProxy().getScheduler().schedule(this, () -> getProxy().getScheduler().runAsync(this, () -> {
+            Bungee bungee = bungee();
+
+            if (bungee != null) {
+                return;
+            }
+
+            getLogger().info("Bungee removed from database, going down...");
+            getProxy().stop(); // bye bye
+        }), 2, 2, TimeUnit.SECONDS);
+
         BungeeType type = bungee().type();
 
         File nContainer = new File("nplugins/");

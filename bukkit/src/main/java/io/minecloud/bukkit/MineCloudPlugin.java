@@ -58,6 +58,13 @@ public class MineCloudPlugin extends JavaPlugin {
             @Override
             public void run() {
                 Server server = server();
+
+                if (server == null) {
+                    getLogger().log(Level.INFO, "Server removed from database, going down...");
+                    getServer().shutdown();
+                    return;
+                }
+
                 Runtime runtime = Runtime.getRuntime();
 
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
@@ -68,7 +75,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
                 mongo.repositoryBy(Server.class).save(server);
             }
-        }.runTaskTimerAsynchronously(this, 0, 600);
+        }.runTaskTimerAsynchronously(this, 0, 200);
 
         redis.addChannel(SimpleRedisChannel.create("server-create-notif", redis));
         redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis));
@@ -194,6 +201,16 @@ public class MineCloudPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         mongo.repositoryBy(Server.class).delete(server());
+
+        try {
+            MessageOutputStream os = new MessageOutputStream();
+
+            os.writeString(serverId);
+
+            redis.channelBy("server-create-notif").publish(os.toMessage());
+        } catch (IOException ex) {
+            ex.printStackTrace(); // almost impossible to happen
+        }
     }
 
     public Server server() {
