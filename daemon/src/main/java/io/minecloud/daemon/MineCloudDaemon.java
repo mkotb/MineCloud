@@ -99,7 +99,7 @@ public class MineCloudDaemon {
                     try {
                         dockerClient.killContainer(server.containerId());
                         MineCloud.logger().info("Killed server " + server.name()
-                                + " with container uuid " + server.containerId());
+                                + " with container id " + server.containerId());
 
                         mongo.repositoryBy(Server.class).delete(server);
                     } catch (DockerException | InterruptedException e) {
@@ -146,7 +146,7 @@ public class MineCloudDaemon {
                     try {
                         dockerClient.killContainer(bungee.containerId());
                         MineCloud.logger().info("Killed bungee " + bungee.name()
-                                + " with container uuid " + bungee.containerId());
+                                + " with container id " + bungee.containerId());
 
                         mongo.repositoryBy(Bungee.class).delete(bungee);
                     } catch (DockerException | InterruptedException e) {

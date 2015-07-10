@@ -50,7 +50,7 @@ public final class Deployer {
         server.setNode(MineCloudDaemon.instance().node());
         server.setOnlinePlayers(new ArrayList<>());
         server.setRamUsage(-1);
-        server.setPort(0);
+        server.setPort(25565);
         server.setId(server.name());
 
         deployServer(server);
@@ -95,6 +95,7 @@ public final class Deployer {
             return;
         }
 
+        server.setContainerId(server.type().name() + server.number());
         MineCloud.logger().info("Started server " + server.name()
                 + " with container id " + server.containerId());
     }

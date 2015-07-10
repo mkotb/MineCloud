@@ -200,7 +200,10 @@ public class MineCloudPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        mongo.repositoryBy(Server.class).delete(server());
+        Server server = server();
+
+        if (server != null)
+            mongo.repositoryBy(Server.class).delete(server);
 
         try {
             MessageOutputStream os = new MessageOutputStream();
