@@ -77,7 +77,7 @@ public class MineCloudPlugin extends JavaPlugin {
             }
         }.runTaskTimerAsynchronously(this, 0, 200);
 
-        redis.addChannel(SimpleRedisChannel.create("server-create-notif", redis));
+        redis.addChannel(SimpleRedisChannel.create("server-start-notif", redis));
         redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis));
 
         getServer().getPluginManager().registerEvents(new PlayerTracker(), this);
@@ -147,7 +147,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
             os.writeString(server().entityId());
 
-            redis.channelBy("server-create-notif").publish(os.toMessage());
+            redis.channelBy("server-start-notif").publish(os.toMessage());
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Unable to publish server create message, shutting down", e);
             Bukkit.shutdown();
@@ -210,7 +210,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
             os.writeString(serverId);
 
-            redis.channelBy("server-stop-notif").publish(os.toMessage());
+            redis.channelBy("server-shutdown-notif").publish(os.toMessage());
         } catch (IOException ex) {
             ex.printStackTrace(); // almost impossible to happen
         }
