@@ -20,17 +20,21 @@ import com.mongodb.DBRef;
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.Bungee;
+import io.minecloud.models.bungee.BungeeRepository;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.bungee.type.BungeeTypeRepository;
 import io.minecloud.models.network.server.ServerMetadata;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.query.FieldCriteria;
+import org.mongodb.morphia.query.QueryImpl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -77,9 +81,11 @@ public class Network extends MongoEntity {
     }
 
     public int serversOnline(ServerType type) {
-        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).collection()
-                .count(new BasicDBObject("network", new DBRef("networks", entityId()))
-                        .append("type", new DBRef("type", type.entityId())));
+        ServerRepository repository = MineCloud.instance().mongo().repositoryBy(Server.class);
+
+        return (int) repository.count(repository.createQuery()
+                .field("network").equal(this)
+                .field("type").equal(type));
     }
 
     public int bungeesOnline() {
@@ -88,9 +94,11 @@ public class Network extends MongoEntity {
     }
 
     public int bungeesOnline(BungeeType type) {
-        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).collection()
-                .count(new BasicDBObject("network", new DBRef("networks", entityId()))
-                        .append("type", new DBRef("type", type.entityId())));
+        BungeeRepository repository = MineCloud.instance().mongo().repositoryBy(Bungee.class);
+
+        return (int) repository.count(repository.createQuery()
+                .field("network").equal(this)
+                .field("type").equal(type));
     }
 
     public List<Node> nodes() {
