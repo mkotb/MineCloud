@@ -72,28 +72,28 @@ public class Network extends MongoEntity {
     public int serversOnline() {
         return (int) MineCloud.instance().mongo().repositoryBy(Server.class).models()
                 .stream()
-                .filter((server) -> server.network().equals(this))
+                .filter((server) -> server.network().name().equalsIgnoreCase(name()))
                 .count();
     }
 
     public int serversOnline(ServerType type) {
         return (int) MineCloud.instance().mongo().repositoryBy(Server.class).models()
                 .stream()
-                .filter((server) -> server.network().equals(this) && server.type().equals(type))
+                .filter((server) -> server.network().name().equalsIgnoreCase(name()) && server.type().equals(type))
                 .count();
     }
 
     public int bungeesOnline() {
         return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
                 .stream()
-                .filter((bungee) -> bungee.network().equals(this))
+                .filter((bungee) -> bungee.network().name().equalsIgnoreCase(name()))
                 .count();
     }
 
     public int bungeesOnline(BungeeType type) {
         return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
                 .stream()
-                .filter((bungee) -> bungee.network().equals(this) && bungee.type().equals(type))
+                .filter((bungee) -> bungee.network().name().equalsIgnoreCase(name()) && bungee.type().equals(type))
                 .count();
     }
 

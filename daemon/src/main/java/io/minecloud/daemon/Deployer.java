@@ -45,6 +45,7 @@ public final class Deployer {
         ServerRepository repository = MineCloud.instance().mongo().repositoryBy(Server.class);
         Server server = new Server();
 
+        server.setType(type);
         server.setNumber(repository.highestNumberFor(type) + 1);
         server.setNetwork(network);
         server.setNode(MineCloudDaemon.instance().node());

@@ -61,17 +61,13 @@ public class MineCloudDaemon {
 
         redis.addChannel(SimpleRedisChannel.create("server-create", redis)
                 .addCallback((message) -> {
-                    System.out.println("received message on server create");
-
                     if (message.type() != MessageType.BINARY) {
-                        System.out.println("not binary");
                         return;
                     }
 
                     MessageInputStream stream = message.contents();
 
                     if (!stream.readString().equalsIgnoreCase(node)) {
-                        System.out.println("not for me, for " + node);
                         return;
                     }
 
@@ -79,7 +75,6 @@ public class MineCloudDaemon {
                     ServerType type = mongo.repositoryBy(ServerType.class).findFirst(stream.readString());
 
                     Deployer.deployServer(network, type);
-                    System.out.println("deployed");
                 }));
 
         redis.addChannel(SimpleRedisChannel.create("server-kill", redis)
