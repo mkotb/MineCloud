@@ -20,7 +20,6 @@ import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.nodes.CoreMetadata;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 // I'm sorry for this class, I recommend almost nobody reads this
@@ -62,7 +62,7 @@ public class StatisticsWatcher extends Thread {
                 try {
                     frequency = Integer.parseInt(Files.readAllLines(currentFreq.toPath()).get(0));
                 } catch (IOException ex) {
-                    MineCloud.logger().log(Level.ERROR, "Was unable to fetch CPU frequency", ex);
+                    MineCloud.logger().log(Level.SEVERE, "Was unable to fetch CPU frequency", ex);
                     continue;
                 }
 
@@ -79,7 +79,7 @@ public class StatisticsWatcher extends Thread {
             try {
                 stat = Files.readAllLines(Paths.get("/proc/stat"));
             } catch (IOException ex) {
-                MineCloud.logger().log(Level.ERROR, "Was unable to fetch CPU statistics", ex);
+                MineCloud.logger().log(Level.SEVERE, "Was unable to fetch CPU statistics", ex);
                 continue;
             }
 

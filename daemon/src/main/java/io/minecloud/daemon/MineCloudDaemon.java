@@ -35,13 +35,13 @@ import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.NodeRepository;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
-import org.apache.logging.log4j.Level;
 import org.mongodb.morphia.query.Query;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Level;
 
 public class MineCloudDaemon {
     private static MineCloudDaemon instance;
@@ -91,7 +91,7 @@ public class MineCloudDaemon {
                     Server server = mongo.repositoryBy(Server.class).findFirst(stream.readString());
 
                     if (!server.node().name().equals(node)) {
-                        MineCloud.logger().log(Level.ERROR, "Invalid request was sent to kill a server " +
+                        MineCloud.logger().log(Level.SEVERE, "Invalid request was sent to kill a server " +
                                 "not on the current node");
                         return;
                     }
@@ -103,7 +103,7 @@ public class MineCloudDaemon {
 
                         mongo.repositoryBy(Server.class).delete(server);
                     } catch (DockerException | InterruptedException e) {
-                        MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
+                        MineCloud.logger().log(Level.SEVERE, "Was unable to kill a server", e);
                     }
                 }));
 
@@ -138,7 +138,7 @@ public class MineCloudDaemon {
                     Bungee bungee = mongo.repositoryBy(Bungee.class).findFirst(stream.readString());
 
                     if (!bungee.node().name().equals(node)) {
-                        MineCloud.logger().log(Level.ERROR, "Invalid request was sent to kill a bungee " +
+                        MineCloud.logger().log(Level.SEVERE, "Invalid request was sent to kill a bungee " +
                                 "not on the current node");
                         return;
                     }
@@ -150,7 +150,7 @@ public class MineCloudDaemon {
 
                         mongo.repositoryBy(Bungee.class).delete(bungee);
                     } catch (DockerException | InterruptedException e) {
-                        MineCloud.logger().log(Level.ERROR, "Was unable to kill a server", e);
+                        MineCloud.logger().log(Level.SEVERE, "Was unable to kill a server", e);
                     }
                 }));
 
@@ -181,7 +181,7 @@ public class MineCloudDaemon {
 
                         mongo.repositoryBy(Server.class).save(server);
                     } catch (Exception e) {
-                        MineCloud.logger().log(Level.ERROR, "Was unable to set the port of a started server", e);
+                        MineCloud.logger().log(Level.SEVERE, "Was unable to set the port of a started server", e);
                     }
                 }));
 
@@ -225,7 +225,7 @@ public class MineCloudDaemon {
 
                                MineCloud.logger().info("Killed dead container " + container.id());
                             } catch (DockerException | InterruptedException | IOException e) {
-                                MineCloud.logger().log(Level.ERROR, "Was unable to kill exited container " + container.id(),
+                                MineCloud.logger().log(Level.SEVERE, "Was unable to kill exited container " + container.id(),
                                         e);
                             }
                         });

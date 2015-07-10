@@ -15,8 +15,6 @@
  */
 package io.minecloud.models.network;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBRef;
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.Bungee;
@@ -31,10 +29,7 @@ import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
-import org.mongodb.morphia.query.FieldCriteria;
-import org.mongodb.morphia.query.QueryImpl;
 
 import java.util.HashMap;
 import java.util.List;

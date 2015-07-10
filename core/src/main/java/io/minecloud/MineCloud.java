@@ -33,18 +33,17 @@ import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import io.minecloud.models.server.type.ServerTypeRepository;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public final class MineCloud {
     private static final MineCloud INSTANCE = new MineCloud();
-    private static final Logger LOGGER = LogManager.getLogger(MineCloud.class);
+    private static final Logger LOGGER = Logger.getLogger("MineCloud");
 
     @Setter
     private MongoDatabase mongo;

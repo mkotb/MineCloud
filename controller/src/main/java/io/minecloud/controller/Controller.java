@@ -28,14 +28,13 @@ import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
+import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 public class Controller {
@@ -153,7 +152,7 @@ public class Controller {
             os.writeString(network.name());
             os.writeString(type.name());
         } catch (IOException e) {
-            MineCloud.logger().log(Level.ERROR, "Encountered an odd exception whilst encoding a message", e);
+            MineCloud.logger().log(Level.SEVERE, "Encountered an odd exception whilst encoding a message", e);
             return;
         }
 
@@ -170,7 +169,7 @@ public class Controller {
             os.writeString(network.name());
             os.writeString(type.name());
         } catch (IOException e) {
-            MineCloud.logger().log(Level.ERROR, "Encountered an odd exception whilst encoding a message", e);
+            MineCloud.logger().log(Level.SEVERE, "Encountered an odd exception whilst encoding a message", e);
             return;
         }
 

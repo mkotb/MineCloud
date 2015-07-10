@@ -55,7 +55,7 @@ public final class RedisDatabase implements Database {
             try {
                 port = Integer.parseInt(host.split(":")[1]);
             } catch (NumberFormatException ignored) {
-                MineCloud.logger().warn("Host " + host + " has an invalid port!");
+                MineCloud.logger().warning("Host " + host + " has an invalid port!");
             }
         }
 

@@ -29,13 +29,12 @@ import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.World;
 import io.minecloud.models.server.type.ServerType;
-import org.apache.logging.log4j.Level;
-import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 public final class Deployer {
 
@@ -91,7 +90,7 @@ public final class Deployer {
                     .binds("/mnt/minecloud:/mnt/minecloud")
                     .build());
         } catch (InterruptedException | DockerException ex) {
-            MineCloud.logger().log(Level.ERROR, "Was unable to create server with type " + server.type().name(),
+            MineCloud.logger().log(Level.SEVERE, "Was unable to create server with type " + server.type().name(),
                     ex);
             return;
         }
@@ -106,7 +105,7 @@ public final class Deployer {
         Bungee bungee = new Bungee();
 
         if (repository.count("_id", node.publicIp()) > 0) {
-            MineCloud.logger().error("Did not create bungee on this node; public ip is already in use");
+            MineCloud.logger().log(Level.WARNING, "Did not create bungee on this node; public ip is already in use");
             return;
         }
 
@@ -146,7 +145,7 @@ public final class Deployer {
 
             client.startContainer(creation.id(), hostConfig);
         } catch (InterruptedException | DockerException ex) {
-            MineCloud.logger().log(Level.ERROR, "Was unable to create bungee with type " + type.name(),
+            MineCloud.logger().log(Level.SEVERE, "Was unable to create bungee with type " + type.name(),
                     ex);
             return;
         }

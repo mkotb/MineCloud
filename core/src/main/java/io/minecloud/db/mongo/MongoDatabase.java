@@ -21,13 +21,12 @@ import io.minecloud.MineCloudException;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.Database;
 import io.minecloud.db.mongo.model.MongoEntity;
-import org.apache.logging.log4j.Level;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
-import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class MongoDatabase implements Database {
     private final Map<Class<?>, MongoRepository<?>> repositories = new HashMap<>();
@@ -82,12 +81,12 @@ public class MongoDatabase implements Database {
             try {
                 hosts.add(new ServerAddress(host));
             } catch (UnknownHostException exception) {
-                MineCloud.logger().warn(host + " caused a UnknownHostException: " + exception.getMessage());
+                MineCloud.logger().warning(host + " caused a UnknownHostException: " + exception.getMessage());
             }
         }
 
         if (hosts.size() == 0) {
-            MineCloud.logger().log(Level.FATAL, "No viable host was found for MongoDB!", new MineCloudException());
+            MineCloud.logger().log(Level.SEVERE, "No viable host was found for MongoDB!", new MineCloudException());
             return;
         }
 

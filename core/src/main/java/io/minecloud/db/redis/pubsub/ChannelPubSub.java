@@ -18,7 +18,6 @@ package io.minecloud.db.redis.pubsub;
 import io.minecloud.MineCloud;
 import io.minecloud.db.redis.msg.Message;
 import io.minecloud.db.redis.msg.MessageType;
-import org.apache.logging.log4j.Level;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedisPubSub;
 
@@ -26,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
 
 public final class ChannelPubSub extends BinaryJedisPubSub {
     private final RedisChannel channel;
@@ -63,7 +63,7 @@ public final class ChannelPubSub extends BinaryJedisPubSub {
                     break;
             }
         } catch (IOException ex) {
-            MineCloud.logger().log(Level.ERROR,
+            MineCloud.logger().log(Level.WARNING,
                     "Encountered an IOException while reading a " + type.name() + " message",
                     ex);
         }
