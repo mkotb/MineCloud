@@ -39,9 +39,10 @@ public class ReconnectHandler extends AbstractReconnectHandler {
         if (info == null) {
             ServerRepository repository = plugin.mongo.repositoryBy(Server.class);
             List<Server> servers = repository.find(repository.createQuery()
-                    .field("defaultServer").equal(true)
                     .field("network").equal(plugin.bungee().network()))
                     .asList();
+
+            servers.removeIf((s) -> !s.type().defaultServer());
 
             Collections.sort(servers, (a, b) -> b.onlinePlayers().size() - a.onlinePlayers().size());
 
