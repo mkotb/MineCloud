@@ -121,6 +121,6 @@ public class Server extends MongoEntity {
     }
 
     public String name() {
-        return type.name() + "." + number();
+        return entityId();
     }
 }
