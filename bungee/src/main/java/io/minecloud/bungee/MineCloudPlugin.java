@@ -55,7 +55,7 @@ public class MineCloudPlugin extends Plugin {
         mongo = MineCloud.instance().mongo();
         redis = MineCloud.instance().redis();
 
-        redis.addChannel(SimpleRedisChannel.create("server-create-notif", redis)
+        redis.addChannel(SimpleRedisChannel.create("server-start-notif", redis)
                 .addCallback((message) -> {
                     if (message.type() != MessageType.BINARY) {
                         return;
