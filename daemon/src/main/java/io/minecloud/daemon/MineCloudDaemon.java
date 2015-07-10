@@ -195,7 +195,7 @@ public class MineCloudDaemon {
                         .filter((container) -> container.status().toLowerCase().contains("exited"))
                         .forEach((container) -> {
                             try {
-                                dockerClient.killContainer(container.id());
+                                dockerClient.removeContainer(container.id());
 
                                 if (container.image().contains("minecloud")) {
                                     String type = container.image().substring(9);
