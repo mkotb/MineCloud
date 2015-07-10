@@ -84,7 +84,18 @@ public final class Deployer {
 
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
-            creation = client.createContainer(config, server.type().name() + server.number());
+            String name = server.type().name() + server.number();
+            ContainerInfo info;
+
+            if ((info = client.inspectContainer(name)) != null) {
+                if (info.state().running()) {
+                    client.waitContainer(info.id()); // wait for the container to exit
+                }
+
+                client.removeContainer(info.id()); // remove old container
+            }
+
+            creation = client.createContainer(config, name);
 
             client.startContainer(creation.id(), HostConfig.builder()
                     .binds("/mnt/minecloud:/mnt/minecloud")
