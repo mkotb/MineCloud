@@ -30,12 +30,15 @@ import io.minecloud.models.server.Server;
 import io.minecloud.models.server.type.ServerType;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginManager;
 import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -129,6 +132,15 @@ public class MineCloudPlugin extends Plugin {
 
             copyFolder(configs, configContainer);
         });
+
+        // release plugin manager lock
+        try {
+            Field f = PluginManager.class.getDeclaredField("toLoad");
+
+            f.setAccessible(true);
+            f.set(getProxy().getPluginManager(), new HashMap<>());
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+        }
 
         getProxy().getPluginManager().detectPlugins(nContainer);
         getProxy().getPluginManager().loadPlugins();
