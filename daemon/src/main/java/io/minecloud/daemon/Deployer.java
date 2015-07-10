@@ -30,6 +30,7 @@ import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.World;
 import io.minecloud.models.server.type.ServerType;
 import org.apache.logging.log4j.Level;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +61,6 @@ public final class Deployer {
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         World defaultWorld = server.type().defaultWorld();
         ContainerConfig config = ContainerConfig.builder()
-                .hostname(server.type().name() + "." + server.number())
                 .volumes("/mnt/minecloud")
                 .image("minecloud/server")
                 .openStdin(true)
@@ -101,12 +101,14 @@ public final class Deployer {
         BungeeRepository repository = MineCloud.instance().mongo().repositoryBy(Bungee.class);
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
+
+        bungee.setId(new ObjectId().toString());
+
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/bungee")
                 .volumes("/mnt/minecloud")
-                .hostname(type.name() + "." + bungee.publicIp())
                 .exposedPorts("25565")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()

@@ -66,6 +66,6 @@ public class Bungee extends MongoEntity {
     }
 
     public String name() {
-        return "bungee." + publicIp();
+        return type.name() + "." + publicIp();
     }
 }
