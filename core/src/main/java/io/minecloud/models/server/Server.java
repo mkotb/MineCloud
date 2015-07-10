@@ -25,6 +25,7 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Reference;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,6 +73,10 @@ public class Server extends MongoEntity {
     }
 
     public List<PlayerData> onlinePlayers() {
+        if (onlinePlayers == null) {
+            onlinePlayers = new ArrayList<>();
+        }
+
         return onlinePlayers;
     }
 
