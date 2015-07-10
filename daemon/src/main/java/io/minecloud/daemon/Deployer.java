@@ -103,7 +103,7 @@ public final class Deployer {
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
 
-        bungee.setId(new ObjectId().toString());
+        bungee.setId(new ObjectId().toString().substring(0, 24));
 
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
