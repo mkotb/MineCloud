@@ -26,6 +26,7 @@ import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import org.apache.logging.log4j.Level;
 
@@ -72,15 +73,18 @@ public class Controller {
                         });
 
                         network.serverMetadata().forEach((metadata) -> {
-                            List<Server> servers = mongo.repositoryBy(Server.class).models()
-                                    .stream()
-                                    .filter((server) -> server.type().equals(metadata.type()))
-                                    .collect(Collectors.toList());
+                            int serversOnline = network.serversOnline(metadata.type());
 
-                            System.out.println("going through " + metadata.type().name() + " (" + servers.size() + ")");
+                            System.out.println("going through " + metadata.type().name() + " (" + serversOnline + ")");
 
-                            int newServers = metadata.minimumAmount() - servers.size();
-                            int space = metadata.type().maxPlayers() * servers.size();
+                            int newServers = metadata.minimumAmount() - serversOnline;
+                            int space = metadata.type().maxPlayers() * serversOnline;
+                            ServerRepository repository = mongo.repositoryBy(Server.class);
+
+                            List<Server> servers = repository.find(repository.createQuery()
+                                    .field("type").equal(metadata.type())
+                                    .field("network").equal(network))
+                                    .asList();
                             int onlinePlayers = servers.stream()
                                     .flatMapToInt((s) -> IntStream.of(s.onlinePlayers().size()))
                                     .sum();
