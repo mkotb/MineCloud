@@ -162,7 +162,7 @@ public final class Deployer {
         }
 
         public EnvironmentBuilder append(String key, String value) {
-            environmentVars.add(key + "='" + value + "'");
+            environmentVars.add(key + "=" + value);
             return this;
         }
 
