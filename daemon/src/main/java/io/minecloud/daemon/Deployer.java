@@ -52,6 +52,7 @@ public final class Deployer {
         server.setOnlinePlayers(new ArrayList<>());
         server.setRamUsage(-1);
         server.setPort(0);
+        server.setId(server.name());
 
         deployServer(server);
         repository.save(server);
