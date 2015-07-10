@@ -51,7 +51,7 @@ public final class Deployer {
         server.setNode(MineCloudDaemon.instance().node());
         server.setOnlinePlayers(new ArrayList<>());
         server.setRamUsage(-1);
-        server.setPort(25565);
+        server.setPort(-1);
         server.setId(server.name());
 
         deployServer(server);
@@ -101,6 +101,7 @@ public final class Deployer {
 
             client.startContainer(creation.id(), HostConfig.builder()
                     .binds("/mnt/minecloud:/mnt/minecloud")
+                    .publishAllPorts(true)
                     .build());
         } catch (InterruptedException | DockerException ex) {
             MineCloud.logger().log(Level.SEVERE, "Was unable to create server with type " + server.type().name(),
@@ -149,6 +150,7 @@ public final class Deployer {
                 .portBindings(new HashMap<String, List<PortBinding>>() {{
                     put(node.privateIp(), Arrays.asList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
                 }})
+                .publishAllPorts(true)
                 .build();
 
         ContainerCreation creation;

@@ -177,6 +177,7 @@ public class MineCloudDaemon {
                                 return;
 
                             server.setPort(Integer.parseInt(l.get(0).hostPort()));
+                            MineCloud.logger().log(Level.INFO, "Set " + server.name() + "'s port to " + server.port());
                         });
 
                         mongo.repositoryBy(Server.class).save(server);
