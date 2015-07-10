@@ -26,6 +26,7 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(value = "server-types", noClassnameStored = true)
@@ -74,6 +75,10 @@ public class ServerType extends MongoEntity {
     }
 
     public List<Plugin> plugins() {
+        if (plugins == null) {
+            plugins = new ArrayList<>();
+        }
+
         return plugins;
     }
 
@@ -82,6 +87,10 @@ public class ServerType extends MongoEntity {
     }
 
     public List<World> worlds() {
+        if (worlds == null) {
+            worlds = new ArrayList<>();
+        }
+
         return worlds;
     }
 

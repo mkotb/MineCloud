@@ -24,6 +24,7 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(value = "bungee-types", noClassnameStored = true)
@@ -38,6 +39,10 @@ public class BungeeType extends MongoEntity {
     private List<Plugin> plugins;
 
     public List<Plugin> plugins() {
+        if (plugins == null) {
+            plugins = new ArrayList<>();
+        }
+
         return plugins;
     }
 
