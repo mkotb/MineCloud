@@ -38,8 +38,6 @@ public class Bungee extends MongoEntity {
     private Node node;
     @Setter
     private String publicIp;
-    @Setter
-    private int ramUsage;
 
     public Network network() {
         return network;
@@ -62,7 +60,7 @@ public class Bungee extends MongoEntity {
     }
 
     public int ramUsage() {
-        return ramUsage;
+        return type.dedicatedRam();
     }
 
     public String name() {

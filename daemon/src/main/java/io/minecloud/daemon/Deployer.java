@@ -145,11 +145,9 @@ public final class Deployer {
         }
 
         bungee.setNetwork(network);
-        bungee.setId(creation.id());
         bungee.setNode(node);
         bungee.setPublicIp(node.publicIp());
         bungee.setType(type);
-        bungee.setRamUsage(-1);
 
         repository.save(bungee);
         MineCloud.logger().info("Started bungee " + bungee.name() + " with container id " + bungee.containerId());

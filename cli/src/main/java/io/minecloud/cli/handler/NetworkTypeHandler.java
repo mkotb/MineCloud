@@ -82,7 +82,7 @@ public class NetworkTypeHandler extends AbstractHandler {
 
         md.setType(serverType);
         md.setMaximumAmount(max);
-        md.setMaximumAmount(min);
+        md.setMinimumAmount(min);
 
         metadata.add(md);
 
