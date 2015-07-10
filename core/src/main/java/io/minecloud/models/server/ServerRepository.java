@@ -31,11 +31,7 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
     public int highestNumberFor(ServerType type) {
         int id = 0;
 
-        for (Server server : models()) {
-            if (!server.type().equals(type)) {
-                continue;
-            }
-
+        for (Server server : find(createQuery().filter("type", type)).asList()) {
             if (server.number() > id) {
                 id = server.number();
             }
