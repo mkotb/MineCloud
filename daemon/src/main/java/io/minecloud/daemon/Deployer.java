@@ -110,6 +110,7 @@ public final class Deployer {
         }
 
         server.setContainerId(server.type().name() + server.number());
+        server.setId(server.containerId());
         MineCloud.logger().info("Started server " + server.name()
                 + " with container id " + server.containerId());
     }
