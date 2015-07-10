@@ -27,6 +27,7 @@ import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.plugins.PluginType;
 import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -79,11 +80,13 @@ public class MineCloudPlugin extends Plugin {
                 }));
 
         getProxy().getScheduler().schedule(this, () -> {
-            ServerType def = mongo.repositoryBy(ServerType.class).findFirst(ServerType::defaultServer);
+            ServerRepository repository = mongo.repositoryBy(Server.class);
+            List<Server> servers = repository.find(repository.createQuery()
+                    .field("network").equal(bungee().network()))
+                    .asList();
 
-            mongo.repositoryBy(Server.class).models().stream()
-                    .filter((server) -> server.type().equals(def) && server.ramUsage() != -1)
-                    .forEach(this::addServer);
+            servers.removeIf((s) -> !s.type().defaultServer());
+            servers.forEach(this::addServer);
 
             getProxy().setReconnectHandler(new ReconnectHandler(this));
             getProxy().getPluginManager().registerListener(this, new MineCloudListener(this));
