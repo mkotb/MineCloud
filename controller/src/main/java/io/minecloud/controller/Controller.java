@@ -55,8 +55,8 @@ public class Controller {
         while (!Thread.currentThread().isInterrupted()) {
             mongo.repositoryBy(Network.class).models()
                     .forEach((network) -> {
-                        System.out.println("Scanning " + network.name() + " (" + network.bungeesOnline() +
-                                "," + network.serversOnline() + ")");
+                        System.out.println("Scanning " + network.name() + " (" + network.bungeesTest() +
+                                "," + network.serversTest() + ")");
 
                         network.bungeeMetadata().forEach((type, amount) -> {
                             System.out.println("Going through " + type.name() + " (" + network.bungeesOnline(type) + ")");

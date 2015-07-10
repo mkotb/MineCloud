@@ -105,6 +105,11 @@ public final class Deployer {
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
 
+        if (repository.count("_id", node.publicIp()) > 0) {
+            MineCloud.logger().error("Did not create bungee on this node; public ip is already in use");
+            return;
+        }
+
         bungee.setId(node.publicIp());
 
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();

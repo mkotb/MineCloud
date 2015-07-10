@@ -83,6 +83,14 @@ public class Network extends MongoEntity {
                 .count();
     }
 
+    public int bungeesTest() {
+        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).count();
+    }
+
+    public int serversTest() {
+        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).count();
+    }
+
     public int bungeesOnline() {
         return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
                 .stream()
