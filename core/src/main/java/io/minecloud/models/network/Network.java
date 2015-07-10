@@ -15,6 +15,8 @@
  */
 package io.minecloud.models.network;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBRef;
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.Bungee;
@@ -70,47 +72,25 @@ public class Network extends MongoEntity {
     }
 
     public int serversOnline() {
-        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).models()
-                .stream()
-                .filter((server) -> server.network().name().equalsIgnoreCase(name()))
-                .count();
+        return (int) MineCloud.instance().mongo().repositoryBy(Server.class)
+                .count("network", this);
     }
 
     public int serversOnline(ServerType type) {
-        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).models()
-                .stream()
-                .filter((server) -> server.network().name().equalsIgnoreCase(name()) && server.type().equals(type))
-                .count();
-    }
-
-    public int bungeesTest() {
-        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).count();
-    }
-
-    public int serversTest() {
-        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).count();
+        return (int) MineCloud.instance().mongo().repositoryBy(Server.class).collection()
+                .count(new BasicDBObject("network", new DBRef("networks", entityId()))
+                        .append("type", new DBRef("type", type.entityId())));
     }
 
     public int bungeesOnline() {
-        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
-                .stream()
-                .filter((bungee) -> {
-                    boolean b = bungee.network().name().equalsIgnoreCase(name());
-
-                    System.out.println("Scanning through " + bungee.name());
-                    System.out.println(bungee.network().name() + ":" + name());
-                    System.out.println(b);
-
-                    return b;
-                })
-                .count();
+        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class)
+                .count("network", this);
     }
 
     public int bungeesOnline(BungeeType type) {
-        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).models()
-                .stream()
-                .filter((bungee) -> bungee.network().name().equalsIgnoreCase(name()) && bungee.type().equals(type))
-                .count();
+        return (int) MineCloud.instance().mongo().repositoryBy(Bungee.class).collection()
+                .count(new BasicDBObject("network", new DBRef("networks", entityId()))
+                        .append("type", new DBRef("type", type.entityId())));
     }
 
     public List<Node> nodes() {
