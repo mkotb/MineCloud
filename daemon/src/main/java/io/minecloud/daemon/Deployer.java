@@ -61,7 +61,6 @@ public final class Deployer {
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         World defaultWorld = server.type().defaultWorld();
         ContainerConfig config = ContainerConfig.builder()
-                .volumes("/mnt/minecloud:/mnt/minecloud")
                 .image("minecloud/server")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()
@@ -84,9 +83,11 @@ public final class Deployer {
 
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
-            creation = client.createContainer(config);
+            creation = client.createContainer(config, server.type().name() + "." + server.number());
 
-            client.startContainer(creation.id());
+            client.startContainer(creation.id(), HostConfig.builder()
+                    .binds("/mnt/minecloud:/mnt/minecloud")
+                    .build());
         } catch (InterruptedException | DockerException ex) {
             MineCloud.logger().log(Level.ERROR, "Was unable to create server with type " + server.type().name(),
                     ex);
@@ -108,7 +109,6 @@ public final class Deployer {
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/bungee")
-                .volumes("/mnt/minecloud:/mnt/minecloud")
                 .exposedPorts("25565")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()
@@ -125,6 +125,7 @@ public final class Deployer {
                         .build())
                 .build();
         HostConfig hostConfig = HostConfig.builder()
+                .binds("/mnt/minecloud:/mnt/minecloud")
                 .portBindings(new HashMap<String, List<PortBinding>>() {{
                     put(node.privateIp(), Arrays.asList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
                 }})
@@ -134,7 +135,7 @@ public final class Deployer {
 
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
-            creation = client.createContainer(config);
+            creation = client.createContainer(config, type.name() + "." + node.publicIp());
 
             client.startContainer(creation.id(), hostConfig);
         } catch (InterruptedException | DockerException ex) {
