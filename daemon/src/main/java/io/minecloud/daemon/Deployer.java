@@ -15,6 +15,7 @@
  */
 package io.minecloud.daemon;
 
+import com.spotify.docker.client.ContainerNotFoundException;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
 import com.spotify.docker.client.messages.*;
@@ -85,15 +86,16 @@ public final class Deployer {
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
             String name = server.type().name() + server.number();
-            ContainerInfo info;
 
-            if ((info = client.inspectContainer(name)) != null) {
+            try {
+                ContainerInfo info = client.inspectContainer(name);
+
                 if (info.state().running()) {
-                    client.waitContainer(info.id()); // wait for the container to exit
+                    client.waitContainer(info.id());
                 }
 
-                client.removeContainer(info.id()); // remove old container
-            }
+                client.removeContainer(info.id());
+            } catch (ContainerNotFoundException ignored) {}
 
             creation = client.createContainer(config, name);
 
