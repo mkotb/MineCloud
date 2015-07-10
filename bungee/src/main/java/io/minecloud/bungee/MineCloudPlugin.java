@@ -208,6 +208,8 @@ public class MineCloudPlugin extends Plugin {
                 "", false);
 
         getProxy().getServers().put(server.name(), info);
+        getLogger().info("Added " + server.name() + " to server list, " + server.node().privateIp() +
+                ":" + server.port());
     }
 
     public void removeServer(String server) {
