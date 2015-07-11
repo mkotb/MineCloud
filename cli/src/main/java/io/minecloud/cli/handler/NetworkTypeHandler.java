@@ -16,6 +16,7 @@
 package io.minecloud.cli.handler;
 
 import asg.cliche.Command;
+import asg.cliche.Param;
 import io.minecloud.MineCloud;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
@@ -42,7 +43,7 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String addBungee(String bungeeName, int amount) {
+    public String addBungee(@Param(name = "bungee-name") String bungeeName, @Param(name = "amount") int amount) {
         BungeeType bungeeType = MineCloud.instance().mongo()
                 .repositoryBy(BungeeType.class)
                 .findFirst(bungeeName);
@@ -64,7 +65,7 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String addServer(String name, int min, int max) {
+    public String addServer(@Param(name = "server-name") String name, @Param(name = "min") int min, @Param(name = "max") int max) {
         ServerType serverType = MineCloud.instance().mongo()
                 .repositoryBy(ServerType.class)
                 .findFirst(name);
@@ -90,7 +91,7 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String addNode(String nodeName) {
+    public String addNode(@Param(name = "node-name") String nodeName) {
         Node node = MineCloud.instance().mongo()
                 .repositoryBy(Node.class)
                 .findFirst(nodeName);
@@ -112,7 +113,7 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String removeBungee(String bungee) {
+    public String removeBungee(@Param(name = "bungee-name") String bungee) {
         BungeeType bungeeType = MineCloud.instance().mongo()
                 .repositoryBy(BungeeType.class)
                 .findFirst(bungee);
@@ -136,7 +137,7 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String removeServer(String name) {
+    public String removeServer(@Param(name = "server-name") String name) {
         ServerType serverType = MineCloud.instance().mongo()
                 .repositoryBy(ServerType.class)
                 .findFirst(name);
@@ -163,7 +164,7 @@ public class NetworkTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String removeNode(String nodeName) {
+    public String removeNode(@Param(name = "node-name") String nodeName) {
         Node node = MineCloud.instance().mongo()
                 .repositoryBy(Node.class)
                 .findFirst(nodeName);

@@ -16,6 +16,7 @@
 package io.minecloud.cli.handler;
 
 import asg.cliche.Command;
+import asg.cliche.Param;
 import io.minecloud.MineCloud;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.nodes.type.NodeType;
@@ -43,7 +44,7 @@ public class BungeeTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String dedicatedRam(int amount) {
+    public String dedicatedRam(@Param(name = "amount") int amount) {
         if (amount < 500) {
             return "Invalid ram amount!";
         }
@@ -53,7 +54,7 @@ public class BungeeTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String preferredNode(String nodeType) {
+    public String preferredNode(@Param(name = "node-type-name") String nodeType) {
         NodeType type = MineCloud.instance().mongo()
                 .repositoryBy(NodeType.class)
                 .findFirst(nodeType);
@@ -67,7 +68,7 @@ public class BungeeTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String addPlugin(String pluginName, String version) {
+    public String addPlugin(@Param(name = "plugin-name") String pluginName, @Param(name = "version") String version) {
         PluginType pluginType = MineCloud.instance().mongo()
                 .repositoryBy(PluginType.class)
                 .findFirst(pluginName);
@@ -93,7 +94,7 @@ public class BungeeTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String removePlugin(String pluginName) {
+    public String removePlugin(@Param(name = "plugin-name") String pluginName) {
         Optional<Plugin> optional = type.plugins().stream()
                 .filter((p) -> p.name().equalsIgnoreCase(pluginName))
                 .findFirst();

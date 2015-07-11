@@ -41,7 +41,7 @@ public class PluginTypeHandler extends AbstractHandler {
     }
 
     @Command(name = "plugin-server-type", abbrev = "pst")
-    public String pluginServerType(@Param(name = "Server Type") String name) {
+    public String pluginServerType(@Param(name = "server-type") String name) {
         PluginServerType type = PluginServerType.valueOf(name.toUpperCase());
 
         if (type == null) {
@@ -54,7 +54,7 @@ public class PluginTypeHandler extends AbstractHandler {
     }
 
     @Command(name = "add-version", abbrev = "av")
-    public String addVersion(String version) {
+    public String addVersion(@Param(name = "version-name") String version) {
         if (type.versions() == null) {
             type.setVersions(new ArrayList<>());
         }
@@ -68,7 +68,7 @@ public class PluginTypeHandler extends AbstractHandler {
     }
 
     @Command(name = "add-config", abbrev = "ac")
-    public String addConfig(String configName) {
+    public String addConfig(@Param(name = "config-name") String configName) {
         if (type.configs() == null) {
             type.setConfigs(new ArrayList<>());
         }

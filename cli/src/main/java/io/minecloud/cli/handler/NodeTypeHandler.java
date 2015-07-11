@@ -16,6 +16,7 @@
 package io.minecloud.cli.handler;
 
 import asg.cliche.Command;
+import asg.cliche.Param;
 import io.minecloud.MineCloud;
 import io.minecloud.models.nodes.type.CPU;
 import io.minecloud.models.nodes.type.NodeType;
@@ -41,7 +42,7 @@ public class NodeTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String ram(int amount) {
+    public String ram(@Param(name = "amount") int amount) {
         if (amount < 0) {
             return "Invalid amount!";
         }

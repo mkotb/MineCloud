@@ -16,6 +16,7 @@
 package io.minecloud.cli.handler;
 
 import asg.cliche.Command;
+import asg.cliche.Param;
 
 public class MainHandler extends AbstractHandler {
     public MainHandler() {
@@ -23,32 +24,32 @@ public class MainHandler extends AbstractHandler {
     }
 
     @Command(name = "plugin-type")
-    public void pluginType(String name) {
+    public void pluginType(@Param(name = "name") String name) {
         enterShell(new PluginTypeHandler(name), "plugin-type");
     }
 
     @Command(name = "server-type")
-    public void serverType(String name) {
+    public void serverType(@Param(name = "name") String name) {
         enterShell(new ServerTypeHandler(name), "server-type");
     }
 
     @Command(name = "node-type")
-    public void nodeType(String name) {
+    public void nodeType(@Param(name = "name") String name) {
         enterShell(new NodeTypeHandler(name), "node-type");
     }
 
     @Command(name = "bungee-type")
-    public void bungeeType(String name) {
+    public void bungeeType(@Param(name = "name") String name) {
         enterShell(new BungeeTypeHandler(name), "bungee-type");
     }
 
     @Command(name = "network-type")
-    public void networkType(String name) {
+    public void networkType(@Param(name = "name") String name) {
         enterShell(new NetworkTypeHandler(name), "network-type");
     }
 
     @Command(name = "node")
-    public void node(String name) {
+    public void node(@Param(name = "name") String name) {
         enterShell(new NodeHandler(name), "node");
     }
 }

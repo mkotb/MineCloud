@@ -16,6 +16,7 @@
 package io.minecloud.cli.handler;
 
 import asg.cliche.Command;
+import asg.cliche.Param;
 import io.minecloud.MineCloud;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.plugins.Plugin;
@@ -46,7 +47,7 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String dedicatedRam(int amount) {
+    public String dedicatedRam(@Param(name = "amount (mb)") int amount) {
         if (amount < 500) {
             return "Invalid ram amount!";
         }
@@ -56,7 +57,7 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String maxPlayers(int max) {
+    public String maxPlayers(@Param(name = "max-players") int max) {
         if (max < 0) {
             return "Invalid max players!";
         }
@@ -66,7 +67,7 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String preferredNode(String nodeType) {
+    public String preferredNode(@Param(name = "node-type-name") String nodeType) {
         NodeType type = MineCloud.instance().mongo()
                 .repositoryBy(NodeType.class)
                 .findFirst(nodeType);
@@ -80,19 +81,19 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String mod(String mod) {
+    public String mod(@Param(name = "mod") String mod) {
         type.setMod(mod);
         return "Set mod to " + mod;
     }
 
     @Command
-    public String defaultServer(boolean def) {
+    public String defaultServer(@Param(name = "value") boolean def) {
         type.setDefaultServer(def);
         return "Set default server value to " + def;
     }
 
     @Command
-    public String addPlugin(String pluginName, String version) {
+    public String addPlugin(@Param(name = "plugin-name") String pluginName, @Param(name = "version") String version) {
         PluginType pluginType = MineCloud.instance().mongo()
                 .repositoryBy(PluginType.class)
                 .findFirst(pluginName);
@@ -118,7 +119,7 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String removePlugin(String pluginName) {
+    public String removePlugin(@Param(name = "plugin-name") String pluginName) {
         Optional<Plugin> optional = type.plugins().stream()
                 .filter((p) -> p.name().equalsIgnoreCase(pluginName))
                 .findFirst();
@@ -133,13 +134,13 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
-    public String defaultWorld(String world, String version) {
+    public String defaultWorld(@Param(name = "world-name") String world, @Param(name = "version") String version) {
         type.setDefaultWorld(new World(world, version));
         return "Set default world to " + world + " version " + version;
     }
 
     @Command(name = "add-world", abbrev = "aw")
-    public String addWorld(String world, String version) {
+    public String addWorld(@Param(name = "world-name") String world, @Param(name = "version") String version) {
         if (type.worlds() == null) {
             type.setWorlds(new ArrayList<>());
         }
