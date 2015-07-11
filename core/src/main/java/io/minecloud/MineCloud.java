@@ -28,6 +28,8 @@ import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.NodeRepository;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.nodes.type.NodeTypeRepository;
+import io.minecloud.models.plugins.PluginType;
+import io.minecloud.models.plugins.PluginTypeRepository;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
@@ -161,6 +163,7 @@ public final class MineCloud {
         mongo.loadRepository(BungeeRepository.create(mongo.datastore()), Bungee.class);
         mongo.loadRepository(ServerTypeRepository.create(mongo.datastore()), ServerType.class);
         mongo.loadRepository(ServerRepository.create(mongo.datastore()), Server.class);
+        mongo.loadRepository(PluginTypeRepository.create(mongo.datastore()), PluginType.class);
     }
 
     public void initiateRedis(Credentials credentials) {
