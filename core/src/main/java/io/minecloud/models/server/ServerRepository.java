@@ -19,6 +19,9 @@ import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.models.server.type.ServerType;
 import org.mongodb.morphia.Datastore;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ServerRepository extends AbstractMongoRepository<Server> {
     private ServerRepository(Datastore datastore) {
         super(Server.class, datastore);
@@ -28,15 +31,19 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
         return new ServerRepository(datastore);
     }
 
-    public int highestNumberFor(ServerType type) {
-        int id = 0;
+    public int nextNumberFor(ServerType type) {
+        List<Server> servers = find(createQuery().filter("type", type)).asList();
+        int lastNumber = 0;
 
-        for (Server server : find(createQuery().filter("type", type)).asList()) {
-            if (server.number() > id) {
-                id = server.number();
-            }
+        Collections.sort(servers, (s1, s2) -> s1.number() - s2.number());
+
+        for (Server server : servers) {
+            if (lastNumber != (server.number() - 1))
+                return server.number() - 1;
+
+            lastNumber = server.number();
         }
 
-        return id;
+        return 1;
     }
 }

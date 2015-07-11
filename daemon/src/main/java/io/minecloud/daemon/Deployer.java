@@ -46,7 +46,7 @@ public final class Deployer {
         Server server = new Server();
 
         server.setType(type);
-        server.setNumber(repository.highestNumberFor(type) + 1);
+        server.setNumber(repository.nextNumberFor(type) + 1);
         server.setNetwork(network);
         server.setNode(MineCloudDaemon.instance().node());
         server.setOnlinePlayers(new ArrayList<>());
