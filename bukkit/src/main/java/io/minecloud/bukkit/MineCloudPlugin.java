@@ -127,10 +127,8 @@ public class MineCloudPlugin extends JavaPlugin {
                     pluginType.name() + "/" + version);
             File configContainer = new File("plugins/" + pluginType.name());
             
-            if (validateFolder(configs, pluginType, version))
-                return;
-
-            copyFolder(configs, configContainer);
+            if (!validateFolder(configs, pluginType, version))
+                copyFolder(configs, configContainer);
 
             plugins.forEach((f) -> {
                 try {

@@ -145,10 +145,8 @@ public class MineCloudPlugin extends Plugin {
                     pluginType.name() + "/" + version);
             File configContainer = new File(nContainer, pluginType.name());
 
-            if (validateFolder(configs, pluginType, version))
-                return;
-
-            copyFolder(configs, configContainer);
+            if (!validateFolder(configs, pluginType, version))
+                copyFolder(configs, configContainer);
         });
 
         // release plugin manager lock
