@@ -61,7 +61,7 @@ case "$1" in
         echo -n "Stopping $name.."
         kill `get_pid`
 
-        while [! is_running ]
+        while is_running
         do
             echo -n "."
             sleep 1
