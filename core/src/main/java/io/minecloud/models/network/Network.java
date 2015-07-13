@@ -21,7 +21,7 @@ import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.BungeeRepository;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.bungee.type.BungeeTypeRepository;
-import io.minecloud.models.network.server.ServerMetadata;
+import io.minecloud.models.network.server.ServerNetworkMetadata;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
@@ -39,7 +39,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class Network extends MongoEntity {
     @Setter
-    private List<ServerMetadata> serverMetadata;
+    private List<ServerNetworkMetadata> serverMetadata;
     @Setter
     private Map<String, Integer> bungees;
     @Setter
@@ -50,7 +50,7 @@ public class Network extends MongoEntity {
         return entityId();
     }
 
-    public List<ServerMetadata> serverMetadata() {
+    public List<ServerNetworkMetadata> serverMetadata() {
         return serverMetadata;
     }
 

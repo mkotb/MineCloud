@@ -20,7 +20,7 @@ import asg.cliche.Param;
 import io.minecloud.MineCloud;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
-import io.minecloud.models.network.server.ServerMetadata;
+import io.minecloud.models.network.server.ServerNetworkMetadata;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.type.ServerType;
 
@@ -78,8 +78,8 @@ public class NetworkTypeHandler extends AbstractHandler {
             type.setServerMetadata(new ArrayList<>());
         }
 
-        List<ServerMetadata> metadata = type.serverMetadata();
-        ServerMetadata md = new ServerMetadata();
+        List<ServerNetworkMetadata> metadata = type.serverMetadata();
+        ServerNetworkMetadata md = new ServerNetworkMetadata();
 
         md.setType(serverType);
         md.setMaximumAmount(max);
@@ -150,8 +150,8 @@ public class NetworkTypeHandler extends AbstractHandler {
             type.setServerMetadata(new ArrayList<>());
         }
 
-        List<ServerMetadata> metadata = type.serverMetadata();
-        Optional<ServerMetadata> optional = metadata.stream()
+        List<ServerNetworkMetadata> metadata = type.serverMetadata();
+        Optional<ServerNetworkMetadata> optional = metadata.stream()
                 .filter((sm) -> sm.type().equals(serverType))
                 .findFirst();
 

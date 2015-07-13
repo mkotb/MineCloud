@@ -19,7 +19,20 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public class PlayerMetadata {
+    private String key;
     private String value;
+
+    public PlayerMetadata() {
+    }
+
+    public PlayerMetadata(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public String key() {
+        return key;
+    }
 
     public String value() {
         return value;
@@ -27,5 +40,9 @@ public class PlayerMetadata {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

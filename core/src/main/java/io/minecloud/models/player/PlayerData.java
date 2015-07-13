@@ -18,7 +18,9 @@ package io.minecloud.models.player;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @EqualsAndHashCode
 public class PlayerData {
@@ -30,6 +32,7 @@ public class PlayerData {
     private double health;
     @Setter
     private double maxHealth;
+    @Setter
     private List<PlayerMetadata> metadata;
 
     public String uuid() {
@@ -49,6 +52,25 @@ public class PlayerData {
     }
 
     public List<PlayerMetadata> metadata() {
+        if (metadata == null) {
+            metadata = new ArrayList<>();
+        }
+
         return metadata;
+    }
+
+    public void addMetadata(PlayerMetadata data) {
+        metadata().removeIf((md) -> md.key().equals(data.key())); // override old entries
+        metadata().add(data);
+    }
+
+    public Optional<PlayerMetadata> metadataBy(String name) {
+        return metadata().stream()
+                .filter((md) -> md.key().equals(name))
+                .findFirst();
+    }
+
+    public boolean hasMetadata(String name) {
+        return metadataBy(name).isPresent();
     }
 }

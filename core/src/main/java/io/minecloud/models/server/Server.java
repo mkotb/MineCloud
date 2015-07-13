@@ -59,6 +59,8 @@ public class Server extends MongoEntity {
     private String containerId;
     @Setter
     private double tps;
+    @Setter
+    private List<ServerMetadata> metadata;
 
     public Network network() {
         return network;
@@ -122,5 +124,28 @@ public class Server extends MongoEntity {
 
     public String name() {
         return entityId();
+    }
+
+    public List<ServerMetadata> metadata() {
+        if (metadata == null) {
+            metadata = new ArrayList<>();
+        }
+
+        return metadata;
+    }
+
+    public void addMetadata(ServerMetadata data) {
+        metadata().removeIf((sm) -> sm.key().equals(data.key())); // override old entries
+        metadata().add(data);
+    }
+
+    public Optional<ServerMetadata> metadataBy(String name) {
+        return metadata().stream()
+                .filter((sm) -> sm.key().equals(name))
+                .findFirst();
+    }
+
+    public boolean hasMetadata(String name) {
+        return metadataBy(name).isPresent();
     }
 }

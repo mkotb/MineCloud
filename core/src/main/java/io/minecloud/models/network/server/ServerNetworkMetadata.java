@@ -21,7 +21,7 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Reference;
 
 @EqualsAndHashCode
-public class ServerMetadata {
+public class ServerNetworkMetadata {
     @Reference
     @Setter
     private ServerType type;
