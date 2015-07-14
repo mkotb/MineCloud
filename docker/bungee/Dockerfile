@@ -2,8 +2,7 @@ FROM centos:centos6
 MAINTAINER Mazen Kotb
 
 RUN yum -y install wget gcc openssl openssl-devel
-RUN wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u25-b17/jdk-8u25-linux-x64.rpm
-RUN rpm -Uvh jdk-8u25-linux-x64.rpm
+RUN yum -y install java-1.8.0-openjdk-headless.x86_64
 
 RUN mkdir /minecloud
 ADD initialize.sh /minecloud/initialize.sh
