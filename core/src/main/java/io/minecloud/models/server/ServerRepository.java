@@ -47,7 +47,7 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
             lastNumber = server.number();
         }
 
-        return 1;
+        return lastNumber + 1;
     }
 
     public Server serverBy(ServerType type, int number) {
