@@ -103,7 +103,7 @@ public final class Deployer {
                 ContainerInfo info = client.inspectContainer(name);
 
                 if (info.state().running()) {
-                    client.waitContainer(info.id());
+                    client.killContainer(name);
                 }
 
                 client.removeContainer(info.id());
@@ -203,6 +203,7 @@ public final class Deployer {
 
     private static void failedStart(Network network) {
         if (FAILED_STARTS.incrementAndGet() < 3) {
+            MineCloud.logger().warning("Failed to start a container on " + network.name() + ", adding to failed starts...");
             return;
         }
 
@@ -212,6 +213,7 @@ public final class Deployer {
         network.setNodes(nodes);
 
         MineCloud.instance().mongo().repositoryBy(Network.class).save(network);
+        MineCloud.logger().log(Level.SEVERE, "Failed to create containers 3 times! Removing node from network...");
     }
 
     private static class EnvironmentBuilder {
