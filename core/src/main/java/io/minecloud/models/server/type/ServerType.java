@@ -105,8 +105,8 @@ public class ServerType extends MongoEntity {
     public void teleport(String player) {
         RedisDatabase redis = MineCloud.instance().redis();
 
-        if (redis.channelBy("teleport") == null) {
-            redis.addChannel(SimpleRedisChannel.create("teleport", redis));
+        if (redis.channelBy("teleport-type") == null) {
+            redis.addChannel(SimpleRedisChannel.create("teleport-type", redis));
         }
 
         MessageOutputStream mos = new MessageOutputStream();

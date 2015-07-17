@@ -158,8 +158,8 @@ public class Server extends MongoEntity {
     public void teleport(String player) {
         RedisDatabase redis = MineCloud.instance().redis();
 
-        if (redis.channelBy("teleport-type") == null) {
-            redis.addChannel(SimpleRedisChannel.create("teleport-type", redis));
+        if (redis.channelBy("teleport") == null) {
+            redis.addChannel(SimpleRedisChannel.create("teleport", redis));
         }
 
         MessageOutputStream mos = new MessageOutputStream();
@@ -171,6 +171,6 @@ public class Server extends MongoEntity {
             throw new MineCloudException("Could not encode teleport message", ex);
         }
 
-        redis.channelBy("teleport-type").publish(mos.toMessage());
+        redis.channelBy("teleport").publish(mos.toMessage());
     }
 }
