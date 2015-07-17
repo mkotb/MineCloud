@@ -80,8 +80,6 @@ public class Controller {
                                     .flatMapToInt((s) -> IntStream.of(s.onlinePlayers().size()))
                                     .sum();
 
-                            System.out.println(newServers + "," + space + "," + onlinePlayers);
-
                             if (onlinePlayers > (space * 0.75)) {
                                 newServers += (int) Math.round(onlinePlayers / (space * 0.75)) + 1;
                             }

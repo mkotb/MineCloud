@@ -15,17 +15,21 @@
  */
 package io.minecloud.models.server.type;
 
+import io.minecloud.MineCloud;
+import io.minecloud.MineCloudException;
 import io.minecloud.db.mongo.model.MongoEntity;
+import io.minecloud.db.redis.RedisDatabase;
+import io.minecloud.db.redis.msg.binary.MessageOutputStream;
+import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.plugins.Plugin;
-import io.minecloud.models.plugins.PluginType;
 import io.minecloud.models.server.World;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,5 +100,24 @@ public class ServerType extends MongoEntity {
 
     public void setName(String name) {
         setId(name);
+    }
+
+    public void teleport(String player) {
+        RedisDatabase redis = MineCloud.instance().redis();
+
+        if (redis.channelBy("teleport") == null) {
+            redis.addChannel(SimpleRedisChannel.create("teleport", redis));
+        }
+
+        MessageOutputStream mos = new MessageOutputStream();
+
+        try {
+            mos.writeString(player);
+            mos.writeString(name());
+        } catch (IOException ex) {
+            throw new MineCloudException("Could not encode teleport message", ex);
+        }
+
+        redis.channelBy("teleport-type").publish(mos.toMessage());
     }
 }

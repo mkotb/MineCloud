@@ -70,6 +70,10 @@ public class Network extends MongoEntity {
         return metadata;
     }
 
+    public List<Server> servers() {
+        return ((ServerRepository) MineCloud.instance().mongo().repositoryBy(Server.class)).serversFor(this);
+    }
+
     public int serversOnline() {
         return (int) MineCloud.instance().mongo().repositoryBy(Server.class)
                 .count("network", this);

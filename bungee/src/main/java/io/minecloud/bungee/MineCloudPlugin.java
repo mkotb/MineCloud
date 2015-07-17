@@ -30,6 +30,7 @@ import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.bson.types.ObjectId;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +83,65 @@ public class MineCloudPlugin extends Plugin {
                     MessageInputStream stream = message.contents();
 
                     removeServer(stream.readString());
+                }));
+
+        redis.addChannel(SimpleRedisChannel.create("teleport", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY) {
+                        return;
+                    }
+
+                    MessageInputStream stream = message.contents();
+                    ProxiedPlayer player = getProxy().getPlayer(stream.readString());
+
+                    if (player == null) {
+                        return;
+                    }
+
+                    ServerInfo info = getProxy().getServerInfo(stream.readString());
+
+                    player.connect(info);
+                }));
+
+        redis.addChannel(SimpleRedisChannel.create("teleport-type", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY) {
+                        return;
+                    }
+
+                    MessageInputStream stream = message.contents();
+                    ProxiedPlayer player = getProxy().getPlayer(stream.readString());
+
+                    if (player == null) {
+                        return;
+                    }
+
+                    ServerType type = mongo.repositoryBy(ServerType.class)
+                            .findFirst(stream.readString());
+
+                    if (type == null) {
+                        getLogger().log(Level.SEVERE, "Received teleport message with invalid server type");
+                        return;
+                    }
+
+                    ServerRepository repository = mongo.repositoryBy(Server.class);
+                    List<Server> servers = repository.find(repository.createQuery()
+                            .field("network").equal(bungee().network())
+                            .field("type").equal(type))
+                            .asList();
+
+                    Collections.sort(servers, (a, b) -> b.onlinePlayers().size() - a.onlinePlayers().size());
+
+                    Server server = servers.get(0);
+                    ServerInfo info = getProxy().getServerInfo(server.name());
+
+                    if (info == null) {
+                        getLogger().warning("Cannot find " + server.name() + " in ServerInfo store, adding.");
+                        addServer(server);
+                        info = getProxy().getServerInfo(server.name());
+                    }
+
+                    player.connect(info);
                 }));
 
         getProxy().getScheduler().schedule(this, () -> {

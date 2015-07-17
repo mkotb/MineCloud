@@ -35,9 +35,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 public final class Deployer {
+    private static final AtomicInteger FAILED_STARTS = new AtomicInteger(0);
 
     private Deployer() {}
 
@@ -55,11 +57,20 @@ public final class Deployer {
         server.setContainerId(server.type().name() + server.number());
         server.setId(server.containerId());
 
-        deployServer(server);
-        repository.save(server);
+        boolean deployed = true;
+
+        for (int i = 0; i < 3 && !deployServer(server); i++) {
+            deployed = i != 2;
+        }
+
+        if (deployed) {
+            repository.save(server);
+        } else {
+            failedStart(network);
+        }
     }
 
-    public static void deployServer(Server server) {
+    public static boolean deployServer(Server server) {
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         World defaultWorld = server.type().defaultWorld();
@@ -107,21 +118,35 @@ public final class Deployer {
         } catch (InterruptedException | DockerException ex) {
             MineCloud.logger().log(Level.SEVERE, "Was unable to create server with type " + server.type().name(),
                     ex);
-            return;
+            return false;
         }
 
         MineCloud.logger().info("Started server " + server.name()
                 + " with container id " + server.containerId());
+        return true;
     }
 
     public static void deployBungee(Network network, BungeeType type) {
+        boolean deployed = true;
+        Bungee bungee;
+
+        for (int i = 0; i < 3 && ((bungee = deployBungeeCord(network, type)) == null || bungee.network() == null); i++) {
+            deployed = i != 2;
+        }
+
+        if (!deployed) {
+            failedStart(network);
+        }
+    }
+
+    public static Bungee deployBungeeCord(Network network, BungeeType type) {
         BungeeRepository repository = MineCloud.instance().mongo().repositoryBy(Bungee.class);
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
 
         if (repository.count("_id", node.publicIp()) > 0) {
             MineCloud.logger().log(Level.WARNING, "Did not create bungee on this node; public ip is already in use");
-            return;
+            return null;
         }
 
         bungee.setId(node.publicIp());
@@ -163,7 +188,7 @@ public final class Deployer {
         } catch (InterruptedException | DockerException ex) {
             MineCloud.logger().log(Level.SEVERE, "Was unable to create bungee with type " + type.name(),
                     ex);
-            return;
+            return bungee;
         }
 
         bungee.setNetwork(network);
@@ -173,6 +198,20 @@ public final class Deployer {
 
         repository.save(bungee);
         MineCloud.logger().info("Started bungee " + bungee.name() + " with container id " + bungee.containerId());
+        return bungee;
+    }
+
+    private static void failedStart(Network network) {
+        if (FAILED_STARTS.incrementAndGet() < 3) {
+            return;
+        }
+
+        List<Node> nodes = network.nodes();
+
+        nodes.removeIf((node) -> node.name().equalsIgnoreCase(System.getenv("node-name")));
+        network.setNodes(nodes);
+
+        MineCloud.instance().mongo().repositoryBy(Network.class).save(network);
     }
 
     private static class EnvironmentBuilder {

@@ -16,11 +16,14 @@
 package io.minecloud.models.server;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
+import io.minecloud.models.network.Network;
+import io.minecloud.models.player.PlayerData;
 import io.minecloud.models.server.type.ServerType;
 import org.mongodb.morphia.Datastore;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class ServerRepository extends AbstractMongoRepository<Server> {
     private ServerRepository(Datastore datastore) {
@@ -45,5 +48,38 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
         }
 
         return 1;
+    }
+
+    public Server serverBy(ServerType type, int number) {
+        return find(createQuery()
+                .field("type").equal(type)
+                .field("number").equal(number))
+                .get();
+    }
+
+    public List<Server> serverBy(ServerType type) {
+        return find(createQuery().field("type").equal(type))
+                .asList();
+    }
+
+    public List<Server> serversFor(Network network) {
+        return find(createQuery().field("network").equal(network))
+                .asList();
+    }
+
+    public Server serverFor(UUID id) {
+        PlayerData data = new PlayerData();
+
+        data.setId(id.toString());
+        return find(createQuery().field("players").hasThisElement(data))
+                .get();
+    }
+
+    public Server serverFor(String name) {
+        PlayerData data = new PlayerData();
+
+        data.setName(name);
+        return find(createQuery().field("players").hasThisElement(data))
+                .get();
     }
 }
