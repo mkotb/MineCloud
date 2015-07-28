@@ -27,6 +27,7 @@ import io.minecloud.models.server.World;
 import io.minecloud.models.server.type.ServerType;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.FileUtil;
@@ -131,7 +132,9 @@ public class MineCloudPlugin extends JavaPlugin {
                 copyFolder(configs, configContainer);
         });
 
-        Bukkit.getPluginManager().loadPlugins(new File("nplugins"));
+        for (Plugin plugin : Bukkit.getPluginManager().loadPlugins(new File("nplugins"))) {
+            Bukkit.getPluginManager().enablePlugin(plugin);
+        }
 
         try {
             MessageOutputStream os = new MessageOutputStream();
