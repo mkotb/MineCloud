@@ -11,6 +11,7 @@ echo ""
 
 mkdir worlds
 mkdir plugins
+mkdir $DEFAULT_WORLD
 
 cp -r /mnt/minecloud/server/bukkit/$SERVER_MOD/* .
 cp -r /mnt/minecloud/worlds/$DEFAULT_WORLD/$DEFAULT_WORLD_VERSION/* $DEFAULT_WORLD/

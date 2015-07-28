@@ -102,12 +102,13 @@ public class MineCloudPlugin extends JavaPlugin {
             Bukkit.createWorld(new WorldCreator(world.name()));
         });
 
+        new File("nplugins").mkdir();
+
         type.plugins().forEach((plugin) -> {
             String version = plugin.version();
             PluginType pluginType = plugin.type();
             File pluginsContainer = new File("/mnt/minecloud/plugins/",
                     pluginType.name() + "/" + version);
-            List<File> plugins = new ArrayList<>();
 
             getLogger().info("Loading " + pluginType.name() + "...");
 
@@ -117,28 +118,20 @@ public class MineCloudPlugin extends JavaPlugin {
             for (File f : pluginsContainer.listFiles()) {
                 if (f.isDirectory())
                     continue; // ignore directories
-                File pl = new File("plugins/" + f.getName());
+                File pl = new File("nplugins/" + f.getName());
 
                 FileUtil.copy(f, pl);
-                plugins.add(pl);
             }
-            
-            File configs = new File("/mnt/minecloud/configs/", 
+
+            File configs = new File("/mnt/minecloud/configs/",
                     pluginType.name() + "/" + version);
-            File configContainer = new File("plugins/" + pluginType.name());
-            
+            File configContainer = new File("nplugins/" + pluginType.name());
+
             if (!validateFolder(configs, pluginType, version))
                 copyFolder(configs, configContainer);
-
-            plugins.forEach((f) -> {
-                try {
-                    Bukkit.getPluginManager().loadPlugin(f);
-                } catch (Exception ex) {
-                    new MineCloudException("Could not load " + pluginType.name()
-                            + " due to an unexpected exception", ex);
-                }
-            });
         });
+
+        Bukkit.getPluginManager().loadPlugins(new File("nplugins"));
 
         try {
             MessageOutputStream os = new MessageOutputStream();
