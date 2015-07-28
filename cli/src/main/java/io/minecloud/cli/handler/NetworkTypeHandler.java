@@ -128,7 +128,8 @@ public class NetworkTypeHandler extends AbstractHandler {
 
         Map<BungeeType, Integer> bungeeTypes = type.bungeeMetadata();
 
-        if (!bungeeTypes.containsKey(bungeeType)) {
+        if (!bungeeTypes.keySet().stream()
+                .anyMatch((bt) -> bt.name().equalsIgnoreCase(bungeeType.name()))) {
             return bungee + " is not on the network";
         }
 
@@ -152,7 +153,7 @@ public class NetworkTypeHandler extends AbstractHandler {
 
         List<ServerNetworkMetadata> metadata = type.serverMetadata();
         Optional<ServerNetworkMetadata> optional = metadata.stream()
-                .filter((sm) -> sm.type().equals(serverType))
+                .filter((sm) -> sm.type().name().equals(serverType.name()))
                 .findFirst();
 
         if (!optional.isPresent()) {
