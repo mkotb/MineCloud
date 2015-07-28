@@ -86,6 +86,7 @@ public final class Deployer {
                         .append("redis_host", redisCreds.hosts()[0])
                         .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
+                        .append("SERVER_MOD", server.type().mod())
 
                         .append("server_id", server.entityId())
                         .append("DEFAULT_WORLD", defaultWorld.name())

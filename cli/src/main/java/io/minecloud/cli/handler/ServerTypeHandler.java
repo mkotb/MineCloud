@@ -163,6 +163,7 @@ public class ServerTypeHandler extends AbstractHandler {
         if (type.dedicatedRam() == 0 ||
                 type.maxPlayers() == 0 ||
                 type.preferredNode() == null ||
+                type.mod() == null ||
                 type.defaultWorld() == null) {
             return "Required fields (dedicatedRam, maxPlayers, preferredNode, defaultWorld) have not been set by the user! " +
                     "Unable to push modifications";
