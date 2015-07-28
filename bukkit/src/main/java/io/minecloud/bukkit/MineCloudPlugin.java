@@ -133,6 +133,7 @@ public class MineCloudPlugin extends JavaPlugin {
         });
 
         for (Plugin plugin : Bukkit.getPluginManager().loadPlugins(new File("nplugins"))) {
+            plugin.onLoad();
             Bukkit.getPluginManager().enablePlugin(plugin);
         }
 
