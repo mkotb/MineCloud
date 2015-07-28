@@ -36,8 +36,7 @@ public class PlayerTracker implements Listener {
         this.plugin = (MineCloudPlugin) JavaPlugin.getProvidingPlugin(PlayerTracker.class);
     }
 
-    private void updatePlayer(PlayerData data) {
-        Server server = plugin.server();
+    private void updatePlayer(Server server, PlayerData data) {
         List<PlayerData> onlinePlayers = server.onlinePlayers();
 
         onlinePlayers.set(onlinePlayers.lastIndexOf(data), data);
@@ -70,7 +69,8 @@ public class PlayerTracker implements Listener {
             return;
 
         Player player = (Player) event.getEntity();
-        PlayerData data = plugin.server().playerBy(player.getUniqueId());
+        Server server = plugin.server();
+        PlayerData data = server.playerBy(player.getUniqueId());
 
         if (data == null)
             return;
@@ -78,7 +78,7 @@ public class PlayerTracker implements Listener {
         data.setHealth(player.getHealth());
         data.setMaxHealth(player.getMaxHealth());
 
-        updatePlayer(data);
+        updatePlayer(server, data);
     }
 
     @EventHandler
