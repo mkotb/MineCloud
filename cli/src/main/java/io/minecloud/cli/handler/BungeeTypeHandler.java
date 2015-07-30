@@ -87,10 +87,35 @@ public class BungeeTypeHandler extends AbstractHandler {
 
         List<Plugin> plugins = type.plugins();
 
-        plugins.add(new Plugin(pluginType, version));
+        plugins.add(new Plugin(pluginType, version, null));
         type.setPlugins(plugins);
 
         return "Successfully added " + pluginName + "v" + version;
+    }
+
+    @Command
+    public String setPluginConfig(@Param(name = "plugin-name") String pluginName, @Param(name = "config") String config) {
+        PluginType pluginType = MineCloud.instance().mongo()
+                .repositoryBy(PluginType.class)
+                .findFirst(pluginName);
+
+        if (pluginType == null) {
+            return "No found plugin by the name of " + pluginName;
+        }
+
+        if (!pluginType.configs().contains(config)) {
+            return "No configs by the name of " + config + " was found!";
+        }
+
+        if (type.plugins() == null || !type.plugins().stream().anyMatch((p) -> p.name().equalsIgnoreCase(pluginName))) {
+            return pluginName + " has not been added through add-plugin!";
+        }
+
+        type.plugins().stream()
+                .filter((p) -> p.name().equalsIgnoreCase(pluginName))
+                .findFirst().get()
+                .setConfig(config);
+        return "Successfully set config version to " + config;
     }
 
     @Command
