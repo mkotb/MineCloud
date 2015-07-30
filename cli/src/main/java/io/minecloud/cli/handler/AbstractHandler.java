@@ -50,21 +50,20 @@ public abstract class AbstractHandler {
         }
     }
 
-    public String optionPrompt(String... optins) {
-        List<String> options = Arrays.asList(optins);
-
+    public String optionPrompt(List<String> options) {
         System.out.println("Available options: (enter number)");
 
         for (int i = 0; i < options.size(); i++) {
             System.out.println(i + ": " + options.get(i));
         }
 
+        System.out.print("Chosen option: ");
         int option = new Scanner(System.in).nextInt();
 
         if (option < 0 || option >= options.size()) {
             System.out.println("\nInvalid option! Trying again...\n\n");
 
-            optionPrompt(optins);
+            optionPrompt(options);
         }
 
         return options.get(option);
@@ -80,7 +79,13 @@ public abstract class AbstractHandler {
         StringBuilder builder = new StringBuilder();
 
         for (Plugin plugin : plugins) {
-            builder.append(plugin.name()).append("(v").append(plugin.version()).append("), ");
+            builder.append(plugin.name()).append("(v").append(plugin.version());
+
+            if (plugin.config() != null) {
+                builder.append(", ").append(plugin.config());
+            }
+
+            builder.append("), ");
         }
 
         String toReturn = builder.toString().trim();

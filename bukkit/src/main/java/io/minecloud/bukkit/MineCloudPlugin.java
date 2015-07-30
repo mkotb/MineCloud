@@ -125,7 +125,7 @@ public class MineCloudPlugin extends JavaPlugin {
             }
 
             File configs = new File("/mnt/minecloud/configs/",
-                    pluginType.name() + "/" + version);
+                    pluginType.name() + "/" + (plugin.config() == null ? version : plugin.config()));
             File configContainer = new File("nplugins/" + pluginType.name());
 
             if (!validateFolder(configs, pluginType, version))

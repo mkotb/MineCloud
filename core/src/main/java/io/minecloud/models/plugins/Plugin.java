@@ -28,6 +28,8 @@ public class Plugin {
     private PluginType type;
     @Setter
     private String version;
+    @Setter
+    private String config;
 
     public Plugin() {
     }
@@ -38,6 +40,10 @@ public class Plugin {
 
     public String version() {
         return version;
+    }
+
+    public String config() {
+        return config;
     }
 
     public String name() {

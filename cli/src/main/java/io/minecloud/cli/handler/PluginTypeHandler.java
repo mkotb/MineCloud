@@ -23,6 +23,7 @@ import io.minecloud.models.plugins.PluginType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PluginTypeHandler extends AbstractHandler {
     PluginType type;
@@ -81,6 +82,66 @@ public class PluginTypeHandler extends AbstractHandler {
         return "Successfully added " + configName + " as a config name";
     }
 
+    @Command(name = "remove-version", abbrev = "rv")
+    public String removeVersion(@Param(name = "version-name") String version) {
+        if (type.versions() == null) {
+            return "There are currently no versions!";
+        }
+
+        List<String> versions = type.versions();
+
+        if (version.contains(version)) {
+            versions.remove(version);
+            type.setVersions(versions);
+
+            return "Successfully removed " + version;
+        }
+
+        List<String> available = versions.stream()
+                .filter((s) -> s.startsWith(version))
+                .collect(Collectors.toList());
+
+        if (available.isEmpty()) {
+            return "No versions were found by the name of " + version;
+        }
+
+        if (available.size() == 1) {
+            return removeVersion(available.get(0));
+        }
+
+        return removeVersion(optionPrompt(available));
+    }
+
+    @Command(name = "remove-config", abbrev = "rc")
+    public String removeConfig(@Param(name = "config-name") String config) {
+        if (type.configs() == null) {
+            return "There are currently no configs!";
+        }
+
+        List<String> configs = type.configs();
+
+        if (configs.contains(config)) {
+            configs.remove(config);
+            type.setVersions(configs);
+
+            return "Successfully removed " + config;
+        }
+
+        List<String> available = configs.stream()
+                .filter((s) -> s.startsWith(config))
+                .collect(Collectors.toList());
+
+        if (available.isEmpty()) {
+            return "No configs were found by the name of " + config;
+        }
+
+        if (available.size() == 1) {
+            return removeConfig(available.get(0));
+        }
+
+        return removeConfig(optionPrompt(available));
+    }
+
     @Command
     public String push() {
         if (type.type() == null) {
@@ -101,7 +162,6 @@ public class PluginTypeHandler extends AbstractHandler {
         list.add("Listing Specifications...");
         list.add("- Server Type: " + type.type().name());
         list.add("- Versions: " + formatStringList(type.versions()));
-        list.add("- Configs: " + formatStringList(type.configs()));
         list.add("===========================================");
         list.add("If you're ready to go, type 'push'.");
         return list;
