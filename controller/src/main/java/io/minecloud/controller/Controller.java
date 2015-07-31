@@ -210,6 +210,8 @@ public class Controller {
                     isPreferredNode(node, selectedNode, preferredNode)) {
                 selectedNode = node;
                 System.out.println("chose " + selectedNode.name() + " because hits threshold and is preferred");
+            } else {
+                System.out.println("not choosing " + node.name() + " " + ramDifference);
             }
         }
 
