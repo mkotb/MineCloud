@@ -27,6 +27,7 @@ import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
 import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerMetadata;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.World;
 import io.minecloud.models.server.type.ServerType;
@@ -43,7 +44,7 @@ public final class Deployer {
 
     private Deployer() {}
 
-    public static void deployServer(Network network, ServerType type) {
+    public static void deployServer(Network network, ServerType type, List<ServerMetadata> metadata) {
         ServerRepository repository = MineCloud.instance().mongo().repositoryBy(Server.class);
         Server server = new Server();
 
@@ -56,6 +57,7 @@ public final class Deployer {
         server.setPort(-1);
         server.setContainerId(server.type().name() + server.number());
         server.setId(server.containerId());
+        server.setMetadata(metadata);
 
         repository.save(server);
 

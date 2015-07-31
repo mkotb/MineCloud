@@ -166,6 +166,7 @@ public class Controller {
             os.writeString(node.name());
             os.writeString(network.name());
             os.writeString(type.name());
+            os.writeVarInt32(0); // no metadata encoded
         } catch (IOException e) {
             MineCloud.logger().log(Level.SEVERE, "Encountered an odd exception whilst encoding a message", e);
             return;
