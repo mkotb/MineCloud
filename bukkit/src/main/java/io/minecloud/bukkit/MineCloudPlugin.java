@@ -128,8 +128,6 @@ public class MineCloudPlugin extends JavaPlugin {
                     pluginType.name() + "/" + (plugin.config() == null ? version : plugin.config()));
             File configContainer = new File("nplugins/" + pluginType.name());
 
-            getLogger().info("using " + configs.getAbsolutePath() + " as folder: " + version + "," + plugin.config());
-
             if (!validateFolder(configs, pluginType, version))
                 copyFolder(configs, configContainer);
         });
