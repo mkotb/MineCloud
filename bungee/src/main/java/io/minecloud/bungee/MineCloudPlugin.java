@@ -150,6 +150,7 @@ public class MineCloudPlugin extends Plugin {
                     .field("network").equal(bungee().network()))
                     .asList();
 
+            servers.removeIf((s) -> s.port() == -1);
             servers.removeIf((s) -> !s.type().defaultServer());
             servers.forEach(this::addServer);
 
