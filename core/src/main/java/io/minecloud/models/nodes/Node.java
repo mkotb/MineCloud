@@ -17,6 +17,7 @@ package io.minecloud.models.nodes;
 
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.MongoEntity;
+import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.server.Server;
 import lombok.EqualsAndHashCode;
@@ -24,6 +25,7 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Reference;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,6 +80,26 @@ public class Node extends MongoEntity {
         }
 
         return coreMetadata.get(core).usage();
+    }
+
+    public double allocatedRam() {
+        Collection<Server> servers = MineCloud.instance().mongo()
+                .repositoryBy(Server.class)
+                .findAll((server) -> server.node().name().equals(name()));
+        Collection<Bungee> bungees = MineCloud.instance().mongo()
+                .repositoryBy(Bungee.class)
+                .findAll((bungee) -> bungee.node().name().equals(name()));
+        int ramUsed = 0;
+
+        for (Server server : servers) {
+            ramUsed += server.type().dedicatedRam();
+        }
+
+        for (Bungee bungee : bungees) {
+            ramUsed += bungee.type().dedicatedRam();
+        }
+
+        return type.ram() - ramUsed;
     }
 
     public double availableRam() {

@@ -92,7 +92,13 @@ public class Controller {
 
                             if (newServers > 0) {
                                 IntStream.range(0, newServers)
-                                        .forEach((i) -> deployServer(network, metadata.type()));
+                                        .forEach((i) -> {
+                                            try {
+                                                Thread.sleep(200L);
+                                            } catch (InterruptedException ignored) {}
+
+                                            deployServer(network, metadata.type());
+                                        });
                             }
                         });
                     });
@@ -197,7 +203,10 @@ public class Controller {
         Node selectedNode = null;
 
         for (Node node : network.nodes()) {
-            if (selectedNode == null && node.availableRam() >= requiredRam) {
+            double nodeAllocated = node.allocatedRam();
+            double selectedNodeAllocated = selectedNode == null ? 0 : selectedNode.allocatedRam();
+
+            if (selectedNode == null && nodeAllocated >= requiredRam) {
                 selectedNode = node;
                 continue;
             }
@@ -206,7 +215,7 @@ public class Controller {
                 continue;
             }
 
-            double ramDifference = node.availableRam() - selectedNode.availableRam();
+            double ramDifference = nodeAllocated - selectedNodeAllocated;
 
             if (ramDifference > 0) {
                 double usageDifference = selectedNode.totalUsage() - node.totalUsage();
