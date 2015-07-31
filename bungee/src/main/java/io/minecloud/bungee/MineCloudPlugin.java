@@ -98,7 +98,18 @@ public class MineCloudPlugin extends Plugin {
                         return;
                     }
 
-                    ServerInfo info = getProxy().getServerInfo(stream.readString());
+                    String name = stream.readString();
+                    ServerInfo info = getProxy().getServerInfo(name);
+
+                    if (info == null) {
+                        ServerRepository repository = mongo.repositoryBy(Server.class);
+                        Server server = repository.findOne("_id", name);
+
+                        if (server != null) {
+                            addServer(server);
+                            info = getProxy().getServerInfo(name);
+                        }
+                    }
 
                     player.connect(info);
                 }));
