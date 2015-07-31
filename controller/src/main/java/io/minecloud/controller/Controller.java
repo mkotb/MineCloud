@@ -172,7 +172,8 @@ public class Controller {
             return;
         }
 
-        MineCloud.logger().info("Sent deploy message to " + node.name() + " for server type " + type.name());
+        MineCloud.logger().info("Sent deploy message to " + node.name() + " for server type " + type.name() +
+                " on " + network.name());
         redis.channelBy("server-create").publish(os.toMessage());
     }
 
@@ -182,12 +183,10 @@ public class Controller {
         for (Node node : network.nodes()) {
             if (selectedNode == null && node.availableRam() >= requiredRam) {
                 selectedNode = node;
-                System.out.println("selectedNode is null, " + node.name());
                 continue;
             }
 
             if (selectedNode == null) {
-                System.out.println("selectedNode is null and current node can't fit");
                 continue;
             }
 
@@ -198,20 +197,14 @@ public class Controller {
 
                 if (usageDifference > 0) {
                     selectedNode = node;
-                    System.out.println("chose " + selectedNode.name() +
-                            " because of less ram and CPU usage");
-                } else if (usageDifference >= -125 &&
-                        isPreferredNode(node, selectedNode, preferredNode)) {
+                } else if (ramDifference >= nodeMemoryThreshold(selectedNode) ||
+                        ramDifference >= (requiredRam * 1.5) ||
+                        (usageDifference >= -125 && isPreferredNode(node, selectedNode, preferredNode))) {
                     selectedNode = node;
-                    System.out.println("chose " + selectedNode.name() +
-                            " because less ram and is preferred node");
                 }
             } else if (ramDifference >= -nodeMemoryThreshold(node) &&
                     isPreferredNode(node, selectedNode, preferredNode)) {
                 selectedNode = node;
-                System.out.println("chose " + selectedNode.name() + " because hits threshold and is preferred");
-            } else {
-                System.out.println("not choosing " + node.name() + " " + ramDifference);
             }
         }
 
