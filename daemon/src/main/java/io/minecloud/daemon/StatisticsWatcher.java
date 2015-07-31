@@ -113,10 +113,10 @@ public class StatisticsWatcher extends Thread {
 
             Collection<Server> servers = MineCloud.instance().mongo()
                     .repositoryBy(Server.class)
-                    .findAll((server) -> server.node().equals(node));
+                    .findAll((server) -> server.node().name().equals(node.name()));
             Collection<Bungee> bungees = MineCloud.instance().mongo()
                     .repositoryBy(Bungee.class)
-                    .findAll((bungee) -> bungee.node().equals(node));
+                    .findAll((bungee) -> bungee.node().name().equals(node.name()));
             int ramUsed = 0;
 
             for (Server server : servers) {
