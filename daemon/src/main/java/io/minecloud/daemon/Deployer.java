@@ -59,16 +59,18 @@ public final class Deployer {
 
         repository.save(server);
 
-        boolean deployed = true;
+        new Thread(() -> {
+            boolean deployed = true;
 
-        for (int i = 0; i < 3 && !deployServer(server); i++) {
-            deployed = i != 2;
-        }
+            for (int i = 0; i < 3 && !deployServer(server); i++) {
+                deployed = i != 2;
+            }
 
-        if (!deployed) {
-            failedStart(network);
-            repository.deleteById(server.entityId());
-        }
+            if (!deployed) {
+                failedStart(network);
+                repository.deleteById(server.entityId());
+            }
+        }, server.name() + " creator").start();
     }
 
     public static boolean deployServer(Server server) {
