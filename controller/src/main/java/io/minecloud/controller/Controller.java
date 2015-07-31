@@ -21,6 +21,8 @@ import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
+import io.minecloud.models.bungee.Bungee;
+import io.minecloud.models.bungee.BungeeRepository;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
@@ -143,7 +145,21 @@ public class Controller {
 
     public void deployBungee(Network network, BungeeType type) {
         MessageOutputStream os = new MessageOutputStream();
-        Node node = findNode(network, type.preferredNode(), type.dedicatedRam());
+        BungeeRepository bungeeRepo = mongo.repositoryBy(Bungee.class);
+        Node node = null;
+
+        for (Node nextNode : network.nodes()) {
+            if (bungeeRepo.find(bungeeRepo.createQuery()
+                    .field("node").equal(nextNode)).get() == null) {
+                node = nextNode;
+                break;
+            }
+        }
+
+        if (node == null) {
+            MineCloud.logger().info("Not deploying bungee, no node to deploy to");
+            return;
+        }
 
         try {
             os.writeString(node.name());
