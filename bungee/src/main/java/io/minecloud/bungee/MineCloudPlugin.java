@@ -204,7 +204,6 @@ public class MineCloudPlugin extends Plugin {
                     .asList();
 
             servers.removeIf((s) -> s.port() == -1);
-            servers.removeIf((s) -> !s.type().defaultServer());
             servers.forEach(this::addServer);
 
             getProxy().setReconnectHandler(new ReconnectHandler(this));
