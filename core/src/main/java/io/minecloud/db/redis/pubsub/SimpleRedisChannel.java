@@ -15,6 +15,7 @@
  */
 package io.minecloud.db.redis.pubsub;
 
+import io.minecloud.MineCloudException;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.Message;
 
@@ -51,8 +52,8 @@ public class SimpleRedisChannel extends RedisChannel {
         callbacks.forEach((c) -> {
             try {
                 c.call(message);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                new MineCloudException(ex).printStackTrace();
             }
         });
     }
