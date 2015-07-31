@@ -144,20 +144,6 @@ public class MineCloudPlugin extends Plugin {
                     player.connect(info);
                 }));
 
-        getProxy().getScheduler().schedule(this, () -> {
-            ServerRepository repository = mongo.repositoryBy(Server.class);
-            List<Server> servers = repository.find(repository.createQuery()
-                    .field("network").equal(bungee().network()))
-                    .asList();
-
-            servers.removeIf((s) -> s.port() == -1);
-            servers.removeIf((s) -> !s.type().defaultServer());
-            servers.forEach(this::addServer);
-
-            getProxy().setReconnectHandler(new ReconnectHandler(this));
-            getProxy().getPluginManager().registerListener(this, new MineCloudListener(this));
-        }, 0, TimeUnit.SECONDS);
-
         getProxy().getScheduler().schedule(this, () -> getProxy().getScheduler().runAsync(this, () -> {
             Bungee bungee = bungee();
 
@@ -211,20 +197,34 @@ public class MineCloudPlugin extends Plugin {
                 copyFolder(configs, configContainer);
         });
 
-        // release plugin manager lock
-        try {
-            Field f = PluginManager.class.getDeclaredField("toLoad");
+        getProxy().getScheduler().schedule(this, () -> {
+            ServerRepository repository = mongo.repositoryBy(Server.class);
+            List<Server> servers = repository.find(repository.createQuery()
+                    .field("network").equal(bungee().network()))
+                    .asList();
 
-            f.setAccessible(true);
-            f.set(getProxy().getPluginManager(), new HashMap<>());
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {
-        }
+            servers.removeIf((s) -> s.port() == -1);
+            servers.removeIf((s) -> !s.type().defaultServer());
+            servers.forEach(this::addServer);
 
-        getProxy().getPluginManager().detectPlugins(nContainer);
-        getProxy().getPluginManager().loadPlugins();
-        getProxy().getPluginManager().getPlugins().stream()
-                .filter((p) -> !p.getDescription().getName().equals("MineCloud-Bungee"))
-                .forEach(Plugin::onEnable);
+            getProxy().setReconnectHandler(new ReconnectHandler(this));
+            getProxy().getPluginManager().registerListener(this, new MineCloudListener(this));
+
+            // release plugin manager lock
+            try {
+                Field f = PluginManager.class.getDeclaredField("toLoad");
+
+                f.setAccessible(true);
+                f.set(getProxy().getPluginManager(), new HashMap<>());
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
+
+            getProxy().getPluginManager().detectPlugins(nContainer);
+            getProxy().getPluginManager().loadPlugins();
+            getProxy().getPluginManager().getPlugins().stream()
+                    .filter((p) -> !p.getDescription().getName().equals("MineCloud-Bungee"))
+                    .forEach(Plugin::onEnable);
+        }, 0, TimeUnit.SECONDS);
     }
 
     @Override
