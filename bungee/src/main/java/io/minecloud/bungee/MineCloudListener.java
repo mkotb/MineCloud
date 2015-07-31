@@ -41,7 +41,7 @@ public class MineCloudListener implements Listener {
             return;
 
         Collection<Server> servers = plugin.mongo.repositoryBy(Server.class)
-                .findAll((s) -> s.network().equals(bungee.network()));
+                .findAll((s) -> s.network().name().equals(bungee.network().name()));
 
         int online = 0;
         int max = 0;
