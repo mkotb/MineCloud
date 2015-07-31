@@ -206,7 +206,7 @@ public class Controller {
             double nodeAllocated = node.allocatedRam();
             double selectedNodeAllocated = selectedNode == null ? 0 : selectedNode.allocatedRam();
 
-            if (selectedNode == null && nodeAllocated >= requiredRam) {
+            if (selectedNode == null && node.availableRam() >= requiredRam) {
                 selectedNode = node;
                 continue;
             }
