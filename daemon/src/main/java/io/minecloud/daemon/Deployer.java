@@ -57,16 +57,17 @@ public final class Deployer {
         server.setContainerId(server.type().name() + server.number());
         server.setId(server.containerId());
 
+        repository.save(server);
+
         boolean deployed = true;
 
         for (int i = 0; i < 3 && !deployServer(server); i++) {
             deployed = i != 2;
         }
 
-        if (deployed) {
-            repository.save(server);
-        } else {
+        if (!deployed) {
             failedStart(network);
+            repository.deleteById(server.entityId());
         }
     }
 

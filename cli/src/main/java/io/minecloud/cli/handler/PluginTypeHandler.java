@@ -162,6 +162,7 @@ public class PluginTypeHandler extends AbstractHandler {
         list.add("Listing Specifications...");
         list.add("- Server Type: " + type.type().name());
         list.add("- Versions: " + formatStringList(type.versions()));
+        list.add("- Configs: " + formatStringList(type.configs()));
         list.add("===========================================");
         list.add("If you're ready to go, type 'push'.");
         return list;
