@@ -182,28 +182,34 @@ public class Controller {
         for (Node node : network.nodes()) {
             if (selectedNode == null && node.availableRam() >= requiredRam) {
                 selectedNode = node;
+                System.out.println("selectedNode is null, " + node.name());
                 continue;
             }
 
             if (selectedNode == null) {
+                System.out.println("selectedNode is null and current node can't fit");
                 continue;
             }
 
-            // TODO allow plugins to interfere with this process
-            double usageDifference = selectedNode.totalUsage() - node.totalUsage();
+            double ramDifference = node.availableRam() - selectedNode.availableRam();
 
-            if (usageDifference > 0) {
-                double ramDifference = node.availableRam() - selectedNode.availableRam();
+            if (ramDifference > 0) {
+                double usageDifference = selectedNode.totalUsage() - node.totalUsage();
 
-                if (ramDifference > 0) {
+                if (usageDifference > 0) {
                     selectedNode = node;
-                } else if (ramDifference >= -nodeMemoryThreshold(node) &&
+                    System.out.println("chose " + selectedNode.name() +
+                            " because of less ram and CPU usage");
+                } else if (usageDifference >= -125 &&
                         isPreferredNode(node, selectedNode, preferredNode)) {
                     selectedNode = node;
+                    System.out.println("chose " + selectedNode.name() +
+                            " because less ram and is preferred node");
                 }
-            } else if (usageDifference >= -200 && // TODO configurable threshold
+            } else if (ramDifference >= -nodeMemoryThreshold(node) &&
                     isPreferredNode(node, selectedNode, preferredNode)) {
                 selectedNode = node;
+                System.out.println("chose " + selectedNode.name() + " because hits threshold and is preferred");
             }
         }
 
@@ -211,7 +217,7 @@ public class Controller {
     }
 
     private double nodeMemoryThreshold(Node node) {
-        return (node.availableRam() / (node.serverCount() + 1)); // TODO configurable
+        return (node.availableRam() / (node.serverCount() + 1));
     }
 
     private boolean isPreferredNode(Node node, Node currentNode, NodeType preferred) {
