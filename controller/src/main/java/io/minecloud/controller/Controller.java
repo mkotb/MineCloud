@@ -213,8 +213,7 @@ public class Controller {
 
                 if (usageDifference > 0) {
                     selectedNode = node;
-                } else if (ramDifference >= nodeMemoryThreshold(selectedNode) ||
-                        ramDifference >= (requiredRam * 1.5) ||
+                } else if (ramDifference >= (requiredRam * 1.5) ||
                         (usageDifference >= -125 && isPreferredNode(node, selectedNode, preferredNode))) {
                     selectedNode = node;
                 }
