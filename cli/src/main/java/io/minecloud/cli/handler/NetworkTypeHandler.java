@@ -133,7 +133,9 @@ public class NetworkTypeHandler extends AbstractHandler {
             return bungee + " is not on the network";
         }
 
-        bungeeTypes.remove(bungeeType);
+        bungeeTypes.keySet().stream()
+                .filter((bt) -> bt.name().equalsIgnoreCase(bungeeType.name()))
+                .forEach(bungeeTypes::remove);
         return bungee + " has been removed from the network!";
     }
 
