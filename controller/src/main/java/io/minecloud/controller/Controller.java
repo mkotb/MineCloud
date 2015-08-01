@@ -34,6 +34,7 @@ import io.minecloud.models.server.type.ServerType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -42,6 +43,7 @@ import java.util.stream.IntStream;
 public class Controller {
     private static Controller instance;
 
+    private final List<String> nodesUsed = new ArrayList<>();
     private final RedisDatabase redis;
     private final MongoDatabase mongo;
 
@@ -55,9 +57,10 @@ public class Controller {
         redis.addChannel(SimpleRedisChannel.create("server-create", redis));
 
         while (!Thread.currentThread().isInterrupted()) {
+            nodesUsed.clear();
+
             mongo.repositoryBy(Network.class).models()
                     .forEach((network) -> {
-
                         network.bungeeMetadata().forEach((type, amount) -> {
                             int difference = amount - network.bungeesOnline(type);
 
@@ -156,7 +159,8 @@ public class Controller {
 
         for (Node nextNode : network.nodes()) {
             if (bungeeRepo.find(bungeeRepo.createQuery()
-                    .field("node").equal(nextNode)).get() == null) {
+                    .field("node").equal(nextNode)).get() == null &&
+                    !nodesUsed.contains(nextNode.name())) {
                 node = nextNode;
                 break;
             }
@@ -166,6 +170,8 @@ public class Controller {
             MineCloud.logger().info("Not deploying bungee, no node to deploy to");
             return;
         }
+
+        nodesUsed.add(node.name());
 
         try {
             os.writeString(node.name());
