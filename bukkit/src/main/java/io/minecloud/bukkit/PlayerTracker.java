@@ -43,6 +43,7 @@ public class PlayerTracker implements Listener {
         onlinePlayers.set(onlinePlayers.lastIndexOf(data), data);
         server.setOnlinePlayers(onlinePlayers);
 
+        plugin.cleanUp(server);
         plugin.mongo().repositoryBy(Server.class).save(server);
     }
 
@@ -62,6 +63,7 @@ public class PlayerTracker implements Listener {
             onlinePlayers.add(data);
 
             server.setOnlinePlayers(onlinePlayers);
+            plugin.cleanUp(server);
             plugin.mongo().repositoryBy(Server.class).save(server);
         });
     }

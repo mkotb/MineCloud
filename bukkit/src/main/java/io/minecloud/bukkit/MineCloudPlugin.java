@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class MineCloudPlugin extends JavaPlugin {
@@ -67,6 +68,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
                 server.setTps(fetchTps());
+                cleanUp(server);
 
                 mongo.repositoryBy(Server.class).save(server);
             }
@@ -216,6 +218,12 @@ public class MineCloudPlugin extends JavaPlugin {
         } catch (IOException ex) {
             ex.printStackTrace(); // almost impossible to happen
         }
+    }
+
+    public void cleanUp(Server server) {
+        new ArrayList<>(server.onlinePlayers()).stream()
+                .filter((pd) -> Bukkit.getPlayer(pd.name()) == null)
+                .forEach((pd) -> server.removePlayer(UUID.fromString(pd.uuid())));
     }
 
     public Server server() {
