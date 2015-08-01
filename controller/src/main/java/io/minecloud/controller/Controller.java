@@ -87,10 +87,17 @@ public class Controller {
 
                             if (onlinePlayers > (space * 0.75)) {
                                 newServers += (int) Math.round(onlinePlayers / (space * 0.75)) + 1;
+                                System.out.println("onlinePlayers is over 75% of space, " +
+                                        onlinePlayers + ";" + space + ";" + newServers);
+                            } else {
+                                System.out.println("onlinePlayers is less than 75% of space, " +
+                                        onlinePlayers + ";" + space + ";" + metadata.type().maxPlayers());
                             }
 
                             if ((newServers + servers.size()) > metadata.maximumAmount()) {
                                 newServers = metadata.maximumAmount() - servers.size();
+                                System.out.println("newServers + onlineServers is greater than the max amount, " +
+                                        "bringing newServers down to " + newServers);
                             }
 
                             if (newServers > 0) {
@@ -98,7 +105,8 @@ public class Controller {
                                         .forEach((i) -> {
                                             try {
                                                 Thread.sleep(200L);
-                                            } catch (InterruptedException ignored) {}
+                                            } catch (InterruptedException ignored) {
+                                            }
 
                                             deployServer(network, metadata.type());
                                         });
