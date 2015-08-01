@@ -34,12 +34,12 @@ import org.bukkit.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 public class MineCloudPlugin extends JavaPlugin {
-    private TPSTracker tracker;
     private MongoDatabase mongo;
     private RedisDatabase redis;
     private String serverId;
@@ -51,9 +51,6 @@ public class MineCloudPlugin extends JavaPlugin {
         serverId = System.getenv("server_id");
         mongo = MineCloud.instance().mongo();
         redis = MineCloud.instance().redis();
-        tracker = new TPSTracker();
-
-        tracker.runTaskTimer(this, 0, 1);
 
         new BukkitRunnable() {
             @Override
@@ -69,10 +66,7 @@ public class MineCloudPlugin extends JavaPlugin {
                 Runtime runtime = Runtime.getRuntime();
 
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
-
-                synchronized (tracker) {
-                    server.setTps(tracker.fetchTps());
-                }
+                server.setTps(fetchTps());
 
                 mongo.repositoryBy(Server.class).save(server);
             }
@@ -146,6 +140,19 @@ public class MineCloudPlugin extends JavaPlugin {
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Unable to publish server create message, shutting down", e);
             Bukkit.shutdown();
+        }
+    }
+
+    public double fetchTps() {
+        try {
+            org.bukkit.Server server = Bukkit.getServer();
+            Object minecraftServer = server.getClass().getDeclaredMethod("getServer").invoke(server);
+            Field tps = minecraftServer.getClass().getField("recentTps");
+
+            return ((double[]) tps.get(minecraftServer))[0];
+        } catch (Exception ex) {
+            getLogger().log(Level.SEVERE, "Could not fetch TPS", ex);
+            return 21;
         }
     }
     
