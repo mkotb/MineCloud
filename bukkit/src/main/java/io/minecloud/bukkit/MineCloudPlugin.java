@@ -21,12 +21,14 @@ import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
+import io.minecloud.models.player.PlayerData;
 import io.minecloud.models.plugins.PluginType;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.World;
 import io.minecloud.models.server.type.ServerType;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -224,6 +226,21 @@ public class MineCloudPlugin extends JavaPlugin {
         new ArrayList<>(server.onlinePlayers()).stream()
                 .filter((pd) -> Bukkit.getPlayer(pd.name()) == null)
                 .forEach((pd) -> server.removePlayer(UUID.fromString(pd.uuid())));
+
+        Bukkit.getOnlinePlayers().stream()
+                .filter((player) -> server.playerBy(player.getUniqueId()) == null)
+                .forEach((player) -> {
+                    List<PlayerData> onlinePlayers = server.onlinePlayers();
+                    PlayerData data = new PlayerData();
+
+                    data.setHealth(player.getHealth());
+                    data.setMaxHealth(player.getMaxHealth());
+                    data.setName(player.getName());
+                    data.setId(player.getUniqueId().toString());
+
+                    onlinePlayers.add(data);
+                    server.setOnlinePlayers(onlinePlayers);
+                });
     }
 
     public Server server() {
