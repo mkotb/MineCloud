@@ -134,15 +134,9 @@ public final class Deployer {
     }
 
     public static void deployBungee(Network network, BungeeType type) {
-        boolean deployed = true;
         Bungee bungee;
 
         for (int i = 0; i < 3 && ((bungee = deployBungeeCord(network, type)) == null || bungee.network() == null); i++) {
-            deployed = i != 2;
-        }
-
-        if (!deployed) {
-            failedStart(network);
         }
     }
 
