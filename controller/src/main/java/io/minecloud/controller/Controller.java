@@ -73,7 +73,6 @@ public class Controller {
                         network.serverMetadata().forEach((metadata) -> {
                             int serversOnline = network.serversOnline(metadata.type());
 
-                            int newServers = metadata.minimumAmount() - serversOnline;
                             int space = metadata.type().maxPlayers() * serversOnline;
                             ServerRepository repository = mongo.repositoryBy(Server.class);
 
@@ -84,27 +83,20 @@ public class Controller {
                             int onlinePlayers = servers.stream()
                                     .flatMapToInt((s) -> IntStream.of(s.onlinePlayers().size()))
                                     .sum();
+                            int scaledServers = onlinePlayers > (space * 0.75) ?
+                                    (int) Math.floor(onlinePlayers / (space * 0.75)) + 1 :
+                                    0;
+                            int requiredServers = metadata.minimumAmount() - serversOnline;
 
-                            if (onlinePlayers > (space * 0.75)) {
-                                int toAdd = (int) Math.floor(onlinePlayers / (space * 0.75));
-                                newServers += toAdd;
-                                newServers++;
-
-                                System.out.println("onlinePlayers is over 75% of space, " +
-                                        onlinePlayers + ";" + space + ";" + newServers + ";" + toAdd);
-                            } else {
-                                System.out.println("onlinePlayers is less than 75% of space, " +
-                                        onlinePlayers + ";" + space + ";" + metadata.type().maxPlayers());
+                            if ((scaledServers + requiredServers + servers.size()) > metadata.maximumAmount()) {
+                                requiredServers = metadata.maximumAmount() - servers.size();
+                                scaledServers = 0;
+                                System.out.println("requiredServers + onlineServers is greater than the max amount, " +
+                                        "bringing requiredServers down to " + requiredServers);
                             }
 
-                            if ((newServers + servers.size()) > metadata.maximumAmount()) {
-                                newServers = metadata.maximumAmount() - servers.size();
-                                System.out.println("newServers + onlineServers is greater than the max amount, " +
-                                        "bringing newServers down to " + newServers);
-                            }
-
-                            if (newServers > 0) {
-                                IntStream.range(0, newServers)
+                            if (requiredServers > 0 || scaledServers > 0) {
+                                IntStream.range(0, requiredServers + scaledServers)
                                         .forEach((i) -> {
                                             try {
                                                 Thread.sleep(200L);
