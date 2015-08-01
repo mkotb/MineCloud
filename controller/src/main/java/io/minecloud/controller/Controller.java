@@ -86,9 +86,12 @@ public class Controller {
                                     .sum();
 
                             if (onlinePlayers > (space * 0.75)) {
-                                newServers += (int) Math.round(onlinePlayers / (space * 0.75)) + 1;
+                                int toAdd = (int) Math.floor(onlinePlayers / (space * 0.75));
+                                newServers += toAdd;
+                                newServers++;
+
                                 System.out.println("onlinePlayers is over 75% of space, " +
-                                        onlinePlayers + ";" + space + ";" + newServers);
+                                        onlinePlayers + ";" + space + ";" + newServers + ";" + toAdd);
                             } else {
                                 System.out.println("onlinePlayers is less than 75% of space, " +
                                         onlinePlayers + ";" + space + ";" + metadata.type().maxPlayers());
