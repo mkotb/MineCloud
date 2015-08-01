@@ -88,6 +88,10 @@ public class Controller {
                                     0;
                             int requiredServers = metadata.minimumAmount() - serversOnline;
 
+                            System.out.println((onlinePlayers > (space * 0.75)) + ":" +
+                                    (Math.floor(onlinePlayers / (space * 0.75)) + 1) + ":" +
+                                    scaledServers);
+
                             if ((scaledServers + requiredServers + servers.size()) > metadata.maximumAmount()) {
                                 requiredServers = metadata.maximumAmount() - servers.size();
                                 scaledServers = 0;
