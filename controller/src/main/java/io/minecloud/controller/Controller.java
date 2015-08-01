@@ -88,15 +88,16 @@ public class Controller {
                                     0;
                             int requiredServers = metadata.minimumAmount() - serversOnline;
 
+                            if (requiredServers < 0) {
+                                requiredServers = 0;
+                            }
+
                             if ((scaledServers + requiredServers + servers.size()) > metadata.maximumAmount()) {
                                 requiredServers = metadata.maximumAmount() - servers.size();
                                 scaledServers = 0;
-                                System.out.println("requiredServers + onlineServers is greater than the max amount, " +
-                                        "bringing requiredServers down to " + requiredServers);
                             }
 
                             if (requiredServers > 0 || scaledServers > 0) {
-                                System.out.println("deploying " + (requiredServers + scaledServers) + " servers...");
                                 IntStream.range(0, requiredServers + scaledServers)
                                         .forEach((i) -> {
                                             try {
@@ -105,9 +106,7 @@ public class Controller {
                                             }
 
                                             deployServer(network, metadata.type());
-                                            System.out.println("sent for deploy");
                                         });
-                                System.out.println("deployed " + (requiredServers + scaledServers) + " servers...");
                             }
                         });
                     });
