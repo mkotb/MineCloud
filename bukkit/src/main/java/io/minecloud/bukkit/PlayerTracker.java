@@ -17,6 +17,7 @@ package io.minecloud.bukkit;
 
 import io.minecloud.models.player.PlayerData;
 import io.minecloud.models.server.Server;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,20 +48,22 @@ public class PlayerTracker implements Listener {
 
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
-        Server server = plugin.server();
-        List<PlayerData> onlinePlayers = server.onlinePlayers();
-        Player player = event.getPlayer();
-        PlayerData data = new PlayerData();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Server server = plugin.server();
+            List<PlayerData> onlinePlayers = server.onlinePlayers();
+            Player player = event.getPlayer();
+            PlayerData data = new PlayerData();
 
-        data.setHealth(player.getHealth());
-        data.setMaxHealth(player.getMaxHealth());
-        data.setName(player.getName());
-        data.setId(player.getUniqueId().toString());
+            data.setHealth(player.getHealth());
+            data.setMaxHealth(player.getMaxHealth());
+            data.setName(player.getName());
+            data.setId(player.getUniqueId().toString());
 
-        onlinePlayers.add(data);
+            onlinePlayers.add(data);
 
-        server.setOnlinePlayers(onlinePlayers);
-        plugin.mongo().repositoryBy(Server.class).save(server);
+            server.setOnlinePlayers(onlinePlayers);
+            plugin.mongo().repositoryBy(Server.class).save(server);
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -68,24 +71,28 @@ public class PlayerTracker implements Listener {
         if (event.getEntityType() != EntityType.PLAYER)
             return;
 
-        Player player = (Player) event.getEntity();
-        Server server = plugin.server();
-        PlayerData data = server.playerBy(player.getUniqueId());
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Player player = (Player) event.getEntity();
+            Server server = plugin.server();
+            PlayerData data = server.playerBy(player.getUniqueId());
 
-        if (data == null)
-            return;
+            if (data == null)
+                return;
 
-        data.setHealth(player.getHealth());
-        data.setMaxHealth(player.getMaxHealth());
+            data.setHealth(player.getHealth());
+            data.setMaxHealth(player.getMaxHealth());
 
-        updatePlayer(server, data);
+            updatePlayer(server, data);
+        });
     }
 
     @EventHandler
     public void playerQuit(PlayerQuitEvent event) {
-        Server server = plugin.server();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Server server = plugin.server();
 
-        server.removePlayer(event.getPlayer().getUniqueId());
-        plugin.mongo().repositoryBy(Server.class).save(server);
+            server.removePlayer(event.getPlayer().getUniqueId());
+            plugin.mongo().repositoryBy(Server.class).save(server);
+        });
     }
 }
