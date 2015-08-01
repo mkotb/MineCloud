@@ -77,8 +77,9 @@ public class MineCloudDaemon {
                     Network network = mongo.repositoryBy(Network.class).findFirst(stream.readString());
                     ServerType type = mongo.repositoryBy(ServerType.class).findFirst(stream.readString());
                     List<ServerMetadata> metadata = new ArrayList<>();
+                    int size = stream.readVarInt32();
 
-                    for (int i = 0; i < stream.readVarInt32(); i++) {
+                    for (int i = 0; i < size; i++) {
                         metadata.add(new ServerMetadata(stream.readString(), stream.readString()));
                     }
 
