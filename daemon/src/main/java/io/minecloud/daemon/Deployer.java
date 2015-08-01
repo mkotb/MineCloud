@@ -93,6 +93,7 @@ public final class Deployer {
                         .append("redis_password", new String(redisCreds.password()))
                         .append("SERVER_MOD", server.type().mod())
                         .append("DEDICATED_RAM", String.valueOf(server.type().dedicatedRam()))
+                        .append("MAX_PLAYERS", String.valueOf(server.type().maxPlayers()))
 
                         .append("server_id", server.entityId())
                         .append("DEFAULT_WORLD", defaultWorld.name())
