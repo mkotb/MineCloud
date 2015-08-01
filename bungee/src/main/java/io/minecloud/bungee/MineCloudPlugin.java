@@ -141,7 +141,7 @@ public class MineCloudPlugin extends Plugin {
                             .field("type").equal(type))
                             .asList();
 
-                    Collections.sort(servers, (a, b) -> b.onlinePlayers().size() - a.onlinePlayers().size());
+                    Collections.sort(servers, (a, b) -> a.onlinePlayers().size() - b.onlinePlayers().size());
 
                     Server server = servers.get(0);
                     ServerInfo info = getProxy().getServerInfo(server.name());
