@@ -74,7 +74,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
                 mongo.repositoryBy(Server.class).save(server);
             }
-        }.runTaskTimerAsynchronously(this, 0, 200);
+        }.runTaskTimerAsynchronously(this, 40, 200);
 
         redis.addChannel(SimpleRedisChannel.create("server-start-notif", redis));
         redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis));
