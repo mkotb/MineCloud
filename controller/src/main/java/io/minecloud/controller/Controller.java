@@ -70,6 +70,10 @@ public class Controller {
                             }
                         });
 
+                        network.servers().stream()
+                                .filter((server) -> server.ramUsage() != -1 && server.port() == -1)
+                                .forEach((server) -> mongo.repositoryBy(Server.class).delete(server));
+
                         network.serverMetadata().forEach((metadata) -> {
                             int serversOnline = network.serversOnline(metadata.type());
 
