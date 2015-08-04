@@ -16,6 +16,8 @@
 package io.minecloud.models.nodes;
 
 import io.minecloud.db.mongo.AbstractMongoRepository;
+import io.minecloud.models.network.Network;
+import io.minecloud.models.nodes.type.NodeType;
 import org.mongodb.morphia.Datastore;
 
 public class NodeRepository extends AbstractMongoRepository<Node> {
@@ -29,5 +31,49 @@ public class NodeRepository extends AbstractMongoRepository<Node> {
 
     public Node nodeBy(String name) {
         return findFirst((node) -> node.name().equalsIgnoreCase(name));
+    }
+
+    public Node findNode(Network network, NodeType preferredNode, int requiredRam) {
+        Node selectedNode = null;
+
+        for (Node node : network.nodes()) {
+            double nodeAllocated = node.allocatedRam();
+            double selectedNodeAllocated = selectedNode == null ? 0 : selectedNode.allocatedRam();
+
+            if (selectedNode == null && node.availableRam() >= requiredRam) {
+                selectedNode = node;
+                continue;
+            }
+
+            if (selectedNode == null) {
+                continue;
+            }
+
+            double ramDifference = nodeAllocated - selectedNodeAllocated;
+
+            if (ramDifference > 0) {
+                double usageDifference = selectedNode.totalUsage() - node.totalUsage();
+
+                if (usageDifference > 0) {
+                    selectedNode = node;
+                } else if (ramDifference >= (requiredRam * 1.5) ||
+                        (usageDifference >= -125 && isPreferredNode(node, selectedNode, preferredNode))) {
+                    selectedNode = node;
+                }
+            } else if (ramDifference >= -nodeMemoryThreshold(node) &&
+                    isPreferredNode(node, selectedNode, preferredNode)) {
+                selectedNode = node;
+            }
+        }
+
+        return selectedNode;
+    }
+
+    private double nodeMemoryThreshold(Node node) {
+        return (node.availableRam() / (node.serverCount() + 1));
+    }
+
+    private boolean isPreferredNode(Node node, Node currentNode, NodeType preferred) {
+        return node.type().equals(preferred) && !currentNode.type().equals(preferred);
     }
 }

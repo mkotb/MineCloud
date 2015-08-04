@@ -109,7 +109,9 @@ public class Controller {
                                             } catch (InterruptedException ignored) {
                                             }
 
-                                            deployServer(network, metadata.type());
+                                            ServerType type = metadata.type();
+                                            MineCloud.logger().info("Sent deploy message to " + network.deployServer(type).name() +
+                                                    " for server type " + type.name() + " on " + network.name());
                                         });
                             }
                         });
@@ -162,7 +164,6 @@ public class Controller {
     }
 
     public void deployBungee(Network network, BungeeType type) {
-        MessageOutputStream os = new MessageOutputStream();
         BungeeRepository bungeeRepo = mongo.repositoryBy(Bungee.class);
         Node node = null;
 
@@ -181,80 +182,6 @@ public class Controller {
         }
 
         nodesUsed.add(node.name());
-
-        try {
-            os.writeString(node.name());
-            os.writeString(network.name());
-            os.writeString(type.name());
-        } catch (IOException e) {
-            MineCloud.logger().log(Level.SEVERE, "Encountered an odd exception whilst encoding a message", e);
-            return;
-        }
-
-        MineCloud.logger().info("Sent deploy message to " + node.name() + " for bungee type " + type.name());
-        redis.channelBy("bungee-create").publish(os.toMessage());
-    }
-
-    public void deployServer(Network network, ServerType type) {
-        MessageOutputStream os = new MessageOutputStream();
-        Node node = findNode(network, type.preferredNode(), type.dedicatedRam());
-
-        try {
-            os.writeString(node.name());
-            os.writeString(network.name());
-            os.writeString(type.name());
-            os.writeVarInt32(0); // no metadata encoded
-        } catch (IOException e) {
-            MineCloud.logger().log(Level.SEVERE, "Encountered an odd exception whilst encoding a message", e);
-            return;
-        }
-
-        MineCloud.logger().info("Sent deploy message to " + node.name() + " for server type " + type.name() +
-                " on " + network.name());
-        redis.channelBy("server-create").publish(os.toMessage());
-    }
-
-    public Node findNode(Network network, NodeType preferredNode, int requiredRam) {
-        Node selectedNode = null;
-
-        for (Node node : network.nodes()) {
-            double nodeAllocated = node.allocatedRam();
-            double selectedNodeAllocated = selectedNode == null ? 0 : selectedNode.allocatedRam();
-
-            if (selectedNode == null && node.availableRam() >= requiredRam) {
-                selectedNode = node;
-                continue;
-            }
-
-            if (selectedNode == null) {
-                continue;
-            }
-
-            double ramDifference = nodeAllocated - selectedNodeAllocated;
-
-            if (ramDifference > 0) {
-                double usageDifference = selectedNode.totalUsage() - node.totalUsage();
-
-                if (usageDifference > 0) {
-                    selectedNode = node;
-                } else if (ramDifference >= (requiredRam * 1.5) ||
-                        (usageDifference >= -125 && isPreferredNode(node, selectedNode, preferredNode))) {
-                    selectedNode = node;
-                }
-            } else if (ramDifference >= -nodeMemoryThreshold(node) &&
-                    isPreferredNode(node, selectedNode, preferredNode)) {
-                selectedNode = node;
-            }
-        }
-
-        return selectedNode;
-    }
-
-    private double nodeMemoryThreshold(Node node) {
-        return (node.availableRam() / (node.serverCount() + 1));
-    }
-
-    private boolean isPreferredNode(Node node, Node currentNode, NodeType preferred) {
-        return node.type().equals(preferred) && !currentNode.type().equals(preferred);
+        network.deployBungee(type, node);
     }
 }

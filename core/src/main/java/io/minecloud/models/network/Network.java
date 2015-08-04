@@ -17,13 +17,16 @@ package io.minecloud.models.network;
 
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.model.MongoEntity;
+import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.BungeeRepository;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.bungee.type.BungeeTypeRepository;
 import io.minecloud.models.network.server.ServerNetworkMetadata;
 import io.minecloud.models.nodes.Node;
+import io.minecloud.models.nodes.NodeRepository;
 import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerMetadata;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import lombok.EqualsAndHashCode;
@@ -31,9 +34,11 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Reference;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 @Entity(value = "networks", noClassnameStored = true)
 @EqualsAndHashCode(callSuper = true)
@@ -46,6 +51,49 @@ public class Network extends MongoEntity {
     @Reference
     private List<Node> nodes;
 
+    public void deployBungee(BungeeType type, Node node) {
+        if (!bungees.containsKey(type.name())) {
+            throw new IllegalArgumentException("Cannot deploy " + type + " on network; is not a valid network bungee type!");
+        }
+
+        MessageOutputStream os = new MessageOutputStream();
+
+        try {
+            os.writeString(node.name());
+            os.writeString(name());
+            os.writeString(type.name());
+        } catch (IOException e) {
+            MineCloud.logger().log(Level.SEVERE, "Encountered an odd exception whilst encoding a message", e);
+            return;
+        }
+
+        MineCloud.instance().redis().channelBy("bungee-create").publish(os.toMessage());
+    }
+
+    public Node deployServer(ServerType type, ServerMetadata... metadata) {
+        NodeRepository nodeRepo = MineCloud.instance().mongo().repositoryBy(Node.class);
+        MessageOutputStream os = new MessageOutputStream();
+        Node node = nodeRepo.findNode(this, type.preferredNode(), type.dedicatedRam());
+
+        try {
+            os.writeString(node.name());
+            os.writeString(name());
+            os.writeString(type.name());
+            os.writeVarInt32(metadata.length);
+
+            for (ServerMetadata md : metadata) {
+                os.writeString(md.key());
+                os.writeString(md.value());
+            }
+        } catch (IOException e) {
+            MineCloud.logger().log(Level.SEVERE, "Encountered an odd exception whilst encoding a message", e);
+            return node;
+        }
+
+        MineCloud.instance().redis().channelBy("server-create").publish(os.toMessage());
+        return node;
+    }
+
     public String name() {
         return entityId();
     }
@@ -56,14 +104,13 @@ public class Network extends MongoEntity {
 
     public Map<BungeeType, Integer> bungeeMetadata() {
         Map<BungeeType, Integer> metadata = new HashMap<>();
+        BungeeTypeRepository repository = MineCloud.instance().mongo().repositoryBy(BungeeType.class);
 
         if (bungees == null) {
             return metadata;
         }
 
         for (Map.Entry<String, Integer> entry : bungees.entrySet()) {
-            BungeeTypeRepository repository = MineCloud.instance().mongo().repositoryBy(BungeeType.class);
-
             metadata.put(repository.findFirst(entry.getKey()), entry.getValue());
         }
 
