@@ -15,6 +15,7 @@
  */
 package io.minecloud.daemon;
 
+import com.spotify.docker.client.ContainerNotFoundException;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
@@ -35,6 +36,7 @@ import io.minecloud.models.nodes.Node;
 import io.minecloud.models.nodes.NodeRepository;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerMetadata;
+import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import org.mongodb.morphia.query.Query;
 
@@ -205,6 +207,7 @@ public class MineCloudDaemon {
                         .filter((container) -> container.status().toLowerCase().contains("exited"))
                         .forEach((container) -> {
                             try {
+                                String name = container.names().isEmpty() ? "null" : container.names().get(0);
                                 dockerClient.removeContainer(container.id());
 
                                 if (container.image().contains("minecloud")) {
@@ -229,12 +232,34 @@ public class MineCloudDaemon {
                                     }
                                 }
 
-                               MineCloud.logger().info("Killed dead container " + container.id());
+                                MineCloud.logger().info("Killed dead container " + container.id() + " (" + name + ")");
                             } catch (DockerException | InterruptedException e) {
                                 MineCloud.logger().log(Level.SEVERE, "Was unable to kill exited container " + container.id(),
                                         e);
                             }
                         });
+                ServerRepository repository = mongo.repositoryBy(Server.class);
+                Query<Server> query = repository.createQuery()
+                        .field("node").equal(node())
+                        .field("port").notEqual(-1)
+                        .field("tps").notEqual(-1);
+
+                repository.find(query).asList().forEach((server) -> {
+                    boolean exists;
+
+                    try {
+                        dockerClient.inspectContainer(server.containerId());
+                        exists = true;
+                    } catch (DockerException | InterruptedException ex) {
+                        exists = false;
+                    }
+
+                    if (exists) {
+                        return;
+                    }
+
+                    repository.delete(server);
+                });
             } catch (DockerException | InterruptedException e) {
                 e.printStackTrace();
             }
