@@ -7,7 +7,7 @@
     <groupId>io.mazenmc.minecloud</groupId>
     <artifactId>minecloud</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <name>MineCloud</name>
     <description>MineCloud is a cloud-based solution for large-scale Minecraft networks which require a fast, reliable, and scalable deployment system.</description>
@@ -23,6 +23,16 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
+    <developers>
+        <developer>
+            <id>mkotb</id>
+            <name>Mazen Kotb</name>
+            <email>mazenkotb@gmail.com</email>
+            <timezone>PST</timezone>
+            <url>https://github.com/mkotb</url>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:git@github.com:mkotb/MineCloud.git</connection>
