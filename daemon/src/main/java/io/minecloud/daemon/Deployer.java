@@ -142,6 +142,7 @@ public final class Deployer {
     }
 
     public static Bungee deployBungeeCord(Network network, BungeeType type) {
+        DockerClient client = MineCloudDaemon.instance().dockerClient();
         BungeeRepository repository = MineCloud.instance().mongo().repositoryBy(Bungee.class);
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
@@ -181,10 +182,19 @@ public final class Deployer {
                 .publishAllPorts(true)
                 .build();
 
+        try {
+            ContainerInfo info = client.inspectContainer("bungee");
+
+            if (info.state().running()) {
+                client.killContainer("bungee");
+            }
+
+            client.removeContainer(info.id());
+        } catch (DockerException | InterruptedException ignored) {}
+
         ContainerCreation creation;
 
         try {
-            DockerClient client = MineCloudDaemon.instance().dockerClient();
             creation = client.createContainer(config, type.name());
 
             client.startContainer(creation.id(), hostConfig);
