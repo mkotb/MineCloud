@@ -118,10 +118,6 @@ public final class MineCloud {
         hosts = new String[] {scanner.nextLine()};
 
         System.out.println();
-        System.out.print("Please enter the username for the Redis server: ");
-        username = scanner.nextLine();
-
-        System.out.println();
         System.out.print("Please enter the password for " + username + ":");
 
         password = scanner.nextLine();
