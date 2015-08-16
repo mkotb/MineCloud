@@ -52,7 +52,7 @@ public class StatisticsWatcher extends Thread {
                 if (!file.isDirectory())
                     continue;
 
-                File currentFreq = new File(file, "cpufreq/cpuinfo_cur_freq");
+                File currentFreq = new File(file, "cpufreq/scaling_cur_freq");
 
                 if (!currentFreq.exists())
                     continue;
