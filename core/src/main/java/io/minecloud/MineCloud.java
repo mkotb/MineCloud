@@ -67,7 +67,7 @@ public final class MineCloud {
                 System.getenv("mongo_username"), System.getenv("mongo_password").toCharArray(),
                 System.getenv("mongo_database"));
         Credentials redisCredentials = new Credentials(new String[] {System.getenv("redis_host")},
-                System.getenv("redis_username"), System.getenv("redis_password").toCharArray());
+                "", System.getenv("redis_password").toCharArray());
 
         instance().initiateMongo(mongoCredentials);
         instance().initiateRedis(redisCredentials);
@@ -127,10 +127,9 @@ public final class MineCloud {
         password = scanner.nextLine();
 
         properties.setProperty("redis-host", hosts[0]);
-        properties.setProperty("redis-username", username);
         properties.setProperty("redis-password", password);
 
-        Credentials redis = new Credentials(hosts, username, password.toCharArray());
+        Credentials redis = new Credentials(hosts, "", password.toCharArray());
         MineCloud.instance().initiateRedis(redis);
 
         System.out.print("Lastly, please enter the name of this node: ");

@@ -89,7 +89,6 @@ public final class Deployer {
                         .append("mongo_database", mongoCreds.database())
 
                         .append("redis_host", redisCreds.hosts()[0])
-                        .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
                         .append("SERVER_MOD", server.type().mod())
                         .append("DEDICATED_RAM", String.valueOf(server.type().dedicatedRam()))
@@ -167,7 +166,6 @@ public final class Deployer {
                         .append("mongo_database", mongoCreds.database())
 
                         .append("redis_host", redisCreds.hosts()[0])
-                        .append("redis_username", redisCreds.username())
                         .append("redis_password", new String(redisCreds.password()))
                         .append("DEDICATED_RAM", String.valueOf(type.dedicatedRam()))
 

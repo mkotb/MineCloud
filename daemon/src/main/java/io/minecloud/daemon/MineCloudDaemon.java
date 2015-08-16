@@ -15,7 +15,6 @@
  */
 package io.minecloud.daemon;
 
-import com.spotify.docker.client.ContainerNotFoundException;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerException;
@@ -27,7 +26,6 @@ import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.MessageType;
 import io.minecloud.db.redis.msg.binary.MessageInputStream;
-import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.type.BungeeType;
@@ -42,7 +40,6 @@ import org.mongodb.morphia.query.Query;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -313,7 +310,7 @@ public class MineCloudDaemon {
                 properties.getProperty("mongo-password").toCharArray(),
                 properties.getProperty("mongo-database"));
         Credentials redis = new Credentials(new String[] {properties.getProperty("redis-host")},
-                properties.getProperty("redis-username"),
+                "",
                 properties.getProperty("redis-password").toCharArray());
 
         MineCloud.instance().initiateMongo(mongo);

@@ -45,7 +45,7 @@ public final class RedisDatabase implements Database {
         config.setMaxTotal(20);
         config.setMinIdle(5);
         config.setMaxIdle(10);
-        config.setMaxWaitMillis(200L); // TODO
+        config.setMaxWaitMillis(200L);
         config.setBlockWhenExhausted(false);
 
         String host = credentials.hosts()[0];
@@ -59,7 +59,8 @@ public final class RedisDatabase implements Database {
             }
         }
 
-        pool = !credentials.username().equals("") ? new JedisPool(config, host, port, 1000, new String(credentials.password())) : new JedisPool(config, host, port, 1000);
+        pool = !Arrays.equals(credentials.password(), new char[] {}) ? new JedisPool(config, host, port, 1000, new String(credentials.password())) :
+                new JedisPool(config, host, port, 1000);
     }
 
     public void addChannel(RedisChannel channel) {

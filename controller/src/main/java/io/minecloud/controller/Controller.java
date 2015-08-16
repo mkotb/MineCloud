@@ -150,7 +150,7 @@ public class Controller {
                 properties.getProperty("mongo-password").toCharArray(),
                 properties.getProperty("mongo-database"));
         Credentials redis = new Credentials(new String[] {properties.getProperty("redis-host")},
-                properties.getProperty("redis-username"),
+                "",
                 properties.getProperty("redis-password").toCharArray());
 
         MineCloud.instance().initiateMongo(mongo);
