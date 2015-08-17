@@ -59,7 +59,7 @@ public final class RedisDatabase implements Database {
             }
         }
 
-        pool = !Arrays.equals(credentials.password(), new char[] {}) ? new JedisPool(config, host, port, 1000, new String(credentials.password())) :
+        pool = credentials.password() != null && credentials.password().length > 0 ? new JedisPool(config, host, port, 1000, new String(credentials.password())) :
                 new JedisPool(config, host, port, 1000);
     }
 
