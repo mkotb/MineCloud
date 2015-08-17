@@ -19,6 +19,7 @@ import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.Database;
 import io.minecloud.db.redis.pubsub.RedisChannel;
+import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -68,6 +69,10 @@ public final class RedisDatabase implements Database {
     }
 
     public RedisChannel channelBy(String name) {
+        if (!channels.containsKey(name)) {
+            addChannel(SimpleRedisChannel.create(name, this));
+        }
+
         return channels.get(name);
     }
 
