@@ -138,7 +138,9 @@ public class MineCloudPlugin extends Plugin {
                     ServerRepository repository = mongo.repositoryBy(Server.class);
                     List<Server> servers = repository.find(repository.createQuery()
                             .field("network").equal(bungee().network())
-                            .field("type").equal(type))
+                            .field("type").equal(type)
+                            .field("port").notEqual(-1)
+                            .field("ramUsage").notEqual(-1))
                             .asList();
 
                     Collections.sort(servers, (a, b) -> a.onlinePlayers().size() - b.onlinePlayers().size());
