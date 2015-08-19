@@ -71,7 +71,7 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
         PlayerData data = new PlayerData();
 
         data.setId(id.toString());
-        return find(createQuery().field("players").hasThisElement(data))
+        return find(createQuery().field("onlinePlayers").hasThisElement(data))
                 .get();
     }
 
@@ -79,7 +79,7 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
         PlayerData data = new PlayerData();
 
         data.setName(name);
-        return find(createQuery().field("players").hasThisElement(data))
+        return find(createQuery().field("onlinePlayers").hasThisElement(data))
                 .get();
     }
 }
