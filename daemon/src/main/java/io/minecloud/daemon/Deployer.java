@@ -78,8 +78,10 @@ public final class Deployer {
     public static boolean deployServer(Server server) {
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
+        String name = server.type().name() + server.number();
         World defaultWorld = server.type().defaultWorld();
         ContainerConfig config = ContainerConfig.builder()
+                .hostname(name)
                 .image("minecloud/server")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()
@@ -104,7 +106,6 @@ public final class Deployer {
 
         try {
             DockerClient client = MineCloudDaemon.instance().dockerClient();
-            String name = server.type().name() + server.number();
 
             try {
                 ContainerInfo info = client.inspectContainer(name);
@@ -157,6 +158,7 @@ public final class Deployer {
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         ContainerConfig config = ContainerConfig.builder()
                 .image("minecloud/bungee")
+                .hostname("bungee" + bungee.publicIp())
                 .exposedPorts("25565")
                 .openStdin(true)
                 .env(new EnvironmentBuilder()
