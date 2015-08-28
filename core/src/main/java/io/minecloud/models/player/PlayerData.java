@@ -73,4 +73,24 @@ public class PlayerData {
     public boolean hasMetadata(String name) {
         return metadataBy(name).isPresent();
     }
+    
+    public void sendMessage(String messages) {
+        RedisDatabase redis = MineCloud.instance().redis();
+
+        if (redis.channelBy("message") == null) {
+            redis.addChannel(SimpleRedisChannel.create("message", redis));
+        }
+
+        MessageOutputStream mos = new MessageOutputStream();
+
+        try {
+            mos.writeString(name());
+            mos.writeString(message);
+        } catch (IOException ex) {
+            throw new MineCloudException("Could not encode teleport message", ex);
+        }
+
+        redis.channelBy("message").publish(mos.toMessage());
+    }
+    
 }
