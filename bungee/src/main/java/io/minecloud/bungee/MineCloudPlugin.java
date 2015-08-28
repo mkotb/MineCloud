@@ -113,6 +113,32 @@ public class MineCloudPlugin extends Plugin {
 
                     player.connect(info);
                 }));
+                
+        redis.addChannel(SimpleRedisChannel.create("message", redis)
+        
+                .addCallback((message) -> {
+                    
+                    if (message.type() != MessageType.BINARY) {
+                        return;
+                    }
+
+                    MessageInputStream stream = message.contents();
+                    ProxiedPlayer player = getProxy().getPlayer(stream.readString());
+
+                    if (player == null) {
+                        return;
+                    }
+
+                    String message = stream.readString();
+
+                    
+                    if(message != null){
+                        
+                        player.sendMessage(new BaseComponent(message));
+                        
+                    }
+                    
+                }));
 
         redis.addChannel(SimpleRedisChannel.create("teleport-type", redis)
                 .addCallback((message) -> {
