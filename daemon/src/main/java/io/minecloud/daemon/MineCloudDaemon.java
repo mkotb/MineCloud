@@ -201,7 +201,7 @@ public class MineCloudDaemon {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 dockerClient.listContainers(DockerClient.ListContainersParam.allContainers()).stream()
-                        .filter((container) -> container.status().toLowerCase().contains("exited"))
+                        .filter((container) -> !container.status().toLowerCase().contains("Up"))
                         .forEach((container) -> {
                             try {
                                 String name = container.names().isEmpty() ? "null" : container.names().get(0);
