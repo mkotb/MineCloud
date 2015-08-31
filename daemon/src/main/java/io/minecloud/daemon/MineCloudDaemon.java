@@ -204,7 +204,7 @@ public class MineCloudDaemon {
                         .filter((container) -> !container.status().toLowerCase().contains("up"))
                         .forEach((container) -> {
                             try {
-                                String name = container.names().isEmpty() ? "null" : container.names().get(0);
+                                String name = container.names() == null || container.names().isEmpty() ? "null" : container.names().get(0);
                                 dockerClient.removeContainer(container.id());
 
                                 if (container.image().contains("minecloud")) {
