@@ -260,7 +260,7 @@ public class MineCloudDaemon {
                     MineCloud.logger().info("Removed " + server.containerId() + " from DB due to not existing as a container");
                 });
             } catch (DockerException | InterruptedException e) {
-                e.printStackTrace(System.out);
+                MineCloud.logger().log(Level.SEVERE, "Was unable to list containers for update", e);
             }
 
             try {
