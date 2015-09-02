@@ -15,6 +15,7 @@
  */
 package io.minecloud.models.server;
 
+import com.mongodb.BasicDBObject;
 import io.minecloud.db.mongo.AbstractMongoRepository;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.player.PlayerData;
@@ -68,18 +69,12 @@ public class ServerRepository extends AbstractMongoRepository<Server> {
     }
 
     public Server serverFor(UUID id) {
-        PlayerData data = new PlayerData();
-
-        data.setId(id.toString());
-        return find(createQuery().field("onlinePlayers").hasThisElement(data))
+        return find(createQuery().field("onlinePlayers").hasThisElement(new BasicDBObject("id", id.toString())))
                 .get();
     }
 
     public Server serverFor(String name) {
-        PlayerData data = new PlayerData();
-
-        data.setName(name);
-        return find(createQuery().field("onlinePlayers").hasThisElement(data))
+        return find(createQuery().field("onlinePlayers").hasThisElement(new BasicDBObject("name", name)))
                 .get();
     }
 }
