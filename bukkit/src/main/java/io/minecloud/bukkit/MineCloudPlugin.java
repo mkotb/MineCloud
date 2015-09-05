@@ -16,7 +16,6 @@
 package io.minecloud.bukkit;
 
 import io.minecloud.MineCloud;
-import io.minecloud.MineCloudException;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
 import io.minecloud.db.redis.msg.binary.MessageOutputStream;
@@ -28,7 +27,6 @@ import io.minecloud.models.server.World;
 import io.minecloud.models.server.type.ServerType;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -39,7 +37,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 
 public class MineCloudPlugin extends JavaPlugin {
@@ -70,7 +67,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
                 server.setTps(fetchTps());
-                cleanUp(server);
+                updatePlayers(server);
 
                 mongo.repositoryBy(Server.class).save(server);
             }
@@ -222,15 +219,11 @@ public class MineCloudPlugin extends JavaPlugin {
         }
     }
 
-    public void cleanUp(Server server) {
-        new ArrayList<>(server.onlinePlayers()).stream()
-                .filter((pd) -> Bukkit.getPlayer(pd.name()) == null)
-                .forEach((pd) -> server.removePlayer(UUID.fromString(pd.uuid())));
+    public void updatePlayers(Server server) {
+        List<PlayerData> onlinePlayers = new ArrayList<>();
 
         Bukkit.getOnlinePlayers().stream()
-                .filter((player) -> server.playerBy(player.getUniqueId()) == null)
                 .forEach((player) -> {
-                    List<PlayerData> onlinePlayers = server.onlinePlayers();
                     PlayerData data = new PlayerData();
 
                     data.setHealth(player.getHealth());
@@ -239,8 +232,9 @@ public class MineCloudPlugin extends JavaPlugin {
                     data.setId(player.getUniqueId().toString());
 
                     onlinePlayers.add(data);
-                    server.setOnlinePlayers(onlinePlayers);
                 });
+
+        server.setOnlinePlayers(onlinePlayers);
     }
 
     public Server server() {

@@ -37,16 +37,6 @@ public class PlayerTracker implements Listener {
         this.plugin = (MineCloudPlugin) JavaPlugin.getProvidingPlugin(PlayerTracker.class);
     }
 
-    private void updatePlayer(Server server, PlayerData data) {
-        List<PlayerData> onlinePlayers = server.onlinePlayers();
-
-        onlinePlayers.set(onlinePlayers.lastIndexOf(data), data);
-        server.setOnlinePlayers(onlinePlayers);
-
-        plugin.cleanUp(server);
-        plugin.mongo().repositoryBy(Server.class).save(server);
-    }
-
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -63,28 +53,8 @@ public class PlayerTracker implements Listener {
             onlinePlayers.add(data);
 
             server.setOnlinePlayers(onlinePlayers);
-            plugin.cleanUp(server);
+            plugin.updatePlayers(server);
             plugin.mongo().repositoryBy(Server.class).save(server);
-        });
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void playerHit(EntityDamageEvent event) {
-        if (event.getEntityType() != EntityType.PLAYER)
-            return;
-
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            Player player = (Player) event.getEntity();
-            Server server = plugin.server();
-            PlayerData data = server.playerBy(player.getUniqueId());
-
-            if (data == null)
-                return;
-
-            data.setHealth(player.getHealth());
-            data.setMaxHealth(player.getMaxHealth());
-
-            updatePlayer(server, data);
         });
     }
 
