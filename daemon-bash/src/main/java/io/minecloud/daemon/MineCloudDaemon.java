@@ -84,7 +84,7 @@ public class MineCloudDaemon {
                     }
 
                     try {
-                        new ProcessBuilder().command("kill -9 " + Deployer.pidOf(server.name())).start();
+                        new ProcessBuilder().command("/usr/bin/kill -9 " + Deployer.pidOf(server.name())).start();
                         MineCloud.logger().info("Killed server " + server.name()
                                 + " with container id " + server.containerId());
                         mongo.repositoryBy(Server.class).delete(server);
@@ -130,7 +130,7 @@ public class MineCloudDaemon {
                     }
 
                     try {
-                        new ProcessBuilder().command("kill -9 " + Deployer.pidOf("bungee")).start();
+                        new ProcessBuilder().command("/usr/bin/kill -9 " + Deployer.pidOf("bungee")).start();
                         MineCloud.logger().info("Killed bungee " + bungee.name()
                                 + " with container id " + bungee.containerId());
 
