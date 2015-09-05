@@ -162,7 +162,7 @@ public class MineCloudDaemon {
             ServerRepository repository = mongo.repositoryBy(Server.class);
             Query<Server> query = repository.createQuery()
                     .field("node").equal(node())
-                    .field("port").notEqual(-1)
+                    .field("containerId").notEqual("null")
                     .field("tps").notEqual(-1);
 
             repository.find(query).asList().forEach((server) -> {

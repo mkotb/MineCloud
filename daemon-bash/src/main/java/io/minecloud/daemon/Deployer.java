@@ -44,6 +44,7 @@ public final class Deployer {
         server.setId(server.type().name() + server.number());
         server.setMetadata(metadata);
         server.setPort(PORT_COUNTER.incrementAndGet());
+        server.setContainerId("null");
 
         Map<String, String> env = new HashMap<String, String>() {{
             put("mongo_hosts", mongoCreds.formattedHosts());
