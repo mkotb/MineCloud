@@ -155,7 +155,7 @@ public final class Deployer {
 
             Process process = new ProcessBuilder()
                     .directory(runDir)
-                    .command("screen -S " + name + " sh init.sh")
+                    .command("/usr/bin/screen -S " + name + " sh init.sh")
                     .start();
 
             return Integer.parseInt(Files.readAllLines(Paths.get(runDir.getAbsolutePath(), "app.pid")).get(0));
