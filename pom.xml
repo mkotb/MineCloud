@@ -54,6 +54,7 @@
         <module>bungee</module>
         <module>bukkit</module>
         <module>cli</module>
+        <module>daemon-bash</module>
     </modules>
 
     <build>
