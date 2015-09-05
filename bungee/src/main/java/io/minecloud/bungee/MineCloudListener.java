@@ -27,6 +27,9 @@ import net.md_5.bungee.event.EventHandler;
 import java.util.Collection;
 
 public class MineCloudListener implements Listener {
+    private long lastUpdated = 0;
+    private int onlinePlayers = -1;
+    private int maxOnline = -1;
     private MineCloudPlugin plugin;
 
     MineCloudListener(MineCloudPlugin plugin) {
@@ -35,26 +38,34 @@ public class MineCloudListener implements Listener {
 
     @EventHandler
     public void onPing(ProxyPingEvent event) {
-        Bungee bungee = plugin.bungee();
-
-        if (bungee == null)
-            return;
-
-        Collection<Server> servers = plugin.mongo.repositoryBy(Server.class)
-                .findAll((s) -> s.network().name().equals(bungee.network().name()));
-
+        ServerPing ping = event.getResponse();
         int online = 0;
         int max = 0;
 
-        for (Server server : servers) {
-            online += server.onlinePlayers().size();
-            max += server.type().maxPlayers();
-        }
-
-        ServerPing ping = event.getResponse();
-
         if (ping == null) {
             ping = new ServerPing();
+        }
+
+        if (onlinePlayers != -1 && (System.currentTimeMillis() - lastUpdated) < 5000L) {
+            online = onlinePlayers;
+            max = maxOnline;
+        } else {
+            Bungee bungee = plugin.bungee();
+
+            if (bungee == null)
+                return;
+
+            Collection<Server> servers = plugin.mongo.repositoryBy(Server.class)
+                    .findAll((s) -> s.network().name().equals(bungee.network().name()));
+
+            for (Server server : servers) {
+                online += server.onlinePlayers().size();
+                max += server.type().maxPlayers();
+            }
+
+            onlinePlayers = online;
+            maxOnline = max;
+            lastUpdated = System.currentTimeMillis();
         }
 
         ping.setPlayers(new ServerPing.Players(max, online, ping.getPlayers().getSample()));
