@@ -144,6 +144,10 @@ public final class Deployer {
     private static int startApplication(List<String> startScript, String name) {
         File runDir = new File("/var/run/" + name);
 
+        if (runDir.exists()) {
+            runDir.delete();
+        }
+
         runDir.mkdirs();
 
         try {
