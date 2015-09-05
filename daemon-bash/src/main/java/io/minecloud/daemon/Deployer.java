@@ -13,8 +13,7 @@ import io.minecloud.models.server.ServerMetadata;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -155,9 +154,19 @@ public final class Deployer {
 
             Process process = new ProcessBuilder()
                     .directory(runDir)
+                    .redirectErrorStream(true)
                     .command("/usr/bin/screen", "-S", name, "sh", "init.sh")
                     .start();
             process.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+
+            try {
+                while ((line = reader.readLine()) != null) {
+                    MineCloud.logger().info("CREATE: " + line);
+                }
+            } catch (EOFException ignored) {
+            }
 
             return Integer.parseInt(Files.readAllLines(Paths.get(runDir.getAbsolutePath(), "app.pid")).get(0));
         } catch (IOException | InterruptedException ex) {
