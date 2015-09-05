@@ -65,8 +65,7 @@ public final class Deployer {
             put("PRIVATE_IP", server.node().privateIp());
         }};
 
-        int pid = startApplication(processScript("/mnt/minecloud/server/bukkit/" + server.type().mod() + "/init.sh", env), server.name());
-        server.setContainerId(String.valueOf(pid));
+        startApplication(processScript("/mnt/minecloud/server/bukkit/" + server.type().mod() + "/init.sh", env), server.name());
         repository.save(server);
         MineCloud.logger().info("Started server " + server.name() + " with container id " + server.containerId());
     }
@@ -140,7 +139,7 @@ public final class Deployer {
         return script;
     }
 
-    private static int startApplication(List<String> startScript, String name) {
+    private static void startApplication(List<String> startScript, String name) {
         File runDir = new File("/var/run/" + name);
 
         if (runDir.exists()) {
@@ -151,25 +150,14 @@ public final class Deployer {
 
         try {
             Files.write(Paths.get(runDir.getAbsolutePath(), "init.sh"), startScript);
+            new File(runDir, "init.sh").setExecutable(true);
 
             Process process = new ProcessBuilder()
                     .directory(runDir)
                     .redirectErrorStream(true)
                     .command("/usr/bin/screen", "-dm", "-S", name, "sh", "init.sh")
                     .start();
-            process.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-
-            try {
-                while ((line = reader.readLine()) != null) {
-                    MineCloud.logger().info("CREATE: " + line);
-                }
-            } catch (EOFException ignored) {
-            }
-
-            return Integer.parseInt(Files.readAllLines(Paths.get(runDir.getAbsolutePath(), "app.pid")).get(0));
-        } catch (IOException | InterruptedException ex) {
+        } catch (IOException ex) {
             throw new MineCloudException(ex);
         }
     }

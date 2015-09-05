@@ -140,6 +140,20 @@ public class MineCloudDaemon {
                     }
                 }));
 
+        redis.addChannel(SimpleRedisChannel.create("server-start-notif", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY)
+                        return;
+
+                    MessageInputStream stream = message.contents();
+                    Server server = mongo.repositoryBy(Server.class).findFirst(stream.readString());
+
+                    if (!server.node().name().equals(node))
+                        return;
+
+                    server.setContainerId(String.valueOf(Deployer.pidOf(server.name())));
+                    mongo.repositoryBy(Server.class).save(server);
+                }));
         redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis));
 
         new StatisticsWatcher().start();
