@@ -155,7 +155,7 @@ public final class Deployer {
             Process process = new ProcessBuilder()
                     .directory(runDir)
                     .redirectErrorStream(true)
-                    .command("/usr/bin/screen", "-S", name, "sh", "init.sh")
+                    .command("/usr/bin/screen", "-dm", "-S", name, "sh", "init.sh")
                     .start();
             process.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
