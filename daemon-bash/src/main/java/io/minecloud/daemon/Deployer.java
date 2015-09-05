@@ -157,9 +157,10 @@ public final class Deployer {
                     .directory(runDir)
                     .command("/usr/bin/screen", "-S", name, "sh", "init.sh")
                     .start();
+            process.waitFor();
 
             return Integer.parseInt(Files.readAllLines(Paths.get(runDir.getAbsolutePath(), "app.pid")).get(0));
-        } catch (IOException ex) {
+        } catch (IOException | InterruptedException ex) {
             throw new MineCloudException(ex);
         }
     }
