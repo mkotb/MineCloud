@@ -38,5 +38,4 @@ sed -i "s/maxplayers/$MAX_PLAYERS/" server.properties
 sed -i "s/port/$PORT"
 sed -i "s/privateip/$PRIVATE_IP"
 
-{ java -jar server.jar <&3 3<&- & } 3<&0
-echo $! > app.pid
+java -jar server.jar

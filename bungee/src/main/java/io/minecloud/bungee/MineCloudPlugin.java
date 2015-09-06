@@ -37,8 +37,10 @@ import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,6 +58,13 @@ public class MineCloudPlugin extends Plugin {
 
         mongo = MineCloud.instance().mongo();
         redis = MineCloud.instance().redis();
+
+        try {
+            Files.write(ManagementFactory.getRuntimeMXBean().getName().split("@")[0].getBytes(Charset.defaultCharset()),
+                    new File("app.pid"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
         redis.addChannel(SimpleRedisChannel.create("server-start-notif", redis)
                 .addCallback((message) ->

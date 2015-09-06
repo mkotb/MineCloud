@@ -15,6 +15,7 @@
  */
 package io.minecloud.bukkit;
 
+import com.google.common.io.Files;
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
@@ -34,7 +35,9 @@ import org.bukkit.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,6 +54,13 @@ public class MineCloudPlugin extends JavaPlugin {
         serverId = System.getenv("server_id");
         mongo = MineCloud.instance().mongo();
         redis = MineCloud.instance().redis();
+
+        try {
+            Files.write(ManagementFactory.getRuntimeMXBean().getName().split("@")[0].getBytes(Charset.defaultCharset()),
+                    new File("app.pid"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
         new BukkitRunnable() {
             @Override

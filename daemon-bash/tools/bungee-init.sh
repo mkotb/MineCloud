@@ -24,5 +24,4 @@ mkdir plugins
 cp -r /mnt/minecloud/server/bungee/* .
 cp -r /mnt/minecloud/plugins/minecloud-bungee/latest/* plugins/
 
-{ java -jar bungee.jar <&3 3<&- & } 3<&0
-echo $! > app.pid
+java -jar bungee.jar
