@@ -63,14 +63,20 @@ public final class MineCloud {
     }
 
     public static void environmentSetup() {
-        Credentials mongoCredentials = new Credentials(System.getenv("mongo_hosts").split(";"),
-                System.getenv("mongo_username"), System.getenv("mongo_password").toCharArray(),
-                System.getenv("mongo_database"));
-        Credentials redisCredentials = new Credentials(new String[] {System.getenv("redis_host")},
-                "", System.getenv("redis_password").toCharArray());
+        Credentials mongoCredentials = new Credentials(getenv("mongo_hosts").split(";"),
+                getenv("mongo_username"), getenv("mongo_password").toCharArray(),
+                getenv("mongo_database"));
+        Credentials redisCredentials = new Credentials(new String[] {getenv("redis_host")},
+                "", getenv("redis_password").toCharArray());
 
         instance().initiateMongo(mongoCredentials);
         instance().initiateRedis(redisCredentials);
+    }
+
+    private static String getenv(String name) {
+        String env = System.getenv(name);
+
+        return env == null ? "" : env;
     }
 
     public static void runSetup(Properties properties, File file) throws IOException {
