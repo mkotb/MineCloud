@@ -35,7 +35,7 @@ cp -r /mnt/minecloud/plugins/minecloud-bukkit/latest/* plugins/
 
 sed -i "s/levelname/$DEFAULT_WORLD/" server.properties
 sed -i "s/maxplayers/$MAX_PLAYERS/" server.properties
-sed -i "s/port/$PORT"
-sed -i "s/privateip/$PRIVATE_IP"
+sed -i "s/port/$PORT" server.properties
+sed -i "s/privateip/$PRIVATE_IP" server.properties
 
 java -jar server.jar
