@@ -9,15 +9,15 @@ echo "------------------------------------------"
 echo ""
 echo ""
 
-mongo_hosts=]mongo_hosts
-mongo_username=]mongo_username
-mongo_password=]mongo_password
-mongo_database=]mongo_database
+mongo_hosts="]mongo_hosts"
+mongo_username="]mongo_username"
+mongo_password="]mongo_password"
+mongo_database="]mongo_database"
 
-redis_host=]redis_host
-redis_password=]redis_password
-DEDICATED_RAM=]DEDICATED_RAM
-bungee_id=]bungee_id
+redis_host="]redis_host"
+redis_password="]redis_password"
+DEDICATED_RAM="]DEDICATED_RAM"
+bungee_id="]bungee_id"
 
 mkdir plugins
 
