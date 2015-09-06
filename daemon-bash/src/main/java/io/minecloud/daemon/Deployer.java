@@ -156,7 +156,7 @@ public final class Deployer {
             Process process = new ProcessBuilder()
                     .directory(runDir)
                     .redirectErrorStream(true)
-                    .command("/usr/bin/screen", "-dm", "-S", name, "sh", "init.sh")
+                    .command("/usr/bin/sh", "init.sh")
                     .start();
         } catch (IOException ex) {
             throw new MineCloudException(ex);
