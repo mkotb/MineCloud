@@ -125,7 +125,7 @@ public final class Deployer {
     }
 
     public static int pidOf(String app) throws IOException {
-        return Integer.parseInt(Files.readAllLines(Paths.get("/var/run/" + app + "/app.pid")).get(0));
+        return Integer.parseInt(Files.readAllLines(Paths.get("/var/run/minecloud/" + app + "/app.pid")).get(0));
     }
 
     public static boolean isRunning(String app) throws InterruptedException, IOException {
@@ -156,7 +156,7 @@ public final class Deployer {
     }
 
     private static void startApplication(List<String> startScript, String name) {
-        File runDir = new File("/var/run/" + name);
+        File runDir = new File("/var/run/minecloud/" + name);
 
         if (runDir.exists()) {
             runDir.delete();

@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class MineCloudDaemon {
     private static MineCloudDaemon instance;
@@ -179,9 +180,10 @@ public class MineCloudDaemon {
                     .field("node").equal(node())
                     .field("containerId").notEqual("null")
                     .field("tps").notEqual(-1);
+            List<Server> nodeServers = repository.find(query).asList();
 
-            repository.find(query).asList().forEach((server) -> {
-                File runDir = new File("/var/run/" + server.name());
+            nodeServers.forEach((server) -> {
+                File runDir = new File("/var/run/minecloud/" + server.name());
 
                 if (!runDir.exists()) {
                     repository.delete(server);
@@ -200,6 +202,27 @@ public class MineCloudDaemon {
                     MineCloud.logger().log(Level.SEVERE, "Was unable to check if server is running", ex);
                 }
             });
+
+            File appContainer = new File("/var/run/minecloud");
+            List<String> names = nodeServers.stream()
+                    .map(Server::name)
+                    .collect(Collectors.toList());
+
+            names.add("bungee"); // don't remove bungee servers
+
+            if (!appContainer.isDirectory()) {
+                appContainer.delete();
+            }
+
+            if (!appContainer.exists()) {
+                appContainer.mkdirs();
+            }
+
+            for (File f : appContainer.listFiles(File::isDirectory)) {
+                if (!names.contains(f.getName())) {
+                    f.delete();
+                }
+            }
 
             try {
                 Thread.sleep(2000L);
