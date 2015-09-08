@@ -31,10 +31,7 @@ import io.minecloud.models.server.type.ServerType;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
@@ -128,6 +125,10 @@ public final class Deployer {
         return Integer.parseInt(Files.readAllLines(Paths.get("/var/run/minecloud/" + app + "/app.pid")).get(0));
     }
 
+    public static long timeStarted(String app) throws IOException {
+        return Long.parseLong(Files.readAllLines(Paths.get("/var/run/minecloud/" + app + "/started.ts")).get(0));
+    }
+
     public static boolean isRunning(String app) throws InterruptedException, IOException {
         Process process = Runtime.getRuntime().exec("ps -p " + pidOf(app));
 
@@ -166,6 +167,7 @@ public final class Deployer {
 
         try {
             Files.write(Paths.get(runDir.getAbsolutePath(), "init.sh"), startScript);
+            Files.write(Paths.get(runDir.getAbsolutePath(), "started.ts"), Arrays.asList(String.valueOf(System.currentTimeMillis())));
             new File(runDir, "init.sh").setExecutable(true);
 
             Process process = new ProcessBuilder()
