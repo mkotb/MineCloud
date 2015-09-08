@@ -210,6 +210,7 @@ public class MineCloudDaemon {
                 try {
                     if (!Deployer.isRunning("bungee")) {
                         bungeeRepo.deleteById(node.publicIp());
+                        MineCloud.logger().info("Removed dead bungee (" + node.publicIp() + ")");
                     }
                 } catch (IOException | InterruptedException ex) {
                     MineCloud.logger().log(Level.SEVERE, "Was unable to check if bungee is running", ex);
