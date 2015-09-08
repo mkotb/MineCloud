@@ -195,11 +195,11 @@ public class MineCloudDaemon {
                 }
 
                 try {
-                    if (Deployer.isRunning(server.name())) {
+                    if ((System.currentTimeMillis() - Deployer.timeStarted(server.name())) < 600_000L) {
                         return;
                     }
 
-                    if ((System.currentTimeMillis() - Deployer.timeStarted(server.name())) < 600_000L) {
+                    if (Deployer.isRunning(server.name())) {
                         return;
                     }
 
@@ -212,7 +212,7 @@ public class MineCloudDaemon {
 
             if (bungeeRepo.findOne("_id", node.publicIp()) != null) {
                 try {
-                    if (!Deployer.isRunning("bungee") && (System.currentTimeMillis() - Deployer.timeStarted("bungee")) > 600_000L) {
+                    if ((System.currentTimeMillis() - Deployer.timeStarted("bungee")) > 600_000L & !Deployer.isRunning("bungee")) {
                         bungeeRepo.deleteById(node.publicIp());
                         MineCloud.logger().info("Removed dead bungee (" + node.publicIp() + ")");
                     }
