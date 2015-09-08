@@ -37,6 +37,7 @@ import org.mongodb.morphia.query.Query;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -206,7 +207,9 @@ public class MineCloudDaemon {
                     repository.delete(server);
                     MineCloud.logger().info("Removed dead server (" + server.name() + ")");
                 } catch (IOException | InterruptedException ex) {
-                    MineCloud.logger().log(Level.SEVERE, "Was unable to check if server is running", ex);
+                    if (!(ex instanceof NoSuchFileException)) {
+                        MineCloud.logger().log(Level.SEVERE, "Was unable to check if server is running", ex);
+                    }
                 }
             });
 
@@ -217,7 +220,9 @@ public class MineCloudDaemon {
                         MineCloud.logger().info("Removed dead bungee (" + node.publicIp() + ")");
                     }
                 } catch (IOException | InterruptedException ex) {
-                    MineCloud.logger().log(Level.SEVERE, "Was unable to check if bungee is running", ex);
+                    if (!(ex instanceof NoSuchFileException)) {
+                        MineCloud.logger().log(Level.SEVERE, "Was unable to check if bungee is running", ex);
+                    }
                 }
             }
 
