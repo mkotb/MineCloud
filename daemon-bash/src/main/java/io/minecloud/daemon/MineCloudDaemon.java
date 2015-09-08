@@ -187,7 +187,7 @@ public class MineCloudDaemon {
             List<Server> nodeServers = repository.find(query).asList();
 
             nodeServers.forEach((server) -> {
-                File runDir = new File("/var/run/minecloud/" + server.name());
+                File runDir = new File("/var/minecloud/" + server.name());
 
                 if (!runDir.exists()) {
                     repository.delete(server);
@@ -226,7 +226,7 @@ public class MineCloudDaemon {
                 }
             }
 
-            File appContainer = new File("/var/run/minecloud");
+            File appContainer = new File("/var/minecloud");
             List<String> names = nodeServers.stream()
                     .map(Server::name)
                     .collect(Collectors.toList());
