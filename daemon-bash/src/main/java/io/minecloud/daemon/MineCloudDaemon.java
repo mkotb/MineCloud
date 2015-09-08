@@ -172,7 +172,18 @@ public class MineCloudDaemon {
                     server.setContainerId(String.valueOf(Deployer.pidOf(server.name())));
                     mongo.repositoryBy(Server.class).save(server);
                 }));
-        redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis));
+        redis.addChannel(SimpleRedisChannel.create("server-shutdown-notif", redis)
+                .addCallback((message) -> {
+                    if (message.type() != MessageType.BINARY)
+                        return;
+
+                    MessageInputStream stream = message.contents();
+                    File file = new File("/var/minecloud/" + stream.readString());
+
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }));
 
         new StatisticsWatcher().start();
 
