@@ -23,6 +23,7 @@ import io.minecloud.db.redis.msg.MessageType;
 import io.minecloud.db.redis.msg.binary.MessageInputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import io.minecloud.models.bungee.Bungee;
+import io.minecloud.models.bungee.BungeeRepository;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
@@ -175,9 +176,11 @@ public class MineCloudDaemon {
         new StatisticsWatcher().start();
 
         while (!Thread.currentThread().isInterrupted()) {
+            BungeeRepository bungeeRepo = mongo.repositoryBy(Bungee.class);
             ServerRepository repository = mongo.repositoryBy(Server.class);
+            Node node = node();
             Query<Server> query = repository.createQuery()
-                    .field("node").equal(node())
+                    .field("node").equal(node)
                     .field("containerId").notEqual("null")
                     .field("tps").notEqual(-1);
             List<Server> nodeServers = repository.find(query).asList();
@@ -202,6 +205,16 @@ public class MineCloudDaemon {
                     MineCloud.logger().log(Level.SEVERE, "Was unable to check if server is running", ex);
                 }
             });
+
+            if (bungeeRepo.findOne("_id", node.publicIp()) != null) {
+                try {
+                    if (!Deployer.isRunning("bungee")) {
+                        bungeeRepo.deleteById(node.publicIp());
+                    }
+                } catch (IOException | InterruptedException ex) {
+                    MineCloud.logger().log(Level.SEVERE, "Was unable to check if bungee is running", ex);
+                }
+            }
 
             File appContainer = new File("/var/run/minecloud");
             List<String> names = nodeServers.stream()
