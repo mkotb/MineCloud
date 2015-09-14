@@ -16,6 +16,7 @@
 package io.minecloud.bungee;
 
 import com.google.common.io.Files;
+
 import io.minecloud.MineCloud;
 import io.minecloud.MineCloudException;
 import io.minecloud.db.mongo.MongoDatabase;
@@ -29,10 +30,12 @@ import io.minecloud.models.plugins.PluginType;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+
 import org.bson.types.ObjectId;
 
 import java.io.File;
@@ -121,6 +124,32 @@ public class MineCloudPlugin extends Plugin {
                     }
 
                     player.connect(info);
+                }));
+                
+        redis.addChannel(SimpleRedisChannel.create("message", redis)
+        
+                .addCallback((message) -> {
+                    
+                    if (message.type() != MessageType.BINARY) {
+                        return;
+                    }
+
+                    MessageInputStream stream = message.contents();
+                    ProxiedPlayer player = getProxy().getPlayer(stream.readString());
+
+                    if (player == null) {
+                        return;
+                    }
+
+                    String msg = stream.readString();
+
+                    
+                    if(message != null){
+                        
+                        player.sendMessage(new TextComponent(msg));
+                        
+                    }
+                    
                 }));
 
         redis.addChannel(SimpleRedisChannel.create("teleport-type", redis)
