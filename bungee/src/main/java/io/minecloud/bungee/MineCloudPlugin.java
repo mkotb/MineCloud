@@ -289,7 +289,6 @@ public class MineCloudPlugin extends Plugin {
         }
     }
 
-
     public void addServer(Server server) {
         ServerInfo info = getProxy().constructServerInfo(server.name(),
                 new InetSocketAddress(server.node().privateIp(), server.port()),
@@ -305,7 +304,6 @@ public class MineCloudPlugin extends Plugin {
     }
 
     public Bungee bungee() {
-        return mongo.repositoryBy(Bungee.class)
-                .findFirst((bungee) -> bungee.entityId().equals(System.getenv("bungee_id")));
+        return mongo.repositoryBy(Bungee.class).findOne("_id", System.getenv("bungee_id"));
     }
 }
