@@ -28,6 +28,6 @@ public class ServerTypeRepository extends AbstractMongoRepository<ServerType> {
     }
 
     public ServerType serverTypeBy(String name) {
-        return findFirst((type) -> type.name().equalsIgnoreCase(name));
+        return findFirst(name);
     }
 }

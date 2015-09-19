@@ -30,7 +30,7 @@ public class NodeRepository extends AbstractMongoRepository<Node> {
     }
 
     public Node nodeBy(String name) {
-        return findFirst((node) -> node.name().equalsIgnoreCase(name));
+        return findFirst(name);
     }
 
     public Node findNode(Network network, NodeType preferredNode, int requiredRam) {

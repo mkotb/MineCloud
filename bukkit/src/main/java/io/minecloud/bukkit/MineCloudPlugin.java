@@ -248,7 +248,7 @@ public class MineCloudPlugin extends JavaPlugin {
     }
 
     public Server server() {
-        return mongo.repositoryBy(Server.class).findOne("_id", serverId);
+        return mongo.repositoryBy(Server.class).findFirst(serverId);
     }
 
     public MongoDatabase mongo() {

@@ -30,6 +30,6 @@ public class BungeeTypeRepository extends AbstractMongoRepository<BungeeType> {
     }
 
     public BungeeType typeBy(String name) {
-        return findFirst((model) -> model.name().equalsIgnoreCase(name));
+        return findFirst(name);
     }
 }

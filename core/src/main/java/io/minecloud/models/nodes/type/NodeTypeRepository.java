@@ -29,6 +29,6 @@ public class NodeTypeRepository extends AbstractMongoRepository<NodeType> {
     }
 
     public NodeType specificationBy(String name) {
-        return findFirst((spec) -> spec.name().equalsIgnoreCase(name));
+        return findFirst(name);
     }
 }

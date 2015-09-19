@@ -304,6 +304,6 @@ public class MineCloudPlugin extends Plugin {
     }
 
     public Bungee bungee() {
-        return mongo.repositoryBy(Bungee.class).findOne("_id", System.getenv("bungee_id"));
+        return mongo.repositoryBy(Bungee.class).findFirst(System.getenv("bungee_id"));
     }
 }

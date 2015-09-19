@@ -38,12 +38,6 @@ public interface MongoRepository<T> {
 
     public T findFirst(String id);
 
-    public default T findFirst(Predicate<T> predicate) {
-        Optional<T> optional = models().stream().filter(predicate).findFirst();
-
-        return optional.isPresent() ? optional.get() : null;
-    }
-
     public default Collection<T> findAll(Predicate<T> predicate) {
         return models().stream().filter(predicate).collect(Collectors.toList());
     }
