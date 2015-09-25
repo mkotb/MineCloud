@@ -16,6 +16,8 @@
 package io.minecloud.bungee;
 
 import com.google.common.io.Files;
+import com.mongodb.BasicDBObject;
+import io.minecloud.Cached;
 import io.minecloud.MineCloud;
 import io.minecloud.MineCloudException;
 import io.minecloud.db.mongo.MongoDatabase;
@@ -49,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class MineCloudPlugin extends Plugin {
+    Cached<Bungee> bungee;
     MongoDatabase mongo;
     RedisDatabase redis;
 
@@ -167,9 +170,7 @@ public class MineCloudPlugin extends Plugin {
                 }));
 
         getProxy().getScheduler().schedule(this, () -> getProxy().getScheduler().runAsync(this, () -> {
-            Bungee bungee = bungee();
-
-            if (bungee != null) {
+            if (mongo.db().getCollection("bungees").count(new BasicDBObject("_id", System.getenv("bungee_id"))) != 0) {
                 return;
             }
 
@@ -250,10 +251,7 @@ public class MineCloudPlugin extends Plugin {
 
     @Override
     public void onDisable() {
-        Bungee bungee = bungee();
-
-        if (bungee != null)
-            mongo.repositoryBy(Bungee.class).delete(bungee);
+        mongo.repositoryBy(Bungee.class).deleteById(System.getenv("bungee_id"));
     }
 
     private boolean validateFolder(File file, PluginType pluginType, String version) {
@@ -304,6 +302,10 @@ public class MineCloudPlugin extends Plugin {
     }
 
     public Bungee bungee() {
-        return mongo.repositoryBy(Bungee.class).findFirst(System.getenv("bungee_id"));
+        if (bungee == null) {
+            this.bungee = Cached.create(() -> mongo.repositoryBy(Bungee.class).findFirst(System.getenv("bungee_id")));
+        }
+
+        return bungee.get();
     }
 }

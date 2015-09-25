@@ -16,6 +16,8 @@
 package io.minecloud.bukkit;
 
 import com.google.common.io.Files;
+import com.mongodb.BasicDBObject;
+import io.minecloud.Cached;
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
@@ -43,6 +45,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class MineCloudPlugin extends JavaPlugin {
+    private Cached<Server> server;
     private MongoDatabase mongo;
     private RedisDatabase redis;
     private String serverId;
@@ -65,14 +68,13 @@ public class MineCloudPlugin extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Server server = server();
-
-                if (server == null) {
+                if (mongo.db().getCollection("bungees").count(new BasicDBObject("_id", System.getenv("bungee_id"))) == 0) {
                     getLogger().log(Level.INFO, "Server removed from database, going down...");
                     getServer().shutdown();
                     return;
                 }
 
+                Server server = server();
                 Runtime runtime = Runtime.getRuntime();
 
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
@@ -213,10 +215,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Server server = server();
-
-        if (server != null)
-            mongo.repositoryBy(Server.class).delete(server);
+        mongo.repositoryBy(Server.class).deleteById(serverId);
 
         try {
             MessageOutputStream os = new MessageOutputStream();
@@ -248,7 +247,11 @@ public class MineCloudPlugin extends JavaPlugin {
     }
 
     public Server server() {
-        return mongo.repositoryBy(Server.class).findFirst(serverId);
+        if (server == null) {
+            server = Cached.create(() -> mongo.repositoryBy(Server.class).findFirst(serverId));
+        }
+
+        return server.get();
     }
 
     public MongoDatabase mongo() {

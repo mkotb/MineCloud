@@ -64,6 +64,7 @@ public class PlayerTracker implements Listener {
             Server server = plugin.server();
 
             server.removePlayer(event.getPlayer().getUniqueId());
+            plugin.updatePlayers(server);
             plugin.mongo().repositoryBy(Server.class).save(server);
         });
     }

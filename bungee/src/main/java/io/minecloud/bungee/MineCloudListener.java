@@ -17,6 +17,7 @@ package io.minecloud.bungee;
 
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.server.Server;
+import io.minecloud.models.server.ServerRepository;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ProxyPingEvent;
@@ -55,8 +56,9 @@ public class MineCloudListener implements Listener {
             if (bungee == null)
                 return;
 
-            Collection<Server> servers = plugin.mongo.repositoryBy(Server.class)
-                    .findAll((s) -> s.network().name().equals(bungee.network().name()));
+            ServerRepository repository = plugin.mongo.repositoryBy(Server.class);
+            Collection<Server> servers = repository.find(repository.createQuery().field("network").equal(bungee.network()))
+                    .asList();
 
             for (Server server : servers) {
                 online += server.onlinePlayers().size();
