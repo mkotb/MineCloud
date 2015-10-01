@@ -68,12 +68,6 @@ public class MineCloudPlugin extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (mongo.db().getCollection("servers").count(new BasicDBObject("_id", serverId)) == 0) {
-                    getLogger().log(Level.INFO, "Server removed from database, going down...");
-                    getServer().shutdown();
-                    return;
-                }
-
                 Server server = server();
                 Runtime runtime = Runtime.getRuntime();
 
