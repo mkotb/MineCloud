@@ -68,8 +68,16 @@ public class MineCloudPlugin extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Server server = server();
+                Server server = mongo.repositoryBy(Server.class).findFirst(serverId);
                 Runtime runtime = Runtime.getRuntime();
+
+                if (server == null) {
+                    getLogger().info("Server removed from db, shutting down");
+                    Bukkit.shutdown();
+                    return;
+                }
+
+                server = server();
 
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
                 server.setTps(fetchTps());
