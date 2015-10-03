@@ -40,7 +40,7 @@ public class ServerType extends MongoEntity {
     private int dedicatedRam;
     @Setter
     private int maxPlayers;
-    @Reference
+    @Reference(lazy = true)
     @Setter
     private NodeType preferredNode;
     @Setter

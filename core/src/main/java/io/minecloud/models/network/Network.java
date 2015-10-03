@@ -48,7 +48,7 @@ public class Network extends MongoEntity {
     @Setter
     private Map<String, Integer> bungees;
     @Setter
-    @Reference
+    @Reference(lazy = true)
     private List<Node> nodes;
 
     public void deployBungee(BungeeType type, Node node) {

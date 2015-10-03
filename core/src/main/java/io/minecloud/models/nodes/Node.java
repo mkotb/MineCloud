@@ -36,7 +36,7 @@ public class Node extends MongoEntity {
     private String publicIp;
     @Setter
     private String privateIp;
-    @Reference
+    @Reference(lazy = true)
     @Setter
     private NodeType type;
     @Setter
