@@ -27,13 +27,13 @@ import org.mongodb.morphia.annotations.Reference;
 @Entity(value = "bungees", noClassnameStored = true)
 @EqualsAndHashCode(callSuper = true)
 public class Bungee extends MongoEntity {
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private Network network;
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private BungeeType type;
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private Node node;
     @Setter

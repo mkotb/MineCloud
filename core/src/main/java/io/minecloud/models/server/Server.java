@@ -44,13 +44,13 @@ import java.util.UUID;
 @Entity(value = "servers", noClassnameStored = true)
 @EqualsAndHashCode(callSuper = true)
 public class Server extends MongoEntity {
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private Network network;
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private ServerType type;
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private Node node;
     @Setter

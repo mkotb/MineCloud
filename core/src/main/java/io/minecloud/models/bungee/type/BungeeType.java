@@ -32,7 +32,7 @@ import java.util.List;
 public class BungeeType extends MongoEntity {
     @Setter
     private int dedicatedRam;
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private NodeType preferredNode;
     @Setter

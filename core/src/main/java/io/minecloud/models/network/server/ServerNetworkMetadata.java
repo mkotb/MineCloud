@@ -22,7 +22,7 @@ import org.mongodb.morphia.annotations.Reference;
 
 @EqualsAndHashCode
 public class ServerNetworkMetadata {
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private ServerType type;
     @Setter

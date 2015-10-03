@@ -23,7 +23,7 @@ import org.mongodb.morphia.annotations.Reference;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class Plugin {
-    @Reference(lazy = true)
+    @Reference
     @Setter
     private PluginType type;
     @Setter
