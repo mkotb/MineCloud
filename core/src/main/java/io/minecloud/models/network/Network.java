@@ -41,14 +41,13 @@ import java.util.Map;
 import java.util.logging.Level;
 
 @Entity(value = "networks", noClassnameStored = true)
-@EqualsAndHashCode(callSuper = true)
 public class Network extends MongoEntity {
     @Setter
     private List<ServerNetworkMetadata> serverMetadata;
     @Setter
     private Map<String, Integer> bungees;
     @Setter
-    @Reference
+    @Reference(lazy = true)
     private List<Node> nodes;
 
     public void deployBungee(BungeeType type, Node node) {

@@ -18,7 +18,6 @@ package io.minecloud.models.nodes;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
-@EqualsAndHashCode
 public class CoreMetadata {
     @Setter
     private double currentFrequency;

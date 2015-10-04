@@ -20,7 +20,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 @AllArgsConstructor
-@EqualsAndHashCode
 public class World {
     @Setter
     private String name;

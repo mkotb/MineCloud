@@ -24,7 +24,6 @@ import org.mongodb.morphia.annotations.Id;
 import java.util.List;
 
 @Entity(value = "plugin-type", noClassnameStored = true)
-@EqualsAndHashCode(callSuper = true)
 public class PluginType extends MongoEntity {
     @Setter
     private PluginServerType type;

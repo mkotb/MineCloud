@@ -15,13 +15,11 @@
  */
 package io.minecloud.models.nodes.type;
 
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 /*
  * It is not recommended to change the values of this class
  */
-@EqualsAndHashCode
 public class CPU {
     @Setter
     private double baseFrequency;

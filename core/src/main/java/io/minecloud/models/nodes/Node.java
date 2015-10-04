@@ -20,7 +20,6 @@ import io.minecloud.db.mongo.model.MongoEntity;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.server.Server;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Reference;
@@ -30,13 +29,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity(value = "nodes", noClassnameStored = true)
-@EqualsAndHashCode(callSuper = true)
 public class Node extends MongoEntity {
     @Setter
     private String publicIp;
     @Setter
     private String privateIp;
-    @Reference
+    @Reference(lazy = true)
     @Setter
     private NodeType type;
     @Setter

@@ -16,13 +16,11 @@
 package io.minecloud.models.network.server;
 
 import io.minecloud.models.server.type.ServerType;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Reference;
 
-@EqualsAndHashCode
 public class ServerNetworkMetadata {
-    @Reference
+    @Reference(lazy = true)
     @Setter
     private ServerType type;
     @Setter

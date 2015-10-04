@@ -34,13 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(value = "server-types", noClassnameStored = true)
-@EqualsAndHashCode(callSuper = true)
 public class ServerType extends MongoEntity {
     @Setter
     private int dedicatedRam;
     @Setter
     private int maxPlayers;
-    @Reference
+    @Reference(lazy = true)
     @Setter
     private NodeType preferredNode;
     @Setter

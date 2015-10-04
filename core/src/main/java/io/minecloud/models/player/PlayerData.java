@@ -15,14 +15,12 @@
  */
 package io.minecloud.models.player;
 
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@EqualsAndHashCode
 public class PlayerData {
     @Setter
     private String id;

@@ -21,9 +21,8 @@ import lombok.Setter;
 import org.mongodb.morphia.annotations.Reference;
 
 @AllArgsConstructor
-@EqualsAndHashCode
 public class Plugin {
-    @Reference
+    @Reference(lazy = true)
     @Setter
     private PluginType type;
     @Setter

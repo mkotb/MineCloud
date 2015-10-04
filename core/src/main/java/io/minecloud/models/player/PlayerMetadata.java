@@ -15,9 +15,6 @@
  */
 package io.minecloud.models.player;
 
-import lombok.EqualsAndHashCode;
-
-@EqualsAndHashCode
 public class PlayerMetadata {
     private String key;
     private String value;

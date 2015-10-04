@@ -15,9 +15,6 @@
  */
 package io.minecloud.models.server;
 
-import lombok.EqualsAndHashCode;
-
-@EqualsAndHashCode
 public class ServerMetadata {
     private String key;
     private String value;
