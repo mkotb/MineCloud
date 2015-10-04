@@ -156,6 +156,8 @@ public class MineCloudPlugin extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Unable to publish server create message, shutting down", e);
             Bukkit.shutdown();
         }
+
+        new File("/var/minecloud/", serverId).deleteOnExit();
     }
 
     public double fetchTps() {
@@ -250,7 +252,7 @@ public class MineCloudPlugin extends JavaPlugin {
 
     public Server server() {
         if (server == null) {
-            server = Cached.create(() -> mongo.repositoryBy(Server.class).findFirst(serverId));
+            server = Cached.create(25_000, () -> mongo.repositoryBy(Server.class).findFirst(serverId));
         }
 
         return server.get();
