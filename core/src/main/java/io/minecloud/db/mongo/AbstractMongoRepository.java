@@ -48,7 +48,7 @@ public abstract class AbstractMongoRepository<T extends MongoEntity> extends Bas
 
     @Override
     public Collection<T> models() {
-        return find().asList();
+        return find(createQuery().disableValidation()).asList();
     }
 
     public Class<T> modelClass() {
