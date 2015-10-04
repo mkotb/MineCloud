@@ -193,7 +193,6 @@ public class MineCloudDaemon {
             Node node = node();
             Query<Server> query = repository.createQuery()
                     .field("node").equal(node)
-                    .field("containerId").notEqual("null")
                     .field("tps").notEqual(-1);
             List<Server> nodeServers = repository.find(query).asList();
 
