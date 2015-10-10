@@ -177,8 +177,9 @@ public final class MineCloud {
             log.setInt(log, log.getModifiers() & ~Modifier.FINAL);
 
             log.set(null, new SilentLogger());
-        } catch (Exception ignored) {
+        } catch (Exception e) {
             logger().info("Unable to override query validator logger!");
+            e.printStackTrace();
         }
     }
 
