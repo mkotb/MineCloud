@@ -173,8 +173,11 @@ public final class MineCloud {
         try {
             Class<?> cls = Class.forName("org.mongodb.morphia.query.QueryValidator");
             Field log = cls.getDeclaredField("LOG");
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+
             log.setAccessible(true);
-            log.setInt(log, log.getModifiers() & ~Modifier.FINAL);
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(log, log.getModifiers() & ~Modifier.FINAL);
 
             log.set(null, new SilentLogger());
         } catch (Exception e) {
