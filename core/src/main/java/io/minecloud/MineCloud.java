@@ -35,10 +35,14 @@ import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import io.minecloud.models.server.type.ServerTypeRepository;
 import lombok.Setter;
+import org.mongodb.morphia.logging.MorphiaLoggerFactory;
+import org.mongodb.morphia.logging.SilentLogger;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -165,6 +169,17 @@ public final class MineCloud {
         mongo.loadRepository(ServerTypeRepository.create(mongo.datastore()), ServerType.class);
         mongo.loadRepository(ServerRepository.create(mongo.datastore()), Server.class);
         mongo.loadRepository(PluginTypeRepository.create(mongo.datastore()), PluginType.class);
+
+        try {
+            Class<?> cls = Class.forName("org.mongodb.morphia.query.QueryValidator");
+            Field log = cls.getDeclaredField("LOG");
+            log.setAccessible(true);
+            log.setInt(log, log.getModifiers() & ~Modifier.FINAL);
+
+            log.set(null, new SilentLogger());
+        } catch (Exception ignored) {
+            logger().info("Unable to override query validator logger!");
+        }
     }
 
     public void initiateRedis(Credentials credentials) {
