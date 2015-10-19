@@ -195,6 +195,9 @@ public class MineCloudDaemon {
                     .field("node").equal(node)
                     .field("tps").notEqual(-1);
             List<Server> nodeServers = repository.find(query).asList();
+            List<String> names = nodeServers.stream()
+                    .map(Server::name)
+                    .collect(Collectors.toList());
 
             nodeServers.forEach((server) -> {
                 File runDir = new File("/var/minecloud/" + server.name());
@@ -215,6 +218,7 @@ public class MineCloudDaemon {
                     }
 
                     repository.delete(server);
+                    names.remove(server.name());
                     MineCloud.logger().info("Removed dead server (" + server.name() + ")");
                 } catch (IOException | InterruptedException ex) {
                     if (!(ex instanceof NoSuchFileException)) {
@@ -237,9 +241,6 @@ public class MineCloudDaemon {
             }
 
             File appContainer = new File("/var/minecloud");
-            List<String> names = nodeServers.stream()
-                    .map(Server::name)
-                    .collect(Collectors.toList());
 
             names.add("bungee"); // don't remove bungee servers
 
@@ -254,6 +255,7 @@ public class MineCloudDaemon {
             for (File f : appContainer.listFiles(File::isDirectory)) {
                 if (!names.contains(f.getName())) {
                     f.delete();
+                    MineCloud.logger().info("Deleted folder of dead server: " + f.getName());
                 }
             }
 
