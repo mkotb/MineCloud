@@ -78,7 +78,6 @@ public class MineCloudPlugin extends Plugin {
 
                         try {
                             MessageInputStream stream = message.contents();
-
                             Server server = mongo.repositoryBy(Server.class).findFirst(stream.readString());
 
                             addServer(server);

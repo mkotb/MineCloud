@@ -254,8 +254,10 @@ public class MineCloudDaemon {
 
             for (File f : appContainer.listFiles(File::isDirectory)) {
                 if (!names.contains(f.getName())) {
-                    if (f.delete())  {
-                        MineCloud.logger().info("Deleted folder of dead server: " + f.getName());
+                    try {
+                        Runtime.getRuntime().exec(("/usr/bin/rm -rf " + f.getAbsolutePath()).split(" ")).waitFor();
+                        MineCloud.logger().info("Deleted folder of dead server " + f.getName());
+                    } catch (IOException | InterruptedException ignored) {
                     }
                 }
             }
