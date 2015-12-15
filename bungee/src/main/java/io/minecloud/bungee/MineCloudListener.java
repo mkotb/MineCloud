@@ -80,6 +80,7 @@ public class MineCloudListener implements Listener {
         String reason = event.getKickReason().toLowerCase();
 
         if (reason.contains("kick") || reason.contains("ban")) {
+            event.getPlayer().disconnect(event.getKickReasonComponent());
             return;
         }
 
