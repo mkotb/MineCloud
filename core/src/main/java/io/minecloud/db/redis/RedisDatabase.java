@@ -78,6 +78,7 @@ public final class RedisDatabase implements Database {
     }
 
     public Jedis grabResource() {
+        this.connected(); //Just security.
         return pool.getResource();
     }
 
