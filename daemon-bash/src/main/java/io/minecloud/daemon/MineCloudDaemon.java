@@ -52,13 +52,11 @@ public class MineCloudDaemon {
     private final String node;
     private final RedisDatabase redis;
     private final MongoDatabase mongo;
-    private final Jedis heartbeatTracker;
 
     private MineCloudDaemon(Properties properties) {
         redis = MineCloud.instance().redis();
         mongo = MineCloud.instance().mongo();
         node = (String) properties.get("node-name");
-        this.heartbeatTracker = redis.grabResource();
 
         instance = this;
 
@@ -110,6 +108,9 @@ public class MineCloudDaemon {
                         MineCloud.logger().info("Killed server " + server.name()
                                 + " with container id " + server.containerId());
                         mongo.repositoryBy(Server.class).delete(server);
+                        try (Jedis jedis = this.redis.grabResource()) {
+                            jedis.hdel("server:" + server.entityId(), "heartbeat");
+                        }
                     } catch (IOException e) {
                         MineCloud.logger().log(Level.SEVERE, "Was unable to kill a server", e);
                     }
@@ -225,6 +226,9 @@ public class MineCloudDaemon {
 
                     repository.delete(server);
                     names.remove(server.name());
+                    try (Jedis jedis = this.redis.grabResource()) {
+                        jedis.hdel("server:" + server.entityId(), "heartbeat");
+                    }
                     MineCloud.logger().info("Removed dead server (" + server.name() + ")");
                 } catch (IOException | InterruptedException ex) {
                     if (!(ex instanceof NoSuchFileException)) {
@@ -234,13 +238,16 @@ public class MineCloudDaemon {
             });
 
             nodeServers.forEach(server ->  {
-                Map<String, String> hResult = heartbeatTracker.hgetAll("server:" + server.entityId());
-                long heartbeat = Long.valueOf(hResult.get("heartbeat"));
-                long difference = System.currentTimeMillis() - heartbeat;
-                if (difference > 30000L) {
-                    repository.delete(server);
-                    names.remove(server.name());
-                    MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing " + server.name() + ")");
+                try (Jedis jedis = this.redis.grabResource()) {
+                    Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
+                    long heartbeat = Long.valueOf(hResult.get("heartbeat"));
+                    long difference = System.currentTimeMillis() - heartbeat;
+                    if (difference > 30000L) {
+                        jedis.hdel("server:" + server.entityId(), "heartbeat");
+                        repository.delete(server);
+                        names.remove(server.name());
+                        MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing " + server.name() + ")");
+                    }
                 }
             });
 

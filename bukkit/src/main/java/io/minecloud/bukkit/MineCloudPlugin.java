@@ -85,11 +85,10 @@ public class MineCloudPlugin extends JavaPlugin {
 
                 mongo.repositoryBy(Server.class).save(server);
 
-                //Heartbeeat
-                Jedis jedis = redis.grabResource();
-
-                jedis.hset("server:" + server.entityId(), "heartbeat", String.valueOf(System.currentTimeMillis()));
-                jedis.close();
+                //Heartbeat
+                try (Jedis jedis = redis.grabResource()) {
+                    jedis.hset("server:" + server.entityId(), "heartbeat", String.valueOf(System.currentTimeMillis()));
+                }
             }
         }.runTaskTimerAsynchronously(this, 40, 200);
 
@@ -225,6 +224,10 @@ public class MineCloudPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        try (Jedis jedis = this.redis.grabResource()) {
+            jedis.hdel("server:" + server().entityId(), "heartbeat");
+        }
+
         mongo.repositoryBy(Server.class).deleteById(serverId);
 
         try {
