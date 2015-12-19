@@ -36,8 +36,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 public final class Deployer {
-    private static final AtomicInteger PORT_COUNTER = new AtomicInteger(32812);
-
     private Deployer() {
     }
 
@@ -55,7 +53,7 @@ public final class Deployer {
         server.setRamUsage(-1);
         server.setId(server.type().name() + server.number());
         server.setMetadata(metadata);
-        server.setPort(PORT_COUNTER.incrementAndGet());
+        server.setPort(selectPort(repository));
         server.setContainerId("null");
 
         Map<String, String> env = new HashMap<String, String>() {{
@@ -178,6 +176,29 @@ public final class Deployer {
         } catch (IOException ex) {
             throw new MineCloudException(ex);
         }
+    }
+
+    private static int selectPort(ServerRepository repository) {
+        int[] usedPorts = repository.find(repository.createQuery().field("node").equal(MineCloudDaemon.instance().node()))
+                .asList().stream().mapToInt(Server::port).sorted().toArray();
+
+        if (usedPorts.length == 0) {
+            return 32812; // start port, return before loop is started
+        }
+
+        int last = usedPorts[0];
+
+        for (int in = 1; in < usedPorts.length; in++) {
+            int i = usedPorts[in];
+
+            if (last != (i - 1)) {
+                break; // i is not the increment of last, break loop and return newly opened port
+            } else {
+                last = i;
+            }
+        }
+
+        return last + 1;
     }
 
     private static class Container<T> {
