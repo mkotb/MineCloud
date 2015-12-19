@@ -237,8 +237,8 @@ public class MineCloudDaemon {
                 }
             });
 
-            nodeServers.forEach(server ->  {
-                try (Jedis jedis = this.redis.grabResource()) {
+            try (Jedis jedis = this.redis.grabResource()) {
+                nodeServers.forEach(server ->  {
                     Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
@@ -248,8 +248,8 @@ public class MineCloudDaemon {
                         names.remove(server.name());
                         MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing " + server.name() + ")");
                     }
-                }
-            });
+                });
+            }
 
             if (bungeeRepo.findOne("_id", node.publicIp()) != null) {
                 try {
