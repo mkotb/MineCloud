@@ -87,12 +87,18 @@ public final class RedisDatabase implements Database {
 
     public boolean connected() {
         boolean connection;
+        Jedis jedis = null;
         try {
-            Jedis jedis = grabResource();
+            jedis = grabResource();
             connection = true;
         } catch (JedisConnectionException e) {
             MineCloud.logger().warning("Redis connection had died, reconnecting.");
             connection = false;
+            this.setup(); //This should work, right?
+        } finally {
+            if (jedis != null) {
+                jedis.close();
+            }
         }
 
         return connection;
