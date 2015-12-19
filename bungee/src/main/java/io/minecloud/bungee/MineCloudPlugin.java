@@ -35,7 +35,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
-import org.bson.types.ObjectId;
 
 import java.io.File;
 import java.io.IOException;
@@ -220,6 +219,8 @@ public class MineCloudPlugin extends Plugin {
         });
 
         getProxy().getScheduler().schedule(this, () -> {
+            this.redis.connected(); //Checks for Redis death, if it's dead it will reconnect.
+
             ServerRepository repository = mongo.repositoryBy(Server.class);
             List<Server> servers = repository.find(repository.createQuery()
                     .field("network").equal(bungee().network()))

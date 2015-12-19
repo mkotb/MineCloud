@@ -16,7 +16,6 @@
 package io.minecloud.bukkit;
 
 import com.google.common.io.Files;
-import com.mongodb.BasicDBObject;
 import io.minecloud.Cached;
 import io.minecloud.MineCloud;
 import io.minecloud.db.mongo.MongoDatabase;
@@ -34,6 +33,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.FileUtil;
+import redis.clients.jedis.Jedis;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,6 +84,12 @@ public class MineCloudPlugin extends JavaPlugin {
                 updatePlayers(server);
 
                 mongo.repositoryBy(Server.class).save(server);
+
+                //Heartbeeat
+                Jedis jedis = redis.grabResource();
+
+                jedis.hset("server:" + server.entityId(), "heartbeat", String.valueOf(System.currentTimeMillis()));
+                jedis.close();
             }
         }.runTaskTimerAsynchronously(this, 40, 200);
 

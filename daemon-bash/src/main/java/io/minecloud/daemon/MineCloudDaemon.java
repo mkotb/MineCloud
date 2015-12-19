@@ -33,6 +33,7 @@ import io.minecloud.models.server.ServerMetadata;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import org.mongodb.morphia.query.Query;
+import redis.clients.jedis.Jedis;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -50,11 +52,13 @@ public class MineCloudDaemon {
     private final String node;
     private final RedisDatabase redis;
     private final MongoDatabase mongo;
+    private final Jedis heartbeatTracker;
 
     private MineCloudDaemon(Properties properties) {
         redis = MineCloud.instance().redis();
         mongo = MineCloud.instance().mongo();
         node = (String) properties.get("node-name");
+        this.heartbeatTracker = redis.grabResource();
 
         instance = this;
 
@@ -188,6 +192,8 @@ public class MineCloudDaemon {
         new StatisticsWatcher().start();
 
         while (!Thread.currentThread().isInterrupted()) {
+            this.redis.connected(); //Checks for Redis death, if it's dead it will reconnect.
+
             BungeeRepository bungeeRepo = mongo.repositoryBy(Bungee.class);
             ServerRepository repository = mongo.repositoryBy(Server.class);
             Node node = node();
@@ -224,6 +230,17 @@ public class MineCloudDaemon {
                     if (!(ex instanceof NoSuchFileException)) {
                         MineCloud.logger().log(Level.SEVERE, "Was unable to check if server is running", ex);
                     }
+                }
+            });
+
+            nodeServers.forEach(server ->  {
+                Map<String, String> hResult = heartbeatTracker.hgetAll("server:" + server.entityId());
+                long heartbeat = Long.valueOf(hResult.get("heartbeat"));
+                long difference = System.currentTimeMillis() - heartbeat;
+                if (difference > 30000L) {
+                    repository.delete(server);
+                    names.remove(server.name());
+                    MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing " + server.name() + ")");
                 }
             });
 
