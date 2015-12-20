@@ -243,6 +243,11 @@ public class MineCloudDaemon {
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
                     if (difference > 30000L) {
+                        try {
+                            new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         jedis.hdel("server:" + server.entityId(), "heartbeat");
                         repository.delete(server);
                         names.remove(server.name());
