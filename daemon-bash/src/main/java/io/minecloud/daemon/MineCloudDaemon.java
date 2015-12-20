@@ -370,12 +370,6 @@ public class MineCloudDaemon {
         File[] dirFiles = directory.listFiles();
         files.addAll(Arrays.asList(dirFiles));
 
-        for (File file : dirFiles) {
-            if (file.isDirectory()) {
-                files.addAll(files(file.getAbsoluteFile()));
-            }
-        }
-
         return files;
     }
 }
