@@ -205,7 +205,7 @@ public class MineCloudDaemon {
 
             List<File> files = files(new File("/var/minecloud"));
 
-            files.stream().filter(file -> !file.getName().equalsIgnoreCase("bungee")).forEach(file1 -> {
+            files.stream().filter(file -> file.isDirectory() && !file.getName().equalsIgnoreCase("bungee")).forEach(file1 -> {
                 String name = file1.getName();
 
                 if (!names.contains(name)) {
