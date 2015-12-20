@@ -203,7 +203,19 @@ public class MineCloudDaemon {
                     .map(Server::name)
                     .collect(Collectors.toList());
 
-            MineCloud.logger().info(nodeServers.size() + ": nodeServers#size()");
+            List<File> files = files(new File("/var/minecloud"));
+
+            files.stream().filter(file -> !file.getName().equalsIgnoreCase("bungee")).forEach(file1 -> {
+                String name = file1.getName();
+
+                if (!names.contains(name)) {
+                    MineCloud.logger().info("Found directory for server not in the DB, " + name);
+
+                    if (file1.exists()) {
+                        file1.delete();
+                    }
+                }
+            });
 
             nodeServers.forEach((server) -> {
                 File runDir = new File("/var/minecloud/" + server.name());
@@ -241,19 +253,11 @@ public class MineCloudDaemon {
                     Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
 
                     if (hResult == null || hResult.isEmpty()) {
-                        return;
+                        return; //Prevent loop from dying.
                     }
 
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
-                    //LOG
-                    MineCloud.logger().info("==================");
-                    MineCloud.logger().info("Debug for " + server.name());
-                    MineCloud.logger().info(Arrays.toString(hResult.entrySet().toArray()));
-                    MineCloud.logger().info("Last heartbeat: " + heartbeat);
-                    MineCloud.logger().info("Difference: " + difference);
-                    MineCloud.logger().info("==================");
-                    //ELOG
                     if (difference > 30000L) {
                         try {
                             new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
@@ -269,7 +273,7 @@ public class MineCloudDaemon {
                             runDir.delete();
                         }
 
-                        MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing " + server.name() + ")");
+                        MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing (" + server.name() + ")");
                     }
                 });
             }
@@ -359,5 +363,19 @@ public class MineCloudDaemon {
 
     public Node node() {
         return ((NodeRepository) mongo.repositoryBy(Node.class)).nodeBy(node);
+    }
+
+    private List<File> files(File directory) {
+        List<File> files = new ArrayList<>();
+        File[] dirFiles = directory.listFiles();
+        files.addAll(Arrays.asList(dirFiles));
+
+        for (File file : dirFiles) {
+            if (file.isDirectory()) {
+                files.addAll(files(file.getAbsoluteFile()));
+            }
+        }
+
+        return files;
     }
 }
