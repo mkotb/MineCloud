@@ -306,27 +306,6 @@ public class MineCloudDaemon {
             } catch (InterruptedException ignored) {
             }
         }
-
-        while (!Thread.currentThread().isInterrupted()) {
-            List<File> files = files(new File("/var/minecloud"));
-
-            files.stream().filter(file -> file.isDirectory() && !file.getName().equalsIgnoreCase("bungee")).forEach(file1 -> {
-                String name = file1.getName();
-
-                if (!names.contains(name)) {
-                    MineCloud.logger().info("Found directory for server not in the DB, " + name);
-
-                    if (file1.exists()) {
-                        file1.delete();
-                    }
-                }
-            });
-
-            try {
-                Thread.sleep(60000L);
-            } catch (InterruptedException ignored) {
-            }
-        }
     }
 
     public static void main(String[] args) throws Exception {
