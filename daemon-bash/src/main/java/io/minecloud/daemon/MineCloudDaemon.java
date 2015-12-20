@@ -50,6 +50,8 @@ public class MineCloudDaemon {
     private final RedisDatabase redis;
     private final MongoDatabase mongo;
 
+    private List<String> names;
+
     private MineCloudDaemon(Properties properties) {
         redis = MineCloud.instance().redis();
         mongo = MineCloud.instance().mongo();
@@ -199,7 +201,7 @@ public class MineCloudDaemon {
                     .field("node").equal(node)
                     .field("tps").notEqual(-1);
             List<Server> nodeServers = repository.find(query).asList();
-            List<String> names = nodeServers.stream()
+            names = nodeServers.stream()
                     .map(Server::name)
                     .collect(Collectors.toList());
 
@@ -244,7 +246,7 @@ public class MineCloudDaemon {
 
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
-                    if (difference > 30000L) {
+                    if (difference > 20000L) {
                         try {
                             new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
                         } catch (IOException e) {
@@ -259,7 +261,7 @@ public class MineCloudDaemon {
                             runDir.delete();
                         }
 
-                        MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing (" + server.name() + ")");
+                        MineCloud.logger().log(Level.WARNING, "Found server not updated in 20s, killing (" + server.name() + ")");
                     }
                 });
             }
@@ -299,6 +301,13 @@ public class MineCloudDaemon {
                 }
             }
 
+            try {
+                Thread.sleep(2000L);
+            } catch (InterruptedException ignored) {
+            }
+        }
+
+        while (!Thread.currentThread().isInterrupted()) {
             List<File> files = files(new File("/var/minecloud"));
 
             files.stream().filter(file -> file.isDirectory() && !file.getName().equalsIgnoreCase("bungee")).forEach(file1 -> {
@@ -314,7 +323,7 @@ public class MineCloudDaemon {
             });
 
             try {
-                Thread.sleep(2000L);
+                Thread.sleep(60000L);
             } catch (InterruptedException ignored) {
             }
         }
