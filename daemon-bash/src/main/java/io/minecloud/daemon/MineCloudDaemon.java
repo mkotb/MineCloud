@@ -203,20 +203,6 @@ public class MineCloudDaemon {
                     .map(Server::name)
                     .collect(Collectors.toList());
 
-            List<File> files = files(new File("/var/minecloud"));
-
-            files.stream().filter(file -> file.isDirectory() && !file.getName().equalsIgnoreCase("bungee")).forEach(file1 -> {
-                String name = file1.getName();
-
-                if (!names.contains(name)) {
-                    MineCloud.logger().info("Found directory for server not in the DB, " + name);
-
-                    if (file1.exists()) {
-                        file1.delete();
-                    }
-                }
-            });
-
             nodeServers.forEach((server) -> {
                 File runDir = new File("/var/minecloud/" + server.name());
 
@@ -312,6 +298,20 @@ public class MineCloudDaemon {
                     }
                 }
             }
+
+            List<File> files = files(new File("/var/minecloud"));
+
+            files.stream().filter(file -> file.isDirectory() && !file.getName().equalsIgnoreCase("bungee")).forEach(file1 -> {
+                String name = file1.getName();
+
+                if (!names.contains(name)) {
+                    MineCloud.logger().info("Found directory for server not in the DB, " + name);
+
+                    if (file1.exists()) {
+                        file1.delete();
+                    }
+                }
+            });
 
             try {
                 Thread.sleep(2000L);
