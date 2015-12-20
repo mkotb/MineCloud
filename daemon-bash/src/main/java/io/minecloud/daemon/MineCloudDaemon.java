@@ -39,10 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -242,6 +239,14 @@ public class MineCloudDaemon {
                     Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
+                    //LOG
+                    MineCloud.logger().info("==================");
+                    MineCloud.logger().info("Debug for " + server.name());
+                    MineCloud.logger().info(Arrays.toString(hResult.entrySet().toArray()));
+                    MineCloud.logger().info("Last heartbeat: " + heartbeat);
+                    MineCloud.logger().info("Difference: " + difference);
+                    MineCloud.logger().info("==================");
+                    //ELOG
                     if (difference > 30000L) {
                         try {
                             new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
@@ -251,6 +256,12 @@ public class MineCloudDaemon {
                         jedis.hdel("server:" + server.entityId(), "heartbeat");
                         repository.delete(server);
                         names.remove(server.name());
+                        File runDir = new File("/var/minecloud/" + server.name());
+
+                        if (runDir.exists()) {
+                            runDir.delete();
+                        }
+
                         MineCloud.logger().log(Level.WARNING, "Found server not updated in 30s, killing " + server.name() + ")");
                     }
                 });
