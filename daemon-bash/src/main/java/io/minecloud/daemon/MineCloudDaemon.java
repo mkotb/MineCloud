@@ -203,6 +203,8 @@ public class MineCloudDaemon {
                     .map(Server::name)
                     .collect(Collectors.toList());
 
+            MineCloud.logger().info(nodeServers.size() + ": nodeServers#size()");
+
             nodeServers.forEach((server) -> {
                 File runDir = new File("/var/minecloud/" + server.name());
 
@@ -237,6 +239,11 @@ public class MineCloudDaemon {
             try (Jedis jedis = this.redis.grabResource()) {
                 nodeServers.forEach(server ->  {
                     Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
+
+                    if (hResult == null || hResult.isEmpty()) {
+                        return;
+                    }
+
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
                     //LOG
