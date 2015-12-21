@@ -23,6 +23,7 @@ import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.*;
 
@@ -82,5 +83,22 @@ public final class RedisDatabase implements Database {
 
     public Credentials credentials() {
         return credentials;
+    }
+
+    public boolean connected() {
+        boolean connection;
+        Jedis jedis = null;
+        try {
+            jedis = grabResource();
+            connection = true;
+        } catch (JedisConnectionException e) {
+            MineCloud.logger().warning("Redis connection had died, reconnecting.");
+            connection = false;
+            this.setup(); //This should work, right?
+        }
+
+        this.pool.returnResource(jedis);
+
+        return connection;
     }
 }

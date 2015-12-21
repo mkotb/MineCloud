@@ -19,25 +19,21 @@ import io.minecloud.MineCloud;
 import io.minecloud.db.Credentials;
 import io.minecloud.db.mongo.MongoDatabase;
 import io.minecloud.db.redis.RedisDatabase;
-import io.minecloud.db.redis.msg.binary.MessageOutputStream;
 import io.minecloud.db.redis.pubsub.SimpleRedisChannel;
 import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.bungee.BungeeRepository;
 import io.minecloud.models.bungee.type.BungeeType;
 import io.minecloud.models.network.Network;
 import io.minecloud.models.nodes.Node;
-import io.minecloud.models.nodes.type.NodeType;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 public class Controller {
@@ -57,6 +53,8 @@ public class Controller {
         redis.addChannel(SimpleRedisChannel.create("server-create", redis));
 
         while (!Thread.currentThread().isInterrupted()) {
+            this.redis.connected(); //Checks for Redis death, if it's dead it will reconnect.
+
             nodesUsed.clear();
 
             mongo.repositoryBy(Network.class).models()

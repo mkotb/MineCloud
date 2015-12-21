@@ -33,14 +33,13 @@ import io.minecloud.models.server.ServerMetadata;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import org.mongodb.morphia.query.Query;
+import redis.clients.jedis.Jedis;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -50,6 +49,8 @@ public class MineCloudDaemon {
     private final String node;
     private final RedisDatabase redis;
     private final MongoDatabase mongo;
+
+    private List<String> names;
 
     private MineCloudDaemon(Properties properties) {
         redis = MineCloud.instance().redis();
@@ -106,6 +107,9 @@ public class MineCloudDaemon {
                         MineCloud.logger().info("Killed server " + server.name()
                                 + " with container id " + server.containerId());
                         mongo.repositoryBy(Server.class).delete(server);
+                        try (Jedis jedis = this.redis.grabResource()) {
+                            jedis.hdel("server:" + server.entityId(), "heartbeat");
+                        }
                     } catch (IOException e) {
                         MineCloud.logger().log(Level.SEVERE, "Was unable to kill a server", e);
                     }
@@ -188,6 +192,8 @@ public class MineCloudDaemon {
         new StatisticsWatcher().start();
 
         while (!Thread.currentThread().isInterrupted()) {
+            this.redis.connected(); //Checks for Redis death, if it's dead it will reconnect.
+
             BungeeRepository bungeeRepo = mongo.repositoryBy(Bungee.class);
             ServerRepository repository = mongo.repositoryBy(Server.class);
             Node node = node();
@@ -195,7 +201,7 @@ public class MineCloudDaemon {
                     .field("node").equal(node)
                     .field("tps").notEqual(-1);
             List<Server> nodeServers = repository.find(query).asList();
-            List<String> names = nodeServers.stream()
+            names = nodeServers.stream()
                     .map(Server::name)
                     .collect(Collectors.toList());
 
@@ -219,6 +225,9 @@ public class MineCloudDaemon {
 
                     repository.delete(server);
                     names.remove(server.name());
+                    try (Jedis jedis = this.redis.grabResource()) {
+                        jedis.hdel("server:" + server.entityId(), "heartbeat");
+                    }
                     MineCloud.logger().info("Removed dead server (" + server.name() + ")");
                 } catch (IOException | InterruptedException ex) {
                     if (!(ex instanceof NoSuchFileException)) {
@@ -226,6 +235,36 @@ public class MineCloudDaemon {
                     }
                 }
             });
+
+            try (Jedis jedis = this.redis.grabResource()) {
+                nodeServers.forEach(server ->  {
+                    Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
+
+                    if (hResult == null || hResult.isEmpty()) {
+                        return; //Prevent loop from dying.
+                    }
+
+                    long heartbeat = Long.valueOf(hResult.get("heartbeat"));
+                    long difference = System.currentTimeMillis() - heartbeat;
+                    if (difference > 20000L) {
+                        try {
+                            new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        jedis.hdel("server:" + server.entityId(), "heartbeat");
+                        repository.delete(server);
+                        names.remove(server.name());
+                        File runDir = new File("/var/minecloud/" + server.name());
+
+                        if (runDir.exists()) {
+                            runDir.delete();
+                        }
+
+                        MineCloud.logger().log(Level.WARNING, "Found server not updated in 20s, killing (" + server.name() + ")");
+                    }
+                });
+            }
 
             if (bungeeRepo.findOne("_id", node.publicIp()) != null) {
                 try {
@@ -312,5 +351,13 @@ public class MineCloudDaemon {
 
     public Node node() {
         return ((NodeRepository) mongo.repositoryBy(Node.class)).nodeBy(node);
+    }
+
+    private List<File> files(File directory) {
+        List<File> files = new ArrayList<>();
+        File[] dirFiles = directory.listFiles();
+        files.addAll(Arrays.asList(dirFiles));
+
+        return files;
     }
 }
