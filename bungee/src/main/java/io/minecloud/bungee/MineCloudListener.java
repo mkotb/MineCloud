@@ -79,8 +79,9 @@ public class MineCloudListener implements Listener {
     public void serverKick(ServerKickEvent event) {
         String reason = event.getKickReason().toLowerCase();
 
-        if (reason.contains("kick") || reason.contains("ban")) {
+        if (reason.contains("kick") || reason.contains("ban") || reason.contains("pack")) {
             event.getPlayer().disconnect(event.getKickReasonComponent());
+            event.setCancelled(false);
             return;
         }
 
@@ -92,7 +93,8 @@ public class MineCloudListener implements Listener {
             return;
         }
 
-        event.setCancelled(true);
+        event.getPlayer().connect(server);
         event.setCancelServer(server);
+        event.setCancelled(true);
     }
 }
