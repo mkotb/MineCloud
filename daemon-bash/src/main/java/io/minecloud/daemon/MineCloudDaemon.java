@@ -104,6 +104,7 @@ public class MineCloudDaemon {
 
                     try {
                         new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start();
+                        Deployer.runExit(server.name());
                         MineCloud.logger().info("Killed server " + server.name()
                                 + " with container id " + server.containerId());
                         mongo.repositoryBy(Server.class).delete(server);
@@ -246,9 +247,10 @@ public class MineCloudDaemon {
 
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
-                    if (difference > 20000L) {
+                    if (difference > 35000L) {
                         try {
                             new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
+                            Deployer.runExit(server.name());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

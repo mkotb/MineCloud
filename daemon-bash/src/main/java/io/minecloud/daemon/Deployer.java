@@ -128,6 +128,20 @@ public final class Deployer {
         return Long.parseLong(Files.readAllLines(Paths.get("/var/minecloud/" + app + "/started.ts")).get(0));
     }
 
+    public static void runExit(String app) throws IOException {
+        File file = new File("/var/minecloud/" + app + "/exit.sh");
+
+        if (!file.exists()) {
+            return;
+        }
+
+        new ProcessBuilder()
+                .directory(new File("/var/minecloud/" + app))
+                .redirectErrorStream(true)
+                .command("sh", "exit.sh")
+                .start();
+    }
+
     public static boolean isRunning(String app) throws InterruptedException, IOException {
         Process process = Runtime.getRuntime().exec("ps -p " + pidOf(app));
 
