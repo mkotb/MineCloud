@@ -138,7 +138,7 @@ public final class Deployer {
         new ProcessBuilder()
                 .directory(new File("/var/minecloud/" + app))
                 .redirectErrorStream(true)
-                .command("sh", "exit.sh")
+                .command("sh", "exit.sh", app)
                 .start();
     }
 
