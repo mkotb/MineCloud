@@ -302,8 +302,7 @@ public class MineCloudDaemon {
                     try {
                         new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(f.getName()))).start();
                         Deployer.runExit(f.getName());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException ignored) {
                     }
 
                     try {
