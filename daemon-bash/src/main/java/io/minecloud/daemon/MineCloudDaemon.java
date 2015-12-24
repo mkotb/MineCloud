@@ -295,6 +295,17 @@ public class MineCloudDaemon {
 
             for (File f : appContainer.listFiles(File::isDirectory)) {
                 if (!names.contains(f.getName())) {
+                    try (Jedis jedis = this.redis.grabResource()) {
+                        jedis.hdel("server:" + f.getName(), "heartbeat");
+                    }
+
+                    try {
+                        new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(f.getName()))).start();
+                        Deployer.runExit(f.getName());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     try {
                         Runtime.getRuntime().exec(("/usr/bin/rm -rf " + f.getAbsolutePath()).split(" "));
                         MineCloud.logger().info("Deleted folder of dead server " + f.getName());
