@@ -57,6 +57,13 @@ public final class Deployer {
         server.setPort(selectPort(repository));
         server.setContainerId("null");
 
+        try {
+            if (isRunning(server.name())) {
+                return;
+            }
+        } catch (IOException | InterruptedException ignored) {
+        }
+
         Map<String, String> env = new HashMap<String, String>() {{
             put("mongo_hosts", mongoCreds.formattedHosts());
             put("mongo_username", mongoCreds.username());
