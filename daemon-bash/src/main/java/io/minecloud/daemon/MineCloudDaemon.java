@@ -40,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,7 @@ public class MineCloudDaemon {
     private final MongoDatabase mongo;
 
     private List<String> names;
+    public List<SecurityCounter> counters;
 
     private MineCloudDaemon(Properties properties) {
         redis = MineCloud.instance().redis();
@@ -191,6 +193,7 @@ public class MineCloudDaemon {
                 }));
 
         new StatisticsWatcher().start();
+        new SecurityCounterThread().start();
         ServerRepository repository = mongo.repositoryBy(Server.class);
         OptionalInt port = repository.find(repository.createQuery().field("node").equal(node()))
                 .asList().stream().mapToInt(Server::port).sorted().max();
@@ -245,6 +248,9 @@ public class MineCloudDaemon {
                     Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
 
                     if (hResult == null || hResult.isEmpty()) {
+                        if (existsFor(server) == null) {
+                            this.counters.add(new SecurityCounter(server));
+                        }
                         return; //Prevent loop from dying.
                     }
 
@@ -368,11 +374,68 @@ public class MineCloudDaemon {
         return ((NodeRepository) mongo.repositoryBy(Node.class)).nodeBy(node);
     }
 
-    private List<File> files(File directory) {
-        List<File> files = new ArrayList<>();
-        File[] dirFiles = directory.listFiles();
-        files.addAll(Arrays.asList(dirFiles));
+    private SecurityCounter existsFor(Server server) {
+        for (SecurityCounter counter : this.counters) {
+            if (counter.getServer().entityId().equals(server.entityId()))
+                return counter;
+        }
 
-        return files;
+        return null;
+    }
+
+    public void killServer(Server server) {
+        ServerRepository repository = mongo.repositoryBy(Server.class);
+        try (Jedis jedis = this.redis.grabResource()) {
+            try {
+                new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
+                Deployer.runExit(server.name());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            jedis.hdel("server:" + server.entityId(), "heartbeat");
+            repository.delete(server);
+            names.remove(server.name());
+            File runDir = new File("/var/minecloud/" + server.name());
+
+            if (runDir.exists()) {
+                runDir.delete();
+            }
+
+            if (existsFor(server) != null) {
+                this.counters.remove(existsFor(server));
+            }
+        }
+    }
+
+    public class SecurityCounter {
+
+        private final Server server;
+        private final AtomicInteger counter;
+
+        public SecurityCounter(Server server) {
+            this.server = server;
+            this.counter = new AtomicInteger(0);
+        }
+
+        public Server getServer() {
+            return server;
+        }
+
+        public AtomicInteger getCounter() {
+            return counter;
+        }
+
+        public boolean shouldKill() {
+            try (Jedis jedis = redis.grabResource()) {
+                Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
+
+                if ((hResult == null || hResult.isEmpty()) && this.getCounter().get() == 1) {
+                    return true;
+                }
+
+                this.getCounter().incrementAndGet();
+                return false;
+            }
+        }
     }
 }
