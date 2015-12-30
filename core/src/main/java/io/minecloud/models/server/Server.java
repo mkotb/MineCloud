@@ -66,6 +66,8 @@ public class Server extends MongoEntity {
     private double tps;
     @Setter
     private List<ServerMetadata> metadata;
+    @Setter
+    private long startTime;
 
     public Network network() {
         return network;
@@ -77,6 +79,10 @@ public class Server extends MongoEntity {
 
     public Node node() {
         return node;
+    }
+
+    public long startTime() {
+        return startTime;
     }
 
     public List<PlayerData> onlinePlayers() {

@@ -202,14 +202,13 @@ public class MineCloudDaemon {
             BungeeRepository bungeeRepo = mongo.repositoryBy(Bungee.class);
             Node node = node();
             Query<Server> query = repository.createQuery()
-                    .field("node").equal(node)
-                    .field("tps").notEqual(-1);
+                    .field("node").equal(node);
             List<Server> nodeServers = repository.find(query).asList();
             names = nodeServers.stream()
                     .map(Server::name)
                     .collect(Collectors.toList());
 
-            nodeServers.forEach((server) -> {
+            nodeServers.stream().filter((s) -> s.ramUsage() != -1).forEach((server) -> {
                 File runDir = new File("/var/minecloud/" + server.name());
 
                 if (!runDir.exists()) {
@@ -227,6 +226,7 @@ public class MineCloudDaemon {
                         return;
                     }
 
+                    Deployer.killServer(server.name());
                     repository.delete(server);
                     names.remove(server.name());
                     try (Jedis jedis = this.redis.grabResource()) {
@@ -241,7 +241,7 @@ public class MineCloudDaemon {
             });
 
             try (Jedis jedis = this.redis.grabResource()) {
-                nodeServers.forEach(server ->  {
+                nodeServers.stream().filter((s) -> s.ramUsage() != -1).forEach(server ->  {
                     Map<String, String> hResult = jedis.hgetAll("server:" + server.entityId());
 
                     if (hResult == null || hResult.isEmpty()) {
@@ -251,21 +251,9 @@ public class MineCloudDaemon {
                     long heartbeat = Long.valueOf(hResult.get("heartbeat"));
                     long difference = System.currentTimeMillis() - heartbeat;
                     if (difference > 35000L) {
-                        try {
-                            new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(server.name()))).start(); //Murder server in cold blood.
-                            Deployer.runExit(server.name());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        jedis.hdel("server:" + server.entityId(), "heartbeat");
+                        Deployer.killServer(server.name());
                         repository.delete(server);
                         names.remove(server.name());
-                        File runDir = new File("/var/minecloud/" + server.name());
-
-                        if (runDir.exists()) {
-                            runDir.delete();
-                        }
-
                         MineCloud.logger().log(Level.WARNING, "Found server not updated in 20s, killing (" + server.name() + ")");
                     }
                 });
@@ -298,23 +286,18 @@ public class MineCloudDaemon {
 
             for (File f : appContainer.listFiles(File::isDirectory)) {
                 if (!names.contains(f.getName())) {
-                    try (Jedis jedis = this.redis.grabResource()) {
-                        jedis.hdel("server:" + f.getName(), "heartbeat");
-                    }
-
-                    try {
-                        new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(Deployer.pidOf(f.getName()))).start();
-                        Deployer.runExit(f.getName());
-                    } catch (IOException ignored) {
-                    }
-
-                    try {
-                        Runtime.getRuntime().exec(("/usr/bin/rm -rf " + f.getAbsolutePath()).split(" "));
-                        MineCloud.logger().info("Deleted folder of dead server " + f.getName());
-                    } catch (IOException ignored) {
-                    }
+                    Deployer.killServer(f.getName());
                 }
             }
+
+            /* Startup timeout */
+            nodeServers.stream().filter((s) -> s.ramUsage() == -1).forEach((s) -> {
+                long timeOut = s.type().timeOut() * 1000L; // to ms
+
+                if ((System.currentTimeMillis() - s.startTime()) >= timeOut) {
+                    Deployer.killServer(s.name());
+                }
+            });
 
             try {
                 Thread.sleep(2000L);
@@ -366,6 +349,10 @@ public class MineCloudDaemon {
 
     public Node node() {
         return ((NodeRepository) mongo.repositoryBy(Node.class)).nodeBy(node);
+    }
+
+    public RedisDatabase redis() {
+        return redis;
     }
 
     private List<File> files(File directory) {

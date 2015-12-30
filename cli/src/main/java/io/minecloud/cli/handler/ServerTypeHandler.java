@@ -57,6 +57,16 @@ public class ServerTypeHandler extends AbstractHandler {
     }
 
     @Command
+    public String timeOut(@Param(name = "start up timeout (seconds)") int timeOut) {
+        if (timeOut < 15) {
+            return "Invalid time out! Timeout must be greater than or equal to 15!";
+        }
+
+        type.setTimeOut(timeOut);
+        return "Set timeout to " + timeOut + "s successfully!";
+    }
+
+    @Command
     public String maxPlayers(@Param(name = "max-players") int max) {
         if (max < 0) {
             return "Invalid max players!";
@@ -214,6 +224,7 @@ public class ServerTypeHandler extends AbstractHandler {
         list.add("- Is Default: " + (type.defaultServer() ? "Yes" : "No"));
         list.add("- Default World: " + type.defaultWorld().name() + "(" + type.defaultWorld().version() + ")");
         list.add("- Worlds: " + formatWorlds(type.worlds()));
+        list.add("- Timeout: " + type.timeOut());
         list.add("===========================================");
         list.add("If you're ready to go, type 'push'.");
         return list;

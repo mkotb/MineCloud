@@ -27,6 +27,7 @@ import io.minecloud.models.server.World;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Property;
 import org.mongodb.morphia.annotations.Reference;
 
 import java.io.IOException;
@@ -52,6 +53,8 @@ public class ServerType extends MongoEntity {
     private World defaultWorld;
     @Setter
     private List<World> worlds;
+    @Setter
+    private int timeOut = 45; // 45 seconds is the default timeout, allowed for overwriting
 
     public String name() {
         return entityId();
@@ -95,6 +98,10 @@ public class ServerType extends MongoEntity {
         }
 
         return worlds;
+    }
+
+    public int timeOut() {
+        return timeOut;
     }
 
     public void setName(String name) {

@@ -27,6 +27,7 @@ import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerMetadata;
 import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
+import redis.clients.jedis.Jedis;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +59,7 @@ public final class Deployer {
         server.setMetadata(metadata);
         server.setPort(PORT_COUNTER.incrementAndGet());
         server.setContainerId("null");
+        server.setStartTime(System.currentTimeMillis());
 
         try {
             if (isRunning(server.name())) {
@@ -135,6 +137,27 @@ public final class Deployer {
 
     public static long timeStarted(String app) throws IOException {
         return Long.parseLong(Files.readAllLines(Paths.get("/var/minecloud/" + app + "/started.ts")).get(0));
+    }
+
+    public static void killServer(String name) {
+        try (Jedis jedis = MineCloudDaemon.instance().redis().grabResource()) {
+            jedis.hdel("server:" + name, "heartbeat");
+        }
+
+        try {
+            int pid = Deployer.pidOf(name);
+            new ProcessBuilder().command("/usr/bin/kill", "-9", String.valueOf(pid)).start();
+            MineCloud.logger().info("Killed pid " + pid + " belonging to " + name);
+            Deployer.runExit(name);
+            MineCloud.logger().info("Executed exit for " + name + " successfully");
+        } catch (IOException ignored) {
+        }
+
+        try {
+            Runtime.getRuntime().exec(("/usr/bin/rm -rf " + new File("/var/minecloud/" + name)).split(" "));
+            MineCloud.logger().info("Deleted folder of dead server " + name);
+        } catch (IOException ignored) {
+        }
     }
 
     public static void runExit(String app) throws IOException {
