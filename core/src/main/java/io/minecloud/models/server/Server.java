@@ -67,7 +67,7 @@ public class Server extends MongoEntity {
     @Setter
     private List<ServerMetadata> metadata;
     @Setter
-    private long startTime;
+    private long startTime = Long.MAX_VALUE;
 
     public Network network() {
         return network;
