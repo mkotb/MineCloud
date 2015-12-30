@@ -77,8 +77,6 @@ public class MineCloudPlugin extends JavaPlugin {
                     return;
                 }
 
-                server = server();
-
                 server.setRamUsage((int) ((runtime.totalMemory() - runtime.freeMemory()) / 1048576));
                 server.setTps(fetchTps());
                 updatePlayers(server);
