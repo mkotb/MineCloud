@@ -296,6 +296,8 @@ public class MineCloudDaemon {
 
                 if ((System.currentTimeMillis() - s.startTime()) >= timeOut) {
                     Deployer.killServer(s.name());
+                    repository.delete(s);
+                    names.remove(s.name());
                 }
             });
 
