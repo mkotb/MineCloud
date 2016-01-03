@@ -36,7 +36,7 @@ import java.util.stream.IntStream;
 /**
  * A very bad hack to watch statistics on the node
  */
-public class StatisticsWatcher extends Thread {
+class StatisticsWatcher extends Thread {
     private int[] prevTotal;
     private int[] prevIdle;
 

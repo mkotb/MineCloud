@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PluginTypeHandler extends AbstractHandler {
-    PluginType type;
+class PluginTypeHandler extends AbstractHandler {
+    private PluginType type;
 
     PluginTypeHandler(String name) {
         type = MineCloud.instance().mongo()

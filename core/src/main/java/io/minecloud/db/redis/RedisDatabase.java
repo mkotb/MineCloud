@@ -27,7 +27,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.*;
 
-public final class RedisDatabase implements Database {
+public final class  RedisDatabase implements Database {
     private final Map<String, RedisChannel> channels = new HashMap<>();
     private final Credentials credentials;
     private JedisPool pool;

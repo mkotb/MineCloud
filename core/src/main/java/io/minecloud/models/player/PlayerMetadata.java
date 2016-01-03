@@ -15,7 +15,7 @@
  */
 package io.minecloud.models.player;
 
-public class PlayerMetadata {
+class PlayerMetadata {
     private String key;
     private String value;
 
@@ -27,7 +27,7 @@ public class PlayerMetadata {
         this.value = value;
     }
 
-    public String key() {
+    String key() {
         return key;
     }
 

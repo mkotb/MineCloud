@@ -128,12 +128,15 @@ public class MineCloudPlugin extends JavaPlugin {
             if (validateFolder(pluginsContainer, pluginType, version))
                 return;
 
-            for (File f : pluginsContainer.listFiles()) {
-                if (f.isDirectory())
-                    continue; // ignore directories
-                File pl = new File("nplugins/" + f.getName());
+            File[] files;
+            if ((files = pluginsContainer.listFiles()) != null) {
+                for (File f : files) {
+                    if (f.isDirectory())
+                        continue; // ignore directories
+                    File pl = new File("nplugins/" + f.getName());
 
-                FileUtil.copy(f, pl);
+                    FileUtil.copy(f, pl);
+                }
             }
 
             File configs = new File("/mnt/minecloud/configs/",
@@ -163,7 +166,7 @@ public class MineCloudPlugin extends JavaPlugin {
         new File("/var/minecloud/", serverId).deleteOnExit();
     }
 
-    public double fetchTps() {
+    private double fetchTps() {
         try {
             org.bukkit.Server server = Bukkit.getServer();
             Object minecraftServer = server.getClass().getDeclaredMethod("getServer").invoke(server);
@@ -175,20 +178,20 @@ public class MineCloudPlugin extends JavaPlugin {
             return 21;
         }
     }
-    
+
     private boolean validateFolder(File file, PluginType pluginType, String version) {
         if (!file.exists()) {
             getLogger().info(file.getPath() + " does not exist! Cannot load " + pluginType.name());
             return true;
         }
-
-        if (!(file.isDirectory()) || file.listFiles() == null
-                || file.listFiles().length < 1) {
+        File[] files = file.listFiles();
+        if (!(file.isDirectory()) || files == null
+                || files.length < 1) {
             getLogger().info(pluginType.name() + " " + version +
                     " has either no files or has an invalid setup");
             return true;
         }
-        
+
         return false;
     }
 
@@ -197,10 +200,10 @@ public class MineCloudPlugin extends JavaPlugin {
             getLogger().info(file.getPath() + " does not exist! Cannot load " + world.name());
             return true;
         }
-
-        if (!(file.isDirectory()) || file.listFiles() == null
-                || file.listFiles().length < 1) {
-            getLogger().info(world.name() + " " +  world.version() + " has either no files or has an invalid setup");
+        File[] files = file.listFiles();
+        if (!(file.isDirectory()) || files == null
+                || files.length < 1) {
+            getLogger().info(world.name() + " " + world.version() + " has either no files or has an invalid setup");
             return true;
         }
 
@@ -209,14 +212,16 @@ public class MineCloudPlugin extends JavaPlugin {
 
     private void copyFolder(File folder, File folderContainer) {
         folderContainer.mkdirs();
+        File[] files;
+        if ((files = folder.listFiles()) != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    File newContainer = new File(folderContainer, f.getName());
+                    copyFolder(f, newContainer);
+                }
 
-        for (File f : folder.listFiles()) {
-            if (f.isDirectory()) {
-                File newContainer = new File(folderContainer, f.getName());
-                copyFolder(f, newContainer);
+                FileUtil.copy(f, new File(folderContainer, f.getName()));
             }
-
-            FileUtil.copy(f, new File(folderContainer, f.getName()));
         }
     }
 
@@ -239,7 +244,7 @@ public class MineCloudPlugin extends JavaPlugin {
         }
     }
 
-    public void updatePlayers(Server server) {
+    void updatePlayers(Server server) {
         List<PlayerData> onlinePlayers = new ArrayList<>();
 
         Bukkit.getOnlinePlayers().stream()
@@ -257,7 +262,7 @@ public class MineCloudPlugin extends JavaPlugin {
         server.setOnlinePlayers(onlinePlayers);
     }
 
-    public Server server() {
+    Server server() {
         if (server == null) {
             server = Cached.create(25_000, () -> mongo.repositoryBy(Server.class).findFirst(serverId));
         }
@@ -265,7 +270,7 @@ public class MineCloudPlugin extends JavaPlugin {
         return server.get();
     }
 
-    public MongoDatabase mongo() {
+    MongoDatabase mongo() {
         return mongo;
     }
 }

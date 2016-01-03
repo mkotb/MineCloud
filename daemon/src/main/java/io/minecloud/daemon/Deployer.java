@@ -34,17 +34,18 @@ import io.minecloud.models.server.type.ServerType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-public final class Deployer {
+final class Deployer {
     private static final AtomicInteger FAILED_STARTS = new AtomicInteger(0);
 
     private Deployer() {}
 
-    public static void deployServer(Network network, ServerType type, List<ServerMetadata> metadata) {
+    static void deployServer(Network network, ServerType type, List<ServerMetadata> metadata) {
         ServerRepository repository = MineCloud.instance().mongo().repositoryBy(Server.class);
         Server server = new Server();
 
@@ -75,7 +76,7 @@ public final class Deployer {
         }, server.name() + " creator").start();
     }
 
-    public static boolean deployServer(Server server) {
+    private static boolean deployServer(Server server) {
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         String name = server.type().name() + server.number();
@@ -134,14 +135,14 @@ public final class Deployer {
         return true;
     }
 
-    public static void deployBungee(Network network, BungeeType type) {
+    static void deployBungee(Network network, BungeeType type) {
         Bungee bungee;
 
         for (int i = 0; i < 3 && ((bungee = deployBungeeCord(network, type)) == null || bungee.network() == null); i++) {
         }
     }
 
-    public static Bungee deployBungeeCord(Network network, BungeeType type) {
+    private static Bungee deployBungeeCord(Network network, BungeeType type) {
         DockerClient client = MineCloudDaemon.instance().dockerClient();
         BungeeRepository repository = MineCloud.instance().mongo().repositoryBy(Bungee.class);
         Node node = MineCloudDaemon.instance().node();
@@ -177,7 +178,7 @@ public final class Deployer {
         HostConfig hostConfig = HostConfig.builder()
                 .binds("/mnt/minecloud:/mnt/minecloud")
                 .portBindings(new HashMap<String, List<PortBinding>>() {{
-                    put("25565", Arrays.asList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
+                    put("25565", Collections.singletonList(PortBinding.of(node.publicIp(), 25565))); // I'm sorry
                 }})
                 .publishAllPorts(true)
                 .build();
@@ -235,12 +236,12 @@ public final class Deployer {
         private EnvironmentBuilder() {
         }
 
-        public EnvironmentBuilder append(String key, String value) {
+        EnvironmentBuilder append(String key, String value) {
             environmentVars.add(key + "=" + value);
             return this;
         }
 
-        public String[] build() {
+        String[] build() {
             return environmentVars.stream().toArray(String[]::new);
         }
     }

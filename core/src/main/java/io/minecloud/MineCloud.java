@@ -35,7 +35,6 @@ import io.minecloud.models.server.ServerRepository;
 import io.minecloud.models.server.type.ServerType;
 import io.minecloud.models.server.type.ServerTypeRepository;
 import lombok.Setter;
-import org.mongodb.morphia.logging.MorphiaLoggerFactory;
 import org.mongodb.morphia.logging.SilentLogger;
 
 import java.io.File;

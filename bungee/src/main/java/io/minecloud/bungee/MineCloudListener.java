@@ -19,6 +19,7 @@ import io.minecloud.models.bungee.Bungee;
 import io.minecloud.models.server.Server;
 import io.minecloud.models.server.ServerRepository;
 import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
@@ -27,7 +28,7 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.util.Collection;
 
-public class MineCloudListener implements Listener {
+class MineCloudListener implements Listener {
     private long lastUpdated = 0;
     private int onlinePlayers = -1;
     private int maxOnline = -1;
@@ -77,7 +78,7 @@ public class MineCloudListener implements Listener {
 
     @EventHandler
     public void serverKick(ServerKickEvent event) {
-        String reason = event.getKickReason().toLowerCase();
+        String reason = BaseComponent.toLegacyText(event.getKickReasonComponent()).toLowerCase();
 
         if (reason.contains("kick") || reason.contains("ban") || reason.contains("pack")) {
             event.getPlayer().disconnect(event.getKickReasonComponent());

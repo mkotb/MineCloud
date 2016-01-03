@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class BungeeTypeHandler extends AbstractHandler {
-    BungeeType type;
+class BungeeTypeHandler extends AbstractHandler {
+    private BungeeType type;
 
     BungeeTypeHandler(String name) {
         type = MineCloud.instance().mongo()

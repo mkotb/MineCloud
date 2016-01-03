@@ -51,6 +51,7 @@ public abstract class AbstractMongoRepository<T extends MongoEntity> extends Bas
         return find(createQuery().disableValidation()).asList();
     }
 
+    @SuppressWarnings("unchecked")
     public Class<T> modelClass() {
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }

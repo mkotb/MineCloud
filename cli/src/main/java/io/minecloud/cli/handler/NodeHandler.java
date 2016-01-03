@@ -24,8 +24,8 @@ import io.minecloud.models.nodes.type.NodeType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NodeHandler extends AbstractHandler {
-    Node node;
+class NodeHandler extends AbstractHandler {
+    private Node node;
 
     NodeHandler(String name) {
         super();

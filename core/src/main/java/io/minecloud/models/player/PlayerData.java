@@ -62,7 +62,7 @@ public class PlayerData {
         metadata().add(data);
     }
 
-    public Optional<PlayerMetadata> metadataBy(String name) {
+    private Optional<PlayerMetadata> metadataBy(String name) {
         return metadata().stream()
                 .filter((md) -> md.key().equals(name))
                 .findFirst();

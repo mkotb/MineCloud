@@ -17,6 +17,6 @@ package io.minecloud.db;
 
 public interface Database {
 
-    public void setup();
+    void setup();
 
 }

@@ -30,7 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
-public class PlayerTracker implements Listener {
+class PlayerTracker implements Listener {
     private MineCloudPlugin plugin;
 
     PlayerTracker() {

@@ -15,7 +15,6 @@
  */
 package io.minecloud.models.nodes;
 
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 public class CoreMetadata {

@@ -161,7 +161,7 @@ public class Controller {
         return instance;
     }
 
-    public void deployBungee(Network network, BungeeType type) {
+    private void deployBungee(Network network, BungeeType type) {
         BungeeRepository bungeeRepo = mongo.repositoryBy(Bungee.class);
         Node node = null;
 

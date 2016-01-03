@@ -44,7 +44,6 @@ import java.util.logging.Level;
 public class Network extends MongoEntity {
     @Setter
     private List<ServerNetworkMetadata> serverMetadata;
-    @Setter
     private Map<String, Integer> bungees;
     @Setter
     @Reference(lazy = true)

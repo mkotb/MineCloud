@@ -43,7 +43,7 @@ public final class Cached<T> {
         return value;
     }
 
-    public void update() {
+    private void update() {
         this.value = function.get();
         this.lastSet = System.currentTimeMillis();
     }

@@ -327,7 +327,6 @@ public class MineCloudDaemon {
             MineCloud.runSetup(properties, file);
             new MineCloudDaemon(properties);
 
-            properties = null;
             return;
         }
 
@@ -345,22 +344,22 @@ public class MineCloudDaemon {
         new MineCloudDaemon(properties);
     }
 
-    public static MineCloudDaemon instance() {
+    static MineCloudDaemon instance() {
         return instance;
     }
 
-    public Node node() {
+    Node node() {
         return ((NodeRepository) mongo.repositoryBy(Node.class)).nodeBy(node);
     }
 
-    public RedisDatabase redis() {
+    RedisDatabase redis() {
         return redis;
     }
 
     private List<File> files(File directory) {
         List<File> files = new ArrayList<>();
         File[] dirFiles = directory.listFiles();
-        files.addAll(Arrays.asList(dirFiles));
+        files.addAll(Arrays.asList(dirFiles != null ? dirFiles : new File[0]));
 
         return files;
     }
