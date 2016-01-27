@@ -87,18 +87,14 @@ public final class RedisDatabase implements Database {
 
     public boolean connected() {
         boolean connection;
-        Jedis jedis = null;
-        try {
-            jedis = grabResource();
-            connection = true;
+        try (Jedis jedis = grabResource()) {
+            return true;
         } catch (JedisConnectionException e) {
             MineCloud.logger().warning("Redis connection had died, reconnecting.");
             connection = false;
-            this.setup(); //This should work, right?
+            this.setup(); //This should work, right? 
+            // No, it returns the old resource to the new pool
         }
-
-        this.pool.returnResource(jedis);
-
         return connection;
     }
 }
