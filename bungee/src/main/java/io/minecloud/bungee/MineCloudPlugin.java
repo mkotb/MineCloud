@@ -50,9 +50,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class MineCloudPlugin extends Plugin {
-    Cached<Bungee> bungee;
+    private Cached<Bungee> bungee;
     MongoDatabase mongo;
-    RedisDatabase redis;
+    private RedisDatabase redis;
 
     @Override
     public void onEnable() {
@@ -193,21 +193,24 @@ public class MineCloudPlugin extends Plugin {
             if (validateFolder(pluginsContainer, pluginType, version))
                 return;
 
-            for (File f : pluginsContainer.listFiles()) {
-                if (f.isDirectory())
-                    continue; // ignore directories
-                File pl = new File(nContainer, f.getName());
+            File[] files;
+            if ((files = pluginsContainer.listFiles()) != null) {
+                for (File f : files) {
+                    if (f.isDirectory())
+                        continue; // ignore directories
+                    File pl = new File(nContainer, f.getName());
 
-                try {
-                    Files.copy(f, pl);
-                } catch (IOException ex) {
-                    getLogger().log(Level.SEVERE, "Could not load " + pluginType.name() +
-                            ", printing stacktrace...");
-                    ex.printStackTrace();
-                    return;
+                    try {
+                        Files.copy(f, pl);
+                    } catch (IOException ex) {
+                        getLogger().log(Level.SEVERE, "Could not load " + pluginType.name() +
+                                ", printing stacktrace...");
+                        ex.printStackTrace();
+                        return;
+                    }
+
+                    plugins.add(pl);
                 }
-
-                plugins.add(pl);
             }
 
             File configs = new File("/mnt/minecloud/configs/",
@@ -260,8 +263,9 @@ public class MineCloudPlugin extends Plugin {
             return true;
         }
 
-        if (!(file.isDirectory()) || file.listFiles() == null
-                || file.listFiles().length < 1) {
+        File[] files = file.listFiles();
+        if (!(file.isDirectory()) || files == null
+                || files.length < 1) {
             getLogger().info(pluginType.name() + " " + version +
                     " has either no files or has an invalid setup");
             return true;
@@ -273,21 +277,24 @@ public class MineCloudPlugin extends Plugin {
     private void copyFolder(File folder, File folderContainer) {
         folderContainer.mkdirs();
 
-        for (File f : folder.listFiles()) {
-            if (f.isDirectory()) {
-                File newContainer = new File(folderContainer, f.getName());
-                copyFolder(f, newContainer);
-            }
+        File[] files;
+        if ((files = folder.listFiles()) != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    File newContainer = new File(folderContainer, f.getName());
+                    copyFolder(f, newContainer);
+                }
 
-            try {
-                Files.copy(f, new File(folderContainer, f.getName()));
-            } catch (IOException ex) {
-                throw new MineCloudException(ex);
+                try {
+                    Files.copy(f, new File(folderContainer, f.getName()));
+                } catch (IOException ex) {
+                    throw new MineCloudException(ex);
+                }
             }
         }
     }
 
-    public void addServer(Server server) {
+    private void addServer(Server server) {
         ServerInfo info = getProxy().constructServerInfo(server.name(),
                 new InetSocketAddress(server.node().privateIp(), server.port()),
                 "", false);
@@ -297,11 +304,11 @@ public class MineCloudPlugin extends Plugin {
                 ":" + server.port());
     }
 
-    public void removeServer(String server) {
+    private void removeServer(String server) {
         getProxy().getServers().remove(server);
     }
 
-    public Bungee bungee() {
+    Bungee bungee() {
         if (bungee == null) {
             this.bungee = Cached.create(() -> mongo.repositoryBy(Bungee.class).findFirst(System.getenv("bungee_id")));
         }

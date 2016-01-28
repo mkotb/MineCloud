@@ -43,6 +43,7 @@ public class MongoDatabase implements Database {
         return new MongoDatabase(credentials);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends MongoEntity, E extends AbstractMongoRepository<T>> E repositoryBy(Class<T> model) {
         return (E) repositories.get(model);
     }
@@ -70,7 +71,7 @@ public class MongoDatabase implements Database {
     @Override
     public void setup() {
         MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(10000)
-                .heartbeatConnectRetryFrequency(15)
+                .minHeartbeatFrequency(15)
                 .heartbeatConnectTimeout(10)
                 .heartbeatFrequency(10)
                 .heartbeatThreadCount(1)
@@ -96,7 +97,7 @@ public class MongoDatabase implements Database {
             MongoCredential credential = MongoCredential.createMongoCRCredential(credentials.username(),
                     credentials.database(), credentials.password());
 
-            client = new MongoClient(hosts, Arrays.asList(credential), options);
+            client = new MongoClient(hosts, Collections.singletonList(credential), options);
         } else {
             client = new MongoClient(hosts, options);
         }

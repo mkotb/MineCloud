@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ServerTypeHandler extends AbstractHandler {
-    ServerType type;
+class ServerTypeHandler extends AbstractHandler {
+    private ServerType type;
 
     ServerTypeHandler(String name) {
         super();

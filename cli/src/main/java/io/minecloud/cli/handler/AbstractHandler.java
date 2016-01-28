@@ -34,14 +34,14 @@ public abstract class AbstractHandler {
     @Setter
     private Shell current;
 
-    protected AbstractHandler() {
+    AbstractHandler() {
     }
 
     public AbstractHandler(Shell shell) {
         this.current = shell;
     }
 
-    public void enterShell(AbstractHandler subHandler, String name) {
+    void enterShell(AbstractHandler subHandler, String name) {
         try {
             subHandler.current = ShellFactory.createSubshell(name, current, "minecloud", subHandler);
             subHandler.current.commandLoop();
@@ -50,7 +50,7 @@ public abstract class AbstractHandler {
         }
     }
 
-    public String optionPrompt(List<String> options) {
+    String optionPrompt(List<String> options) {
         System.out.println("Available options: (enter number)");
 
         for (int i = 0; i < options.size(); i++) {
@@ -73,7 +73,7 @@ public abstract class AbstractHandler {
         return current;
     }
 
-    public String formatPlugins(List<Plugin> plugins) {
+    String formatPlugins(List<Plugin> plugins) {
         if (plugins == null || plugins.isEmpty())
             return "N/A";
         StringBuilder builder = new StringBuilder();
@@ -93,7 +93,7 @@ public abstract class AbstractHandler {
         return toReturn;
     }
 
-    public String formatStringList(List<String> versions) {
+    String formatStringList(List<String> versions) {
         if (versions == null || versions.isEmpty())
             return "N/A";
         StringBuilder builder = new StringBuilder();
@@ -107,7 +107,7 @@ public abstract class AbstractHandler {
         return toReturn;
     }
 
-    public String formatWorlds(List<World> worlds) {
+    String formatWorlds(List<World> worlds) {
         if (worlds == null || worlds.isEmpty())
             return "N/A";
         StringBuilder builder = new StringBuilder();
@@ -121,7 +121,7 @@ public abstract class AbstractHandler {
         return toReturn;
     }
 
-    public String formatBungees(Map<BungeeType, Integer> bungeeTypes) {
+    String formatBungees(Map<BungeeType, Integer> bungeeTypes) {
         if (bungeeTypes == null || bungeeTypes.isEmpty())
             return "N/A";
 
@@ -139,7 +139,7 @@ public abstract class AbstractHandler {
         return toReturn;
     }
 
-    public String formatNodes(List<Node> nodes) {
+    String formatNodes(List<Node> nodes) {
         if (nodes == null || nodes.isEmpty())
             return "N/A";
         StringBuilder builder = new StringBuilder();

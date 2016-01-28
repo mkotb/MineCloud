@@ -34,11 +34,11 @@ import java.util.stream.Collectors;
  * @param <T>
  */
 public interface MongoRepository<T> {
-    public String collectionName();
+    String collectionName();
 
-    public T findFirst(String id);
+    T findFirst(String id);
 
-    public default Collection<T> findAll(Predicate<T> predicate) {
+    default Collection<T> findAll(Predicate<T> predicate) {
         return models().stream().filter(predicate).collect(Collectors.toList());
     }
 
@@ -46,7 +46,7 @@ public interface MongoRepository<T> {
      * Retrieves all models or entries in the repository
      * @return All models in the repository
      */
-    public Collection<T> models();
+    Collection<T> models();
 
-    public DBCollection collection();
+    DBCollection collection();
 }

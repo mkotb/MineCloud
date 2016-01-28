@@ -302,7 +302,6 @@ public class MineCloudDaemon {
             MineCloud.runSetup(properties, file);
             new MineCloudDaemon(properties);
 
-            properties = null;
             return;
         }
 

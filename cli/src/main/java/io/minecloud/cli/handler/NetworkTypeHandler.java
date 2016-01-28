@@ -26,8 +26,8 @@ import io.minecloud.models.server.type.ServerType;
 
 import java.util.*;
 
-public class NetworkTypeHandler extends AbstractHandler {
-    Network type;
+class NetworkTypeHandler extends AbstractHandler {
+    private Network type;
 
     NetworkTypeHandler(String name) {
         type = MineCloud.instance().mongo()

@@ -62,7 +62,7 @@ public class Node extends MongoEntity {
         return coreMetadata;
     }
 
-    public double totalUsage() {
+    double totalUsage() {
         double total = 0;
 
         for (int i = 0; i < coreMetadata.size(); i++) {
@@ -72,7 +72,7 @@ public class Node extends MongoEntity {
         return total;
     }
 
-    public double usage(int core) {
+    private double usage(int core) {
         if (core >= coreMetadata.size()) {
             return -1;
         }
@@ -80,7 +80,7 @@ public class Node extends MongoEntity {
         return coreMetadata.get(core).usage();
     }
 
-    public double allocatedRam() {
+    double allocatedRam() {
         Collection<Server> servers = MineCloud.instance().mongo()
                 .repositoryBy(Server.class)
                 .findAll((server) -> server.node().name().equals(name()));
@@ -100,7 +100,7 @@ public class Node extends MongoEntity {
         return type.ram() - ramUsed;
     }
 
-    public double availableRam() {
+    double availableRam() {
         return availableRam;
     }
 
@@ -111,7 +111,7 @@ public class Node extends MongoEntity {
                 .collect(Collectors.toList());
     }
 
-    public int serverCount() {
+    int serverCount() {
         return servers().size();
     }
 

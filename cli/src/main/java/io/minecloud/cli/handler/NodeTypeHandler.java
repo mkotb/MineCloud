@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class NodeTypeHandler extends AbstractHandler {
-    NodeType type;
+class NodeTypeHandler extends AbstractHandler {
+    private NodeType type;
 
     NodeTypeHandler(String name) {
         type = MineCloud.instance().mongo()

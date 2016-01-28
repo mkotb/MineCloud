@@ -37,13 +37,13 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-public final class Deployer {
-    public static final AtomicInteger PORT_COUNTER = new AtomicInteger(32812);
+final class Deployer {
+    static final AtomicInteger PORT_COUNTER = new AtomicInteger(32812);
 
     private Deployer() {
     }
 
-    public static void deployServer(Network network, ServerType type, List<ServerMetadata> metadata) {
+    static void deployServer(Network network, ServerType type, List<ServerMetadata> metadata) {
         Credentials mongoCreds = MineCloud.instance().mongo().credentials();
         Credentials redisCreds = MineCloud.instance().redis().credentials();
         ServerRepository repository = MineCloud.instance().mongo().repositoryBy(Server.class);
@@ -93,7 +93,7 @@ public final class Deployer {
         MineCloud.logger().info("Started server " + server.name() + " with container id " + server.containerId());
     }
 
-    public static void deployBungee(Network network, BungeeType type) {
+    static void deployBungee(Network network, BungeeType type) {
         BungeeRepository repository = MineCloud.instance().mongo().repositoryBy(Bungee.class);
         Node node = MineCloudDaemon.instance().node();
         Bungee bungee = new Bungee();
@@ -131,15 +131,15 @@ public final class Deployer {
         MineCloud.logger().info("Started bungee " + bungee.name() + " with id " + bungee.containerId());
     }
 
-    public static int pidOf(String app) throws IOException {
+    static int pidOf(String app) throws IOException {
         return Integer.parseInt(Files.readAllLines(Paths.get("/var/minecloud/" + app + "/app.pid")).get(0));
     }
 
-    public static long timeStarted(String app) throws IOException {
+    static long timeStarted(String app) throws IOException {
         return Long.parseLong(Files.readAllLines(Paths.get("/var/minecloud/" + app + "/started.ts")).get(0));
     }
 
-    public static void killServer(String name) {
+    static void killServer(String name) {
         try (Jedis jedis = MineCloudDaemon.instance().redis().grabResource()) {
             jedis.hdel("server:" + name, "heartbeat");
         }
@@ -160,7 +160,7 @@ public final class Deployer {
         }
     }
 
-    public static void runExit(String app) throws IOException {
+    static void runExit(String app) throws IOException {
         File file = new File("/var/minecloud/" + app + "/exit.sh");
 
         if (!file.exists()) {
@@ -174,7 +174,7 @@ public final class Deployer {
                 .start();
     }
 
-    public static boolean isRunning(String app) throws InterruptedException, IOException {
+    static boolean isRunning(String app) throws InterruptedException, IOException {
         Process process = Runtime.getRuntime().exec("ps -p " + pidOf(app));
 
         process.waitFor();
@@ -212,7 +212,7 @@ public final class Deployer {
 
         try {
             Files.write(Paths.get(runDir.getAbsolutePath(), "init.sh"), startScript);
-            Files.write(Paths.get(runDir.getAbsolutePath(), "started.ts"), Arrays.asList(String.valueOf(System.currentTimeMillis())));
+            Files.write(Paths.get(runDir.getAbsolutePath(), "started.ts"), Collections.singletonList(String.valueOf(System.currentTimeMillis())));
             new File(runDir, "init.sh").setExecutable(true);
 
             Process process = new ProcessBuilder()
@@ -228,7 +228,7 @@ public final class Deployer {
     private static class Container<T> {
         private T value;
 
-        public Container(T value) {
+        Container(T value) {
             this.value = value;
         }
 
@@ -236,11 +236,11 @@ public final class Deployer {
             this.value = null;
         }
 
-        public T get() {
+        T get() {
             return value;
         }
 
-        public void set(T value) {
+        void set(T value) {
             this.value = value;
         }
     }
