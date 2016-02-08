@@ -70,19 +70,13 @@ public class MongoDatabase implements Database {
     @Override
     public void setup() {
         MongoClientOptions options = MongoClientOptions.builder().connectionsPerHost(10000)
-                .heartbeatConnectRetryFrequency(15)
                 .heartbeatConnectTimeout(10)
                 .heartbeatFrequency(10)
-                .heartbeatThreadCount(1)
                 .build();
         List<ServerAddress> hosts = new ArrayList<>();
 
         for (String host : credentials.hosts()) {
-            try {
-                hosts.add(new ServerAddress(host));
-            } catch (UnknownHostException exception) {
-                MineCloud.logger().warning(host + " caused a UnknownHostException: " + exception.getMessage());
-            }
+            hosts.add(new ServerAddress(host));
         }
 
         if (hosts.size() == 0) {

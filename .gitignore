@@ -49,6 +49,9 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+buildNumber.properties
+dependency-reduced-pom.xml
+.mvn/timing.properties
 
 ## Directory-based project format
 .idea/
@@ -95,6 +98,5 @@ application.macosx
 
 ### Some others ###
 MANIFEST.MF
-dependency-reduced-pom.xml
 
 Thumbs.db
