@@ -18,7 +18,7 @@ and lastly, interact with server metadata. This API can also be accessed through
 
 ### Reliability
 
-MineCloud uses a fail-safe system designed to prevent network-breaking exceptions and instead, quietly logs the exceptions for later access.
+MineCloud uses a fail-safe system designed to prevent network-breaking exceptions and instead, quietly logs the exceptions for later access. And breaks a lot.
 
 ## MineCloud's License
 
